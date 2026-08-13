@@ -16,6 +16,8 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { AuthModal } from './components/AuthModal';
 import { VerifiedPortfolioModal } from './components/VerifiedPortfolioModal';
 import { LandingPage } from './components/LandingPage';
+import { CourseCatalog } from './components/CourseCatalog';
+import { CourseDetailPage } from './components/CourseDetailPage';
 import { AboutPage } from './components/AboutPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/TermsOfServicePage';
@@ -27,7 +29,7 @@ import { Play, Sparkles, CheckCheck, ShieldCheck, Check } from 'lucide-react';
 export default function App() {
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [selectedTrackId, setSelectedTrackId] = useState<string>('whatsapp-retail-agent');
-  const [activeNav, setActiveNav] = useState<string>('curriculum');
+  const [activeNav, setActiveNav] = useState<string>('catalog');
   const [viewMode, setViewMode] = useState<'landing' | 'app' | 'about' | 'privacy' | 'terms'>('landing');
 
   // User Account State
@@ -224,7 +226,7 @@ export default function App() {
           selectedTrackId={selectedTrackId}
           onSelectTrack={(id) => {
             setSelectedTrackId(id);
-            setActiveNav('curriculum');
+            setActiveNav('course-detail');
           }}
           onOpenPricing={() => setIsPricingOpen(true)}
           onOpenPortfolio={() => setIsPortfolioOpen(true)}
@@ -236,6 +238,26 @@ export default function App() {
         <main className="flex-1 overflow-y-auto">
           {activeNav === 'community' && (
             <CommunityView user={user} />
+          )}
+
+          {activeNav === 'catalog' && (
+            <CourseCatalog
+              tracks={tracks}
+              onSelectCourse={(id) => {
+                setSelectedTrackId(id);
+                setActiveNav('course-detail');
+              }}
+            />
+          )}
+
+          {activeNav === 'course-detail' && (
+            <CourseDetailPage
+              track={activeTrack}
+              isProUser={isProUser}
+              onBack={() => setActiveNav('catalog')}
+              onStart={() => setActiveNav('curriculum')}
+              onOpenPricing={() => setIsPricingOpen(true)}
+            />
           )}
 
           {activeNav === 'curriculum' && (

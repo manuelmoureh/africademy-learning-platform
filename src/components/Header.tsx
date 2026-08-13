@@ -48,14 +48,14 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Navigation Links */}
       <nav className="hidden md:flex items-center gap-6 lg:gap-8">
         <button
-          onClick={() => setActiveNav('curriculum')}
+          onClick={() => setActiveNav('catalog')}
           className={`text-sm font-bold transition-all cursor-pointer ${
-            activeNav === 'curriculum' 
-              ? 'text-[#12102A] border-b-2 border-[#F5A623] pb-1' 
+            activeNav === 'catalog' || activeNav === 'course-detail' || activeNav === 'curriculum'
+              ? 'text-[#12102A] border-b-2 border-[#F5A623] pb-1'
               : 'text-[#12102A]/60 hover:text-[#12102A]'
           }`}
         >
-          Curriculum
+          Courses
         </button>
 
         <button

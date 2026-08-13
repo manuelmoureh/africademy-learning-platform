@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Verified Portfolio
             </div>
             <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#10B981]/15 text-[#10B981]">
-              98/100
+              Preview
             </span>
           </div>
           <p className="text-[11px] text-[#12102A]/70 leading-relaxed font-medium">
@@ -141,7 +141,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </p>
             </div>
             <p className="text-xs leading-relaxed text-white/80 mb-3.5 font-medium">
-              Unlock steps 06–12, Daraja webhooks, and your verified portfolio.
+              Unlock steps 06-12, real M-Pesa payment code, and your verified portfolio.
             </p>
             <button 
               onClick={onOpenPricing}

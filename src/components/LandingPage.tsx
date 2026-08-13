@@ -89,7 +89,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5A623]/10 border border-[#F5A623]/20">
               <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
               <span className="text-[11px] font-bold font-mono uppercase tracking-wider text-[#12102A]">
-                Now Enrolling — Nairobi Cohort
+                Now Enrolling: Nairobi Cohort
               </span>
             </div>
 
@@ -398,7 +398,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <footer className="px-6 lg:px-12 py-10 bg-[#12102A] text-white/60 text-xs flex flex-col gap-6 border-t border-white/10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="font-semibold text-white/80">
-            Africademy — Nairobi, Kenya
+            Africademy, based in Nairobi, Kenya
           </div>
           <div className="flex items-center gap-6">
             <button onClick={onOpenAbout} className="hover:text-white transition-colors cursor-pointer">About</button>
