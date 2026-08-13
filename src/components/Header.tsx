@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ShieldCheck, Terminal, User, ArrowUpRight, Globe } from 'lucide-react';
+import { Sparkles, ShieldCheck, Terminal, User, ArrowUpRight, Globe, Search, Info } from 'lucide-react';
 import { UserAccount } from '../types';
 
 interface HeaderProps {
@@ -8,9 +8,13 @@ interface HeaderProps {
   onOpenPortfolio: () => void;
   onOpenAuth: () => void;
   onGoHome: () => void;
+  onOpenAbout: () => void;
   activeNav: string;
   setActiveNav: (nav: string) => void;
   user: UserAccount;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  onSearchSubmit: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,9 +23,13 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenPortfolio,
   onOpenAuth,
   onGoHome,
+  onOpenAbout,
   activeNav,
   setActiveNav,
   user,
+  searchQuery,
+  onSearchChange,
+  onSearchSubmit,
 }) => {
   return (
     <header className="flex items-center justify-between px-6 lg:px-8 h-20 bg-white border-b border-[#12102A]/10 select-none shrink-0 z-20">
@@ -44,6 +52,26 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </div>
       </div>
+
+      {/* Search */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSearchSubmit();
+        }}
+        className="hidden lg:flex items-center flex-1 max-w-xs mx-4"
+      >
+        <div className="relative w-full">
+          <Search className="w-4 h-4 text-[#12102A]/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search courses"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#12102A]/10 bg-[#FAF9FC] text-xs font-semibold text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] transition-colors"
+          />
+        </div>
+      </form>
 
       {/* Navigation Links */}
       <nav className="hidden md:flex items-center gap-6 lg:gap-8">
@@ -85,6 +113,14 @@ export const Header: React.FC<HeaderProps> = ({
           Community
         </button>
 
+        <button
+          onClick={onOpenAbout}
+          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] flex items-center gap-1.5 transition-colors cursor-pointer"
+        >
+          <Info className="w-4 h-4 text-[#12102A]/40" />
+          About
+        </button>
+
         {/* User profile & Actions */}
         <div className="flex items-center gap-3 pl-4 lg:pl-6 border-l border-[#12102A]/10">
           <button 
@@ -98,7 +134,8 @@ export const Header: React.FC<HeaderProps> = ({
             {user.plan === 'pro' ? 'PRO ACTIVE' : 'UPGRADE PRO'}
           </button>
 
-          <div 
+          <button
+            type="button"
             onClick={onOpenAuth}
             className="flex items-center gap-2.5 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition-colors"
             title="Click to Switch Profile / Edit Account"
@@ -118,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               {user.initials}
             </div>
-          </div>
+          </button>
         </div>
       </nav>
 

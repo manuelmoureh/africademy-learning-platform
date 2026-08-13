@@ -4,10 +4,21 @@ import { Track } from '../types';
 
 interface CourseCatalogProps {
   tracks: Track[];
+  searchQuery?: string;
   onSelectCourse: (trackId: string) => void;
 }
 
-export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, onSelectCourse }) => {
+export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuery = '', onSelectCourse }) => {
+  const q = searchQuery.trim().toLowerCase();
+  const visibleTracks = q
+    ? tracks.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          t.description.toLowerCase().includes(q) ||
+          t.tags.some((tag) => tag.toLowerCase().includes(q))
+      )
+    : tracks;
+
   return (
     <section className="p-6 md:p-10 max-w-7xl mx-auto w-full space-y-8">
       <div>
@@ -19,8 +30,15 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, onSelectCo
         </p>
       </div>
 
+      {visibleTracks.length === 0 && (
+        <div className="p-8 rounded-2xl border border-dashed border-[#12102A]/20 text-center">
+          <p className="text-sm font-bold text-[#12102A]">No courses match "{searchQuery}"</p>
+          <p className="text-xs text-[#12102A]/60 mt-1">Try WhatsApp, leads, invoicing, or support.</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tracks.map((track) => (
+        {visibleTracks.map((track) => (
           <button
             key={track.id}
             onClick={() => onSelectCourse(track.id)}

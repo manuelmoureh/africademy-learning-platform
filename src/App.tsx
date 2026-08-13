@@ -30,6 +30,7 @@ export default function App() {
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [selectedTrackId, setSelectedTrackId] = useState<string>('whatsapp-retail-agent');
   const [activeNav, setActiveNav] = useState<string>('catalog');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'landing' | 'app' | 'about' | 'privacy' | 'terms'>('landing');
 
   // User Account State
@@ -215,7 +216,11 @@ export default function App() {
         onOpenPortfolio={() => setIsPortfolioOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
         onGoHome={() => setViewMode('landing')}
+        onOpenAbout={() => setViewMode('about')}
         user={user}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={() => setActiveNav('catalog')}
       />
 
       {/* Main Learning Hub Layout */}
@@ -243,6 +248,7 @@ export default function App() {
           {activeNav === 'catalog' && (
             <CourseCatalog
               tracks={tracks}
+              searchQuery={searchQuery}
               onSelectCourse={(id) => {
                 setSelectedTrackId(id);
                 setActiveNav('course-detail');

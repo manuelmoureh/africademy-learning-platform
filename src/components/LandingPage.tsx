@@ -1,9 +1,15 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
   Check, Users
 } from 'lucide-react';
 import { Track } from '../types';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -28,6 +34,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenTerms,
   tracks,
 }) => {
+  const reduce = useReducedMotion();
+
   return (
     <div className="min-h-screen bg-[#FAF9FC] text-[#12102A] flex flex-col">
       {/* Top Navbar — translucent, stays legible over whatever scrolls beneath it */}
@@ -81,8 +89,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </nav>
 
       {/* Hero Section */}
-      <section className="px-6 lg:px-12 py-16 md:py-24 max-w-6xl mx-auto w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="relative px-6 lg:px-12 py-16 md:py-24 max-w-6xl mx-auto w-full overflow-hidden">
+        {/* Subtle living background: a soft amber glow that breathes, motivated by the "still alive" ask, not decoration for its own sake */}
+        {!reduce && (
+          <motion.div
+            aria-hidden
+            className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#F5A623]/10 blur-3xl pointer-events-none"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
           {/* Left Column: Heading & CTAs */}
           <div className="lg:col-span-7 space-y-6">
@@ -215,9 +232,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tracks.map((track) => (
-              <div
+            {tracks.map((track, i) => (
+              <motion.div
                 key={track.id}
+                initial={reduce ? false : 'hidden'}
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={fadeUp}
+                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col justify-between hover:border-[#F5A623] transition-all group"
               >
                 <div>
@@ -250,7 +272,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     See the Steps <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -259,7 +281,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Verified Portfolio vs Certificate Section */}
       <section className="px-6 lg:px-12 py-16 max-w-6xl mx-auto w-full space-y-8">
-        <div className="p-8 md:p-12 rounded-3xl bg-[#12102A] text-white flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden">
+        <motion.div
+          initial={reduce ? false : 'hidden'}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeUp}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="p-8 md:p-12 rounded-3xl bg-[#12102A] text-white flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden">
           <div className="space-y-4 max-w-xl">
             <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
               Not a Certificate. A Working System, Live, With Your Name on It.
@@ -301,7 +329,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Pricing Comparison Section */}

@@ -93,9 +93,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </ul>
 
         {/* Verified Portfolio Trigger Card */}
-        <div 
+        <button
+          type="button"
           onClick={onOpenPortfolio}
-          className="mt-6 p-4 rounded-xl bg-[#FAF9FC] border border-[#10B981]/30 hover:border-[#10B981] transition-all cursor-pointer group"
+          className="w-full text-left mt-6 p-4 rounded-xl bg-[#FAF9FC] border border-[#10B981]/30 hover:border-[#10B981] transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#12102A]">
@@ -109,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <p className="text-[11px] text-[#12102A]/70 leading-relaxed font-medium">
             Live public link & 5-point SME engineering audit preview.
           </p>
-        </div>
+        </button>
 
         {/* Track Specifications */}
         <div className="mt-6 pt-4 border-t border-[#12102A]/10">
