@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star, ChevronDown } from 'lucide-react';
 import { Track } from '../types';
+import { TrackIcon } from '../utils/trackIcons';
 
 const ModuleRow: React.FC<{ step: Track['steps'][number]; isProUser: boolean }> = ({ step, isProUser }) => {
   const [showReviews, setShowReviews] = useState(false);
@@ -94,9 +95,14 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
         {/* Left: overview + curriculum */}
         <div className="lg:col-span-2 space-y-8">
           <div>
-            <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider">
-              {track.trackNumber}
-            </span>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-[#F5A623]/10 flex items-center justify-center shrink-0">
+                <TrackIcon name={track.icon} className="w-4 h-4 text-[#F5A623]" />
+              </div>
+              <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider">
+                {track.trackNumber}
+              </span>
+            </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[#12102A] tracking-tight mt-1">
               {track.title}
             </h1>

@@ -64,6 +64,7 @@ export const INITIAL_TRACKS: Track[] = [
     trackNumber: 'Track 01: Core Commerce',
     title: 'WhatsApp AI Agent for Kenyan Retail',
     category: 'Conversational Commerce',
+    icon: 'MessageSquare',
     status: 'active',
     progress: 42,
     totalSteps: 12,
@@ -331,6 +332,7 @@ Check the LIVE INVENTORY table before answering.
     trackNumber: 'Track 02: Growth Engines',
     title: 'Lead Qualification Agent for Real Estate',
     category: 'Lead Generation',
+    icon: 'UserPlus',
     status: 'upcoming',
     progress: 0,
     totalSteps: 8,
@@ -422,6 +424,7 @@ Check the LIVE INVENTORY table before answering.
     trackNumber: 'Track 03: SME Finance',
     title: 'Invoicing & Receipt AI Assistant',
     category: 'Financial Automation',
+    icon: 'Receipt',
     status: 'upcoming',
     progress: 0,
     totalSteps: 10,
@@ -486,6 +489,398 @@ Check the LIVE INVENTORY table before answering.
             'Sending instant thank-you receipts to the payer'
           ]
         }
+      }
+    ]
+  },
+  {
+    id: 'support-ticketing-agent',
+    trackNumber: 'Track 04: Support Ops',
+    title: 'AI Customer Support & Ticketing Agent',
+    category: 'Support Operations',
+    icon: 'Headset',
+    status: 'upcoming',
+    progress: 0,
+    totalSteps: 6,
+    completedSteps: 0,
+    description: 'Build a multi-channel support agent that triages WhatsApp and email complaints, searches a business FAQ knowledge base, and escalates unresolved issues to a human agent with full conversation context attached.',
+    badgeTitle: 'Verified Support Automation Engineer',
+    tags: ['Knowledge Base RAG', 'Ticket Escalation', 'Sentiment Detection'],
+    steps: [
+      {
+        id: 'sup-step-1',
+        number: '01',
+        title: 'FAQ Knowledge Base & Retrieval',
+        subtitle: 'Answering from a business\'s real policies, not guesses',
+        status: 'locked',
+        duration: '35 min',
+        category: 'Architecture',
+        summary: 'Indexing a business\'s actual return policy, hours, and product FAQs so the agent answers from real source material.',
+        isGated: true,
+        content: {
+          overview: 'Build a retrieval-augmented pipeline that grounds every answer in the business\'s actual documented policies, never inventing a return window or price that was never confirmed.',
+          keyLearnings: [
+            'Chunking and embedding a small business knowledge base',
+            'Retrieval-augmented prompting to avoid hallucinated policy answers',
+            'Confidence thresholds for when to answer versus escalate'
+          ]
+        },
+        reviews: []
+      },
+      {
+        id: 'sup-step-2',
+        number: '02',
+        title: 'Escalation & Human Handoff',
+        subtitle: 'Knowing exactly when to stop and call a person',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Flow Design',
+        summary: 'Detecting frustration and complexity signals that mean a human needs to take over, with the full conversation history attached.',
+        isGated: true,
+        content: {
+          overview: 'Design the handoff moment: sentiment detection, repeated unresolved queries, and explicit request-for-human triggers, each handing the human agent a clean summary instead of a raw transcript.',
+          keyLearnings: [
+            'Basic sentiment and frustration signal detection',
+            'Structuring a clean handoff summary for a human agent',
+            'Never leaving the customer without an acknowledgment'
+          ]
+        },
+        reviews: []
+      }
+    ]
+  },
+  {
+    id: 'booking-scheduler-agent',
+    trackNumber: 'Track 05: Service Ops',
+    title: 'AI Booking & Appointment Scheduler',
+    category: 'Scheduling Automation',
+    icon: 'Calendar',
+    status: 'upcoming',
+    progress: 0,
+    totalSteps: 6,
+    completedSteps: 0,
+    description: 'Build a WhatsApp booking agent for salons, clinics, and repair shops that checks real calendar availability, confirms appointments, and sends automatic reminders before no-shows happen.',
+    badgeTitle: 'Verified Scheduling Automation Specialist',
+    tags: ['Calendar API', 'Reminder Automation', 'No-Show Reduction'],
+    steps: [
+      {
+        id: 'book-step-1',
+        number: '01',
+        title: 'Real-Time Availability Lookups',
+        subtitle: 'Never double-booking a slot',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Integrations',
+        summary: 'Connecting to a live calendar so the agent only ever offers slots that are genuinely free.',
+        isGated: true,
+        content: {
+          overview: 'Wire the agent to Google Calendar so every offered time slot reflects the real, current schedule, not a stale cached copy.',
+          keyLearnings: [
+            'Calendar API read/write with conflict checking',
+            'Offering slots conversationally instead of a rigid form',
+            'Handling timezone edge cases for remote clients'
+          ]
+        },
+        reviews: []
+      },
+      {
+        id: 'book-step-2',
+        number: '02',
+        title: 'Automated Reminders & No-Show Reduction',
+        subtitle: 'Following up before the appointment, not after',
+        status: 'locked',
+        duration: '25 min',
+        category: 'Automation',
+        summary: 'Scheduling reminder messages timed to actually reduce no-shows, with an easy reschedule path built in.',
+        isGated: true,
+        content: {
+          overview: 'Build the reminder sequence: a confirmation on booking, a reminder the day before, and a same-morning nudge, each with a one-tap reschedule link.',
+          keyLearnings: [
+            'Timed message scheduling against calendar events',
+            'One-tap reschedule flows inside WhatsApp',
+            'Measuring no-show rate before and after automation'
+          ]
+        },
+        reviews: []
+      }
+    ]
+  },
+  {
+    id: 'social-content-agent',
+    trackNumber: 'Track 06: Marketing Ops',
+    title: 'AI Social Media Content Assistant',
+    category: 'Marketing Automation',
+    icon: 'Megaphone',
+    status: 'upcoming',
+    progress: 0,
+    totalSteps: 5,
+    completedSteps: 0,
+    description: 'Build an agent that turns a business owner\'s voice notes into ready-to-post captions for Instagram and Facebook, scheduled automatically around real engagement patterns.',
+    badgeTitle: 'Verified Marketing Automation Specialist',
+    tags: ['Content Generation', 'Post Scheduling', 'Voice-to-Caption'],
+    steps: [
+      {
+        id: 'soc-step-1',
+        number: '01',
+        title: 'Voice Note to Caption Pipeline',
+        subtitle: 'From a 30-second voice note to a ready post',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Content Engine',
+        summary: 'Transcribing a business owner\'s spoken update and turning it into a clean, on-brand caption automatically.',
+        isGated: true,
+        content: {
+          overview: 'Build the pipeline: transcribe the voice note, extract the actual news (new stock, a sale, a closure), then draft a caption in the business\'s own established tone.',
+          keyLearnings: [
+            'Speech-to-text for informal spoken Kenyan English/Swahili',
+            'Extracting the actual announcement from a rambling voice note',
+            'Keeping generated captions in the business\'s real voice, not generic marketing-speak'
+          ]
+        },
+        reviews: []
+      },
+      {
+        id: 'soc-step-2',
+        number: '02',
+        title: 'Scheduled Posting',
+        subtitle: 'Publishing at the times that actually get seen',
+        status: 'locked',
+        duration: '25 min',
+        category: 'Automation',
+        summary: 'Queuing approved posts to go out automatically at times that reflect the business\'s real audience activity.',
+        isGated: true,
+        content: {
+          overview: 'Connect to the Meta Graph API to schedule approved posts, with a simple approval step so nothing goes live without the owner seeing it first.',
+          keyLearnings: [
+            'Meta Graph API post scheduling',
+            'A lightweight human-approval gate before anything publishes',
+            'Basic engagement tracking on published posts'
+          ]
+        },
+        reviews: []
+      }
+    ]
+  },
+  {
+    id: 'inventory-restock-agent',
+    trackNumber: 'Track 07: Supply Chain',
+    title: 'AI Inventory & Restock Alert Agent',
+    category: 'Supply Chain Automation',
+    icon: 'Package',
+    status: 'upcoming',
+    progress: 0,
+    totalSteps: 6,
+    completedSteps: 0,
+    description: 'Build an agent that watches stock levels in real time, predicts when a Kenyan SME will run out based on real sales velocity, and messages the supplier to reorder before shelves go empty.',
+    badgeTitle: 'Verified Supply Chain Automation Engineer',
+    tags: ['Stock Forecasting', 'Supplier Messaging', 'Reorder Triggers'],
+    steps: [
+      {
+        id: 'inv2-step-1',
+        number: '01',
+        title: 'Sales Velocity & Stockout Prediction',
+        subtitle: 'Knowing you\'ll run out before you actually do',
+        status: 'locked',
+        duration: '35 min',
+        category: 'Forecasting',
+        summary: 'Calculating real sell-through rate per SKU to predict a stockout date, not just watching a static low-stock number.',
+        isGated: true,
+        content: {
+          overview: 'Build a simple velocity model from real order history so the agent flags "this SKU runs out in 4 days" instead of a flat threshold that\'s wrong half the time.',
+          keyLearnings: [
+            'Basic sales-velocity calculation from order data',
+            'Setting realistic reorder points per product',
+            'Avoiding false alerts from one-off bulk orders'
+          ]
+        },
+        reviews: []
+      },
+      {
+        id: 'inv2-step-2',
+        number: '02',
+        title: 'Automated Supplier Reorder Messaging',
+        subtitle: 'Sending the actual reorder request, not just an alert',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Automation',
+        summary: 'Drafting and sending a real reorder message to the supplier\'s WhatsApp with the exact quantities needed.',
+        isGated: true,
+        content: {
+          overview: 'Close the loop: once a stockout is predicted, generate the actual supplier order message with quantities and delivery deadline, not just an internal notification nobody acts on.',
+          keyLearnings: [
+            'Structured reorder message generation',
+            'Confirming supplier receipt and expected delivery date',
+            'Logging reorder history for future forecasting'
+          ]
+        },
+        reviews: []
+      }
+    ]
+  },
+  {
+    id: 'hr-screening-agent',
+    trackNumber: 'Track 08: HR Ops',
+    title: 'AI Hiring & CV Screening Agent',
+    category: 'HR Automation',
+    icon: 'FileCheck',
+    status: 'upcoming',
+    progress: 0,
+    totalSteps: 5,
+    completedSteps: 0,
+    description: 'Build an agent that screens incoming job applications against a role\'s actual requirements, ranks candidates fairly, and messages shortlisted applicants to schedule an interview.',
+    badgeTitle: 'Verified HR Automation Specialist',
+    tags: ['Resume Parsing', 'Candidate Ranking', 'Interview Scheduling'],
+    steps: [
+      {
+        id: 'hr-step-1',
+        number: '01',
+        title: 'Structured Resume Parsing',
+        subtitle: 'Extracting real qualifications, not keyword guessing',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Data Extraction',
+        summary: 'Parsing CVs into structured fields the agent can actually reason about, years of experience, specific skills, location.',
+        isGated: true,
+        content: {
+          overview: 'Build a parser that extracts real structured data from varied CV formats, so ranking is based on actual qualifications, not just resumes with the right buzzwords.',
+          keyLearnings: [
+            'Structured extraction from unstructured CV text and PDFs',
+            'Handling inconsistent formats without breaking',
+            'Flagging fields the parser genuinely couldn\'t extract, instead of guessing'
+          ]
+        },
+        reviews: []
+      },
+      {
+        id: 'hr-step-2',
+        number: '02',
+        title: 'Fair Ranking & Interview Scheduling',
+        subtitle: 'A defensible shortlist, then a booked interview',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Automation',
+        summary: 'Scoring candidates against the role\'s actual stated requirements, then handing shortlisted candidates a real interview slot.',
+        isGated: true,
+        content: {
+          overview: 'Rank candidates against explicit, stated job requirements only, avoiding proxies that could introduce bias, then message the shortlist directly to book a real interview time.',
+          keyLearnings: [
+            'Scoring against explicit stated requirements, not inferred proxies',
+            'Keeping a human reviewer in the loop before any rejection is sent',
+            'Automated interview slot booking for shortlisted candidates'
+          ]
+        },
+        reviews: []
+      }
+    ]
+  },
+  {
+    id: 'payment-collections-agent',
+    trackNumber: 'Track 09: Collections Ops',
+    title: 'AI Overdue Payment Follow-Up Agent',
+    category: 'Collections Automation',
+    icon: 'AlertCircle',
+    status: 'upcoming',
+    progress: 0,
+    totalSteps: 5,
+    completedSteps: 0,
+    description: 'Build an agent that tracks unpaid invoices, sends a polite escalating sequence of WhatsApp payment reminders with a live M-Pesa link, and flags genuinely stuck accounts for a human to call.',
+    badgeTitle: 'Verified Collections Automation Engineer',
+    tags: ['Escalation Sequencing', 'M-Pesa Payment Links', 'Aging Reports'],
+    steps: [
+      {
+        id: 'col-step-1',
+        number: '01',
+        title: 'Overdue Detection & Escalation Sequencing',
+        subtitle: 'Polite first, firm later, never rude',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Flow Design',
+        summary: 'Designing a reminder sequence that escalates tone appropriately as an invoice ages, without ever crossing into harassment.',
+        isGated: true,
+        content: {
+          overview: 'Build a staged sequence: a friendly nudge at day 1 overdue, a firmer reminder at day 7, and a flag for human follow-up at day 21, each with a real M-Pesa payment link attached.',
+          keyLearnings: [
+            'Aging-based message sequencing',
+            'Tone calibration so reminders stay professional, never harassing',
+            'Attaching a working payment link to every reminder'
+          ]
+        },
+        reviews: []
+      },
+      {
+        id: 'col-step-2',
+        number: '02',
+        title: 'Aging Reports & Human Escalation',
+        subtitle: 'Knowing which accounts genuinely need a phone call',
+        status: 'locked',
+        duration: '25 min',
+        category: 'Reporting',
+        summary: 'Generating a real accounts-aging view and flagging accounts that need a human call instead of another automated message.',
+        isGated: true,
+        content: {
+          overview: 'Build the aging report and the escalation rule: after N automated reminders with no response, stop messaging and flag the account for a human to call directly.',
+          keyLearnings: [
+            'Basic accounts-receivable aging report generation',
+            'Setting a sane automation-to-human handoff threshold',
+            'Avoiding endless automated messaging on accounts that won\'t respond'
+          ]
+        },
+        reviews: []
+      }
+    ]
+  },
+  {
+    id: 'food-ordering-agent',
+    trackNumber: 'Track 10: Hospitality Ops',
+    title: 'AI Food Ordering & Delivery Agent',
+    category: 'Hospitality Automation',
+    icon: 'UtensilsCrossed',
+    status: 'upcoming',
+    progress: 0,
+    totalSteps: 5,
+    completedSteps: 0,
+    description: 'Build a WhatsApp ordering agent for a Kenyan restaurant that reads the daily menu, takes orders with modifications, calculates delivery fees by estate, and hands off confirmed orders to the kitchen and rider.',
+    badgeTitle: 'Verified Hospitality Automation Specialist',
+    tags: ['Menu Parsing', 'Delivery Fee Calculation', 'Kitchen Handoff'],
+    steps: [
+      {
+        id: 'food-step-1',
+        number: '01',
+        title: 'Menu Parsing & Order Capture',
+        subtitle: 'Taking an order with real modifications',
+        status: 'locked',
+        duration: '30 min',
+        category: 'Architecture',
+        summary: 'Handling a real order with substitutions and special requests, not just a rigid numbered menu list.',
+        isGated: true,
+        content: {
+          overview: 'Build an order-capture flow that understands modifications ("no onions", "extra spicy") against a structured daily menu, confirming the full order back before checkout.',
+          keyLearnings: [
+            'Structuring a daily menu for reliable agent lookups',
+            'Handling free-text modifications without breaking the order schema',
+            'Confirming the full order back to the customer before payment'
+          ]
+        },
+        reviews: []
+      },
+      {
+        id: 'food-step-2',
+        number: '02',
+        title: 'Delivery Fee Calculation & Kitchen Handoff',
+        subtitle: 'From confirmed order to the kitchen and the rider',
+        status: 'locked',
+        duration: '25 min',
+        category: 'Operations',
+        summary: 'Calculating delivery fees by estate and handing the confirmed order straight to kitchen and rider, no manual relay.',
+        isGated: true,
+        content: {
+          overview: 'Close the loop: calculate the delivery fee based on the customer\'s estate, confirm payment, and push the order directly to a kitchen display and rider dispatch, removing the manual phone-relay step.',
+          keyLearnings: [
+            'Estate-based delivery fee lookup tables',
+            'Direct kitchen order handoff without manual re-entry',
+            'Rider dispatch notification with delivery address'
+          ]
+        },
+        reviews: []
       }
     ]
   }

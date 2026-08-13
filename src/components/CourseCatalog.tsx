@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Track } from '../types';
+import { TrackIcon } from '../utils/trackIcons';
 
 interface CourseCatalogProps {
   tracks: Track[];
@@ -46,13 +47,17 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
           >
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider">
-                  {track.trackNumber}
-                </span>
+                <div className="w-10 h-10 rounded-lg bg-[#12102A]/5 flex items-center justify-center group-hover:bg-[#F5A623]/15 transition-colors">
+                  <TrackIcon name={track.icon} className="w-5 h-5 text-[#12102A] group-hover:text-[#F5A623] transition-colors" />
+                </div>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#12102A] text-white">
-                  {track.steps.length || 8} lessons
+                  {track.steps.length || track.totalSteps} lessons
                 </span>
               </div>
+
+              <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider block mb-1">
+                {track.trackNumber}
+              </span>
 
               <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors">
                 {track.title}

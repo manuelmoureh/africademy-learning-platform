@@ -1,6 +1,7 @@
 import React from 'react';
-import { Lock, Sparkles, ShieldCheck, CheckCircle2, Terminal } from 'lucide-react';
+import { Lock, Sparkles, ShieldCheck, CheckCircle2, Terminal, Target, MessageCircle, Smartphone } from 'lucide-react';
 import { Track } from '../types';
+import { TrackIcon } from '../utils/trackIcons';
 
 interface SidebarProps {
   tracks: Track[];
@@ -29,7 +30,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Active Track Highlight Box */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#12102A]/40 font-mono">
+          <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#12102A]/40 font-mono flex items-center gap-1.5">
+            <Target className="w-3 h-3" />
             Active Track
           </h3>
           <span className="flex h-2 w-2 relative">
@@ -39,9 +41,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="p-4 rounded-xl border-2 border-[#F5A623] bg-[#F5A623]/5 transition-all hover:bg-[#F5A623]/10">
-          <span className="text-[9px] font-mono font-bold uppercase text-[#F5A623] block mb-1">
-            {activeTrack.trackNumber}
-          </span>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-6 h-6 rounded-md bg-[#F5A623]/20 flex items-center justify-center shrink-0">
+              <TrackIcon name={activeTrack.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
+            </div>
+            <span className="text-[9px] font-mono font-bold uppercase text-[#F5A623]">
+              {activeTrack.trackNumber}
+            </span>
+          </div>
           <p className="font-bold text-sm text-[#12102A] leading-snug">
             {activeTrack.title}
           </p>
@@ -77,13 +84,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => onSelectTrack(track.id)}
               className="p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-[#FAF9FC] border border-[#12102A]/5 hover:border-[#F5A623] group"
             >
-              <div className="min-w-0 pr-2">
-                <span className="text-[9px] font-mono font-bold text-[#12102A]/40 block uppercase">
-                  {track.trackNumber}
-                </span>
-                <span className="text-xs font-bold text-[#12102A]/80 group-hover:text-[#12102A] transition-colors truncate block">
-                  {track.title}
-                </span>
+              <div className="flex items-center gap-2 min-w-0 pr-2">
+                <div className="w-7 h-7 rounded-md bg-[#12102A]/5 flex items-center justify-center shrink-0 group-hover:bg-[#F5A623]/15 transition-colors">
+                  <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#12102A]/60 group-hover:text-[#F5A623] transition-colors" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-mono font-bold text-[#12102A]/40 block uppercase">
+                    {track.trackNumber}
+                  </span>
+                  <span className="text-xs font-bold text-[#12102A]/80 group-hover:text-[#12102A] transition-colors truncate block">
+                    {track.title}
+                  </span>
+                </div>
               </div>
               <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 shrink-0">
                 {track.steps.length} STEPS
@@ -118,13 +130,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             Stack Specifications
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <span className="text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+              <MessageCircle className="w-2.5 h-2.5" />
               Meta WhatsApp v21.0
             </span>
-            <span className="text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+              <Sparkles className="w-2.5 h-2.5" />
               Gemini 3.7 Flash
             </span>
-            <span className="text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+              <Smartphone className="w-2.5 h-2.5" />
               Safaricom Daraja
             </span>
           </div>

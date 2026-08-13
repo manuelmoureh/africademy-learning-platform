@@ -30,11 +30,24 @@ export interface Step {
   reviews?: Review[];
 }
 
+export type TrackIconName =
+  | 'MessageSquare'
+  | 'UserPlus'
+  | 'Receipt'
+  | 'Headset'
+  | 'Calendar'
+  | 'Megaphone'
+  | 'Package'
+  | 'FileCheck'
+  | 'AlertCircle'
+  | 'UtensilsCrossed';
+
 export interface Track {
   id: string;
   trackNumber: string;
   title: string;
   category: string;
+  icon: TrackIconName;
   status: 'active' | 'upcoming' | 'completed';
   progress: number;
   totalSteps: number;
