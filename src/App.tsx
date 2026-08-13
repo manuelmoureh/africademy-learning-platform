@@ -16,6 +16,9 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { AuthModal } from './components/AuthModal';
 import { VerifiedPortfolioModal } from './components/VerifiedPortfolioModal';
 import { LandingPage } from './components/LandingPage';
+import { AboutPage } from './components/AboutPage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
+import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { CommunityView } from './components/CommunityView';
 import { INITIAL_TRACKS, INITIAL_PORTFOLIO_VERIFICATION } from './data/courses';
 import { Step, Track, UserAccount, PortfolioVerification } from './types';
@@ -25,7 +28,7 @@ export default function App() {
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [selectedTrackId, setSelectedTrackId] = useState<string>('whatsapp-retail-agent');
   const [activeNav, setActiveNav] = useState<string>('curriculum');
-  const [viewMode, setViewMode] = useState<'landing' | 'app'>('landing');
+  const [viewMode, setViewMode] = useState<'landing' | 'app' | 'about' | 'privacy' | 'terms'>('landing');
 
   // User Account State
   const [user, setUser] = useState<UserAccount>({
@@ -106,6 +109,18 @@ export default function App() {
     setTimeout(() => setShowUpgradeToast(false), 5000);
   };
 
+  if (viewMode === 'about') {
+    return <AboutPage onBack={() => setViewMode('landing')} />;
+  }
+
+  if (viewMode === 'privacy') {
+    return <PrivacyPolicyPage onBack={() => setViewMode('landing')} />;
+  }
+
+  if (viewMode === 'terms') {
+    return <TermsOfServicePage onBack={() => setViewMode('landing')} />;
+  }
+
   // If on Landing Page view
   if (viewMode === 'landing') {
     return (
@@ -116,6 +131,9 @@ export default function App() {
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenSandbox={() => setIsSandboxOpen(true)}
           onOpenPortfolio={() => setIsPortfolioOpen(true)}
+          onOpenAbout={() => setViewMode('about')}
+          onOpenPrivacy={() => setViewMode('privacy')}
+          onOpenTerms={() => setViewMode('terms')}
           tracks={tracks}
         />
 
