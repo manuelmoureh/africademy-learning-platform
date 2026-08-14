@@ -196,6 +196,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <p className="relative text-[10px] text-[#12102A]/40 mt-2 max-w-6xl">*Based on current Nairobi freelance market rates for AI automation builders. Not a guaranteed income.</p>
       </section>
 
+      {/* Category Strip */}
+      <section className="px-6 lg:px-12 py-10 max-w-6xl mx-auto w-full">
+        <p className="text-[11px] font-bold text-[#12102A]/50 uppercase tracking-wider mb-4">Browse by Category</p>
+        <div className="flex flex-wrap gap-2.5">
+          {tracks.map((track) => (
+            <div
+              key={track.id}
+              className="flex items-center gap-2 pl-2.5 pr-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:border-[#F5A623] transition-colors"
+            >
+              <span className="w-7 h-7 rounded-full bg-[#F5A623]/15 flex items-center justify-center shrink-0">
+                <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
+              </span>
+              <span className="text-xs font-bold text-[#12102A]">{track.category}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Curriculum Tracks Section */}
       <section className="px-6 lg:px-12 py-16 bg-white border-y border-[#12102A]/10">
         <div className="max-w-6xl mx-auto space-y-12">
