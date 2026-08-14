@@ -100,7 +100,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.05]">
-              Build AI Tools. Get Paid by Real Businesses.
+              Build AI Tools. Get Paid by <span className="italic text-[#F5A623]">Real</span> Businesses.
             </h1>
 
             <p className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl">
@@ -146,32 +146,37 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
-          {/* Right Column: two large image tiles, not a cramped grid */}
+          {/* Right Column: one dominant photo with floating proof badges, not a tile grid */}
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-2 gap-4 h-full">
-              <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] min-h-[340px] sm:min-h-[440px]">
-                <img
-                  src="/hero-photo.jpg"
-                  alt="A learner building a real AI system"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-                <div className="absolute top-3 left-3 bg-white text-[#12102A] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-[#10B981]" />
-                  Verified builds
+            <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] min-h-[420px] sm:min-h-[520px]">
+              <img
+                src="/hero-photo.jpg"
+                alt="A learner building a real AI system"
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+
+              {/* Floating badges, referencing the reference layouts */}
+              <div className="absolute top-4 right-4 bg-[#12102A] text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg">
+                10 Business Systems
+              </div>
+
+              <div className="absolute top-20 left-4 bg-white rounded-xl shadow-lg p-3 max-w-[170px]">
+                <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick your track</p>
+                <div className="flex flex-wrap gap-1">
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Sales</span>
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Finance</span>
                 </div>
               </div>
 
-              <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-[#FAF9FC] min-h-[340px] sm:min-h-[440px]">
-                <img
-                  src="/hero-illustration.jpg"
-                  alt="An AI automation workflow"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-                <div className="absolute bottom-3 left-3 bg-white text-[#12102A] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-                  10 real systems
-                </div>
+              <div className="absolute bottom-4 left-4 bg-white text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
+                Verified, not self-reported
+              </div>
+
+              <div className="absolute bottom-4 right-4 bg-[#F5A623] text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg">
+                80K&ndash;400K KES/mo*
               </div>
             </div>
           </div>
