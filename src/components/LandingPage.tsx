@@ -230,10 +230,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#12102A]/10 shadow-sm">
               <div className="flex items-center gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-[#F5A623] text-[#F5A623]" />
+                  <div key={i} className="w-4 h-4 rounded-[3px] bg-[#00B67A] flex items-center justify-center">
+                    <Star className="w-2.5 h-2.5 fill-white text-white" />
+                  </div>
                 ))}
               </div>
-              <span className="text-[11px] font-bold text-[#12102A]">4.9 on Trustpilot</span>
+              <span className="text-[11px] font-bold text-[#12102A]">4.9 <span className="font-semibold text-[#12102A]/50">on</span> Trustpilot</span>
             </div>
 
             <motion.h1
@@ -286,7 +288,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned by our students</p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={30} prefix="KES " suffix="K+" /></p>
+                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={60} prefix="KES " suffix="K+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned monthly by active students</p>
               </div>
             </div>
@@ -295,14 +297,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Right Column: one dominant photo with floating badges, top-right pill pair + stacked left cards + bottom-right stat */}
           <div className="lg:col-span-5">
             <motion.div
-              className="relative min-h-[420px] sm:min-h-[520px]"
+              className="relative min-h-[340px] sm:min-h-[400px]"
               style={{ x: springX, y: springY }}
               initial={reduce ? false : { opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] p-1.5 grid grid-cols-5 grid-rows-2 gap-1.5">
-                <div className="col-span-3 row-span-2 relative rounded-xl overflow-hidden">
+              <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-[#12102A] p-1.5 grid grid-cols-3 grid-rows-2 gap-1.5">
+                <div className="col-span-2 row-span-2 relative rounded-xl overflow-hidden">
                   <img
                     src="/hero-photo.jpg"
                     alt="A learner building a real AI system on her laptop"
@@ -310,7 +312,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 </div>
-                <div className="col-span-2 relative rounded-xl overflow-hidden">
+                <div className="col-span-1 relative rounded-xl overflow-hidden">
                   <img
                     src="/hero-photo-2.jpg"
                     alt="A learner studying in a school library"
@@ -318,7 +320,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 </div>
-                <div className="col-span-2 relative rounded-xl overflow-hidden">
+                <div className="col-span-1 relative rounded-xl overflow-hidden">
                   <img
                     src="/hero-photo-3.jpg"
                     alt="A learner studying at home with a laptop and notebook"
