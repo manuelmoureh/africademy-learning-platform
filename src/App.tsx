@@ -19,6 +19,7 @@ import { LandingPage } from './components/LandingPage';
 import { CourseCatalog } from './components/CourseCatalog';
 import { CourseDetailPage } from './components/CourseDetailPage';
 import { AboutPage } from './components/AboutPage';
+import { CaseStudiesPage } from './components/CaseStudiesPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { CommunityView } from './components/CommunityView';
@@ -31,7 +32,7 @@ export default function App() {
   const [selectedTrackId, setSelectedTrackId] = useState<string>('whatsapp-retail-agent');
   const [activeNav, setActiveNav] = useState<string>('catalog');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'landing' | 'app' | 'about' | 'privacy' | 'terms'>('landing');
+  const [viewMode, setViewMode] = useState<'landing' | 'app' | 'about' | 'privacy' | 'terms' | 'case-studies'>('landing');
 
   // User Account State
   const [user, setUser] = useState<UserAccount>({
@@ -124,6 +125,10 @@ export default function App() {
     return <TermsOfServicePage onBack={() => setViewMode('landing')} />;
   }
 
+  if (viewMode === 'case-studies') {
+    return <CaseStudiesPage onBack={() => setViewMode('landing')} />;
+  }
+
   // If on Landing Page view
   if (viewMode === 'landing') {
     return (
@@ -134,6 +139,7 @@ export default function App() {
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenSandbox={() => setIsSandboxOpen(true)}
           onOpenPortfolio={() => setIsPortfolioOpen(true)}
+          onOpenCaseStudies={() => setViewMode('case-studies')}
           onOpenAbout={() => setViewMode('about')}
           onOpenPrivacy={() => setViewMode('privacy')}
           onOpenTerms={() => setViewMode('terms')}
