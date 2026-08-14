@@ -55,6 +55,8 @@ export interface Track {
   description: string;
   badgeTitle: string;
   tags: string[];
+  whoBuysThis: string;
+  impactStat: string;
   steps: Step[];
 }
 

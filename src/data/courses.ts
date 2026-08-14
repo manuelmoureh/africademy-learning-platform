@@ -72,6 +72,8 @@ export const INITIAL_TRACKS: Track[] = [
     description: 'Build an autonomous WhatsApp business agent that handles customer inquiries in English and Sheng/Swahili, verifies live product inventory, triggers Safaricom M-Pesa STK push checkouts, and confirms orders.',
     badgeTitle: 'Verified WhatsApp Commerce Engineer',
     tags: ['WhatsApp Cloud API', 'Gemini 3.7 Flash', 'M-Pesa STK Push', 'Live Inventory Hooks'],
+    whoBuysThis: 'Retail shops, boutiques, and online sellers',
+    impactStat: 'WhatsApp AI agents already resolve up to 70% of customer questions instantly',
     steps: [
       {
         id: 'step-1',
@@ -340,6 +342,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build an automated qualification agent that collects budget, location preferences (Westlands, Kilimani, Karen, Kileleshwa), schedules viewings, and syncs leads to Google Sheets and CRM webhooks.',
     badgeTitle: 'Verified Lead Automation Specialist',
     tags: ['CRM Webhooks', 'Google Sheets API', 'Calendar Scheduling', 'Property Filters'],
+    whoBuysThis: 'Real estate agencies and property managers',
+    impactStat: 'Slow lead response costs African SMEs up to 25% of potential revenue',
     steps: [
       {
         id: 'lc-step-1',
@@ -432,6 +436,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Extract line items from photographed handwritten invoices using Gemini Vision OCR, generate automated PDF receipts, and trigger overdue payment follow-ups with M-Pesa Till payment links.',
     badgeTitle: 'Verified Financial Automation Engineer',
     tags: ['Gemini Flash Vision', 'PDF Generation', 'M-Pesa Till Reconciliation', 'Overdue Follow-ups'],
+    whoBuysThis: 'Small shops, service providers, and contractors',
+    impactStat: 'Automated reminders mean invoices actually get paid on time, not chased by hand',
     steps: [
       {
         id: 'inv-step-1',
@@ -505,6 +511,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build a multi-channel support agent that triages WhatsApp and email complaints, searches a business FAQ knowledge base, and escalates unresolved issues to a human agent with full conversation context attached.',
     badgeTitle: 'Verified Support Automation Engineer',
     tags: ['Knowledge Base RAG', 'Ticket Escalation', 'Sentiment Detection'],
+    whoBuysThis: 'Any business fielding WhatsApp or email support',
+    impactStat: 'AI-driven support automation cuts ticket backlog by up to 40%',
     steps: [
       {
         id: 'sup-step-1',
@@ -561,6 +569,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build a WhatsApp booking agent for salons, clinics, and repair shops that checks real calendar availability, confirms appointments, and sends automatic reminders before no-shows happen.',
     badgeTitle: 'Verified Scheduling Automation Specialist',
     tags: ['Calendar API', 'Reminder Automation', 'No-Show Reduction'],
+    whoBuysThis: 'Salons, clinics, and repair shops',
+    impactStat: 'Bots handle bookings 24/7, so a business never misses one after hours',
     steps: [
       {
         id: 'book-step-1',
@@ -617,6 +627,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build an agent that turns a business owner\'s voice notes into ready-to-post captions for Instagram and Facebook, scheduled automatically around real engagement patterns.',
     badgeTitle: 'Verified Marketing Automation Specialist',
     tags: ['Content Generation', 'Post Scheduling', 'Voice-to-Caption'],
+    whoBuysThis: 'Small brands, boutiques, and local businesses',
+    impactStat: 'Kenyan SMEs are shifting from rented social platforms to owned, automated systems',
     steps: [
       {
         id: 'soc-step-1',
@@ -673,6 +685,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build an agent that watches stock levels in real time, predicts when a Kenyan SME will run out based on real sales velocity, and messages the supplier to reorder before shelves go empty.',
     badgeTitle: 'Verified Supply Chain Automation Engineer',
     tags: ['Stock Forecasting', 'Supplier Messaging', 'Reorder Triggers'],
+    whoBuysThis: 'Retailers, distributors, and small manufacturers',
+    impactStat: 'AI-driven demand forecasting has improved stock accuracy by up to 35%',
     steps: [
       {
         id: 'inv2-step-1',
@@ -729,6 +743,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build an agent that screens incoming job applications against a role\'s actual requirements, ranks candidates fairly, and messages shortlisted applicants to schedule an interview.',
     badgeTitle: 'Verified HR Automation Specialist',
     tags: ['Resume Parsing', 'Candidate Ranking', 'Interview Scheduling'],
+    whoBuysThis: 'Growing SMEs that hire regularly',
+    impactStat: 'AI screening cut one Nairobi company\'s hiring time from 3 months to 3 weeks',
     steps: [
       {
         id: 'hr-step-1',
@@ -785,6 +801,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build an agent that tracks unpaid invoices, sends a polite escalating sequence of WhatsApp payment reminders with a live M-Pesa link, and flags genuinely stuck accounts for a human to call.',
     badgeTitle: 'Verified Collections Automation Engineer',
     tags: ['Escalation Sequencing', 'M-Pesa Payment Links', 'Aging Reports'],
+    whoBuysThis: 'Any business that invoices clients',
+    impactStat: 'Automated payment reminders close a real, named gap in most SME billing today',
     steps: [
       {
         id: 'col-step-1',
@@ -841,6 +859,8 @@ Check the LIVE INVENTORY table before answering.
     description: 'Build a WhatsApp ordering agent for a Kenyan restaurant that reads the daily menu, takes orders with modifications, calculates delivery fees by estate, and hands off confirmed orders to the kitchen and rider.',
     badgeTitle: 'Verified Hospitality Automation Specialist',
     tags: ['Menu Parsing', 'Delivery Fee Calculation', 'Kitchen Handoff'],
+    whoBuysThis: 'Restaurants, cafes, and food vendors',
+    impactStat: 'Direct WhatsApp ordering can save up to 30% in margin lost to delivery apps',
     steps: [
       {
         id: 'food-step-1',

@@ -5,6 +5,7 @@ import {
   Check, Users
 } from 'lucide-react';
 import { Track } from '../types';
+import { TrackIcon } from '../utils/trackIcons';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -236,7 +237,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tracks.map((track, i) => (
+            {tracks.slice(0, 6).map((track, i) => (
               <motion.div
                 key={track.id}
                 initial={reduce ? false : 'hidden'}
@@ -244,40 +245,48 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 viewport={{ once: true, amount: 0.3 }}
                 variants={fadeUp}
                 transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col justify-between hover:border-[#F5A623] transition-all group"
+                className="rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col overflow-hidden hover:border-[#F5A623] transition-all group"
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider">
-                      {track.trackNumber}
-                    </span>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#12102A] text-white">
-                      {track.steps.length || 8} steps
-                    </span>
-                  </div>
-
-                  <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors">
+                <div className="relative h-24 bg-gradient-to-br from-[#12102A] to-[#3f3a6b] flex items-center justify-center">
+                  <TrackIcon name={track.icon} className="w-8 h-8 text-white/80" />
+                  <span className="absolute top-2 right-2 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/90 text-[#12102A]">
+                    {track.steps.length || track.totalSteps} lessons
+                  </span>
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider">
+                    {track.trackNumber}
+                  </span>
+                  <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-1">
                     {track.title}
                   </h3>
-
-                  <p className="text-xs text-[#12102A]/70 mt-2 leading-relaxed font-medium">
-                    {track.description}
+                  <p className="text-xs text-[#10B981] font-bold mt-2">
+                    {track.impactStat}
                   </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#10B981]">
-                    {track.badgeTitle}
-                  </span>
-                  <button
-                    onClick={onEnterApp}
-                    className="text-xs font-bold text-[#12102A] hover:text-[#F5A623] flex items-center gap-1 cursor-pointer transition-colors"
-                  >
-                    See the Steps <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="mt-auto pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#10B981]">
+                      {track.badgeTitle}
+                    </span>
+                    <button
+                      onClick={onEnterApp}
+                      className="text-xs font-bold text-[#12102A] hover:text-[#F5A623] flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      See the Steps <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}
+          </div>
+
+          <div className="text-center">
+            <button
+              onClick={onEnterApp}
+              className="px-6 py-3 rounded-xl border border-[#12102A]/10 bg-white hover:border-[#F5A623] text-sm font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97] inline-flex items-center gap-2"
+            >
+              Browse All {tracks.length} Courses
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
         </div>

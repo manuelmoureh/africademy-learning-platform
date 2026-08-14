@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Users, TrendingUp, Star } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 
@@ -43,18 +43,23 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
           <button
             key={track.id}
             onClick={() => onSelectCourse(track.id)}
-            className="text-left p-6 rounded-2xl border border-[#12102A]/10 bg-white flex flex-col justify-between hover:border-[#F5A623] transition-all active:scale-[0.98] cursor-pointer group"
+            className="text-left rounded-2xl border border-[#12102A]/10 bg-white flex flex-col overflow-hidden hover:border-[#F5A623] hover:shadow-md transition-all active:scale-[0.98] cursor-pointer group"
           >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-lg bg-[#12102A]/5 flex items-center justify-center group-hover:bg-[#F5A623]/15 transition-colors">
-                  <TrackIcon name={track.icon} className="w-5 h-5 text-[#12102A] group-hover:text-[#F5A623] transition-colors" />
-                </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#12102A] text-white">
-                  {track.steps.length || track.totalSteps} lessons
-                </span>
-              </div>
+            {/* Thumbnail: real image if provided (/course-thumbs/{id}.jpg), otherwise a colored icon tile */}
+            <div className="relative h-36 bg-gradient-to-br from-[#12102A] to-[#3f3a6b] flex items-center justify-center overflow-hidden">
+              <img
+                src={`/course-thumbs/${track.id}.jpg`}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+              <TrackIcon name={track.icon} className="w-10 h-10 text-white/80 relative z-10 group-hover:scale-110 transition-transform" />
+              <span className="absolute top-2.5 right-2.5 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-white/90 text-[#12102A] z-10">
+                {track.steps.length || track.totalSteps} lessons
+              </span>
+            </div>
 
+            <div className="p-5 flex flex-col flex-1">
               <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider block mb-1">
                 {track.trackNumber}
               </span>
@@ -66,16 +71,36 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
               <p className="text-xs text-[#12102A]/70 mt-2 leading-relaxed font-medium">
                 {track.description}
               </p>
-            </div>
 
-            <div className="mt-6 pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
-              <span className="text-xs font-bold text-[#10B981] flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                First 5 lessons free
-              </span>
-              <span className="text-xs font-bold text-[#12102A] flex items-center gap-1">
-                View Course <ArrowRight className="w-3.5 h-3.5" />
-              </span>
+              {/* Who buys this + impact stat, replacing plain spec pills */}
+              <div className="mt-3 space-y-1.5">
+                <div className="flex items-start gap-1.5 text-[11px] text-[#12102A]/70 font-semibold">
+                  <Users className="w-3.5 h-3.5 text-[#12102A]/40 shrink-0 mt-0.5" />
+                  <span>Sells to: {track.whoBuysThis}</span>
+                </div>
+                <div className="flex items-start gap-1.5 text-[11px] text-[#10B981] font-bold">
+                  <TrendingUp className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>{track.impactStat}</span>
+                </div>
+              </div>
+
+              {/* Honest rating placeholder, not a fabricated number */}
+              <div className="flex items-center gap-1 mt-3 text-[11px] text-[#12102A]/40 font-semibold">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="w-3 h-3 text-[#12102A]/15" />
+                ))}
+                <span className="ml-1">Not yet rated</span>
+              </div>
+
+              <div className="mt-auto pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
+                <span className="text-xs font-bold text-[#10B981] flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  First 5 lessons free
+                </span>
+                <span className="text-xs font-bold text-[#12102A] flex items-center gap-1">
+                  View Course <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
             </div>
           </button>
         ))}
