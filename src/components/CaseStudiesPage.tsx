@@ -63,7 +63,7 @@ export const CaseStudiesPage: React.FC<CaseStudiesPageProps> = ({ onBack }) => {
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-10">
         <div className="max-w-2xl space-y-3">
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#12102A]">
-            What Our Students Have Built
+            What Our Students Are Building
           </h1>
           <p className="text-sm text-[#12102A]/70 font-medium leading-relaxed">
             Every build here shows a workflow a student shipped for a real business. These five are illustrative placeholders showing how a finished, verified build gets presented, real case studies replace them as students complete verified work.

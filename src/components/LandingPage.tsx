@@ -125,7 +125,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   className="px-6 py-3.5 bg-white hover:bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] font-bold text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-2xs"
                 >
                   <Play className="w-4 h-4 text-[#F5A623] fill-current" />
-                  See What Students Built
+                  See What Our Students Are Building
                 </button>
               </div>
             </div>
