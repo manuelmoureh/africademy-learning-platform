@@ -54,7 +54,7 @@ export const PortfolioStatus: React.FC<PortfolioStatusProps> = ({
         )}
         <button
           onClick={onOpenPortfolio}
-          className="w-full py-2.5 px-3 rounded-xl bg-[#FAF9FC] hover:bg-[#FAF9FC]/80 border border-[#12102A]/10 text-xs font-bold text-[#12102A] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          className="w-full py-2.5 px-3 rounded-xl bg-[#F0EEF6] hover:bg-[#F0EEF6]/80 border border-[#12102A]/10 text-xs font-bold text-[#12102A] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
         >
           <ShieldCheck className="w-4 h-4 text-[#10B981]" />
           View Example Verified Portfolio

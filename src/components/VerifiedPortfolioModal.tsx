@@ -49,7 +49,7 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
       >
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#12102A]/10 bg-[#FAF9FC]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#12102A]/10 bg-[#F0EEF6]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#10B981]/15 text-[#10B981] flex items-center justify-center">
               <ShieldCheck className="w-5 h-5" />
@@ -113,7 +113,7 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
           </div>
 
           {/* Live Portfolio Shareable Link Box */}
-          <div className="p-4 rounded-xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-8 h-8 rounded-lg bg-[#12102A]/5 flex items-center justify-center text-[#12102A] shrink-0">
                 <Code2 className="w-4 h-4" />
@@ -224,7 +224,7 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
                     <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#10B981]/10 text-[#10B981] rounded">
                       {item.status}
                     </span>
-                    <span className="text-xs font-mono font-bold text-[#12102A] bg-[#FAF9FC] px-2.5 py-1 rounded border border-[#12102A]/5">
+                    <span className="text-xs font-mono font-bold text-[#12102A] bg-[#F0EEF6] px-2.5 py-1 rounded border border-[#12102A]/5">
                       {item.score}/{item.maxScore}
                     </span>
                   </div>
@@ -235,7 +235,7 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
 
           {/* Tab 2: SME Reviewer Card */}
           {activeTab === 'reviewer' && (
-            <div className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] space-y-4">
+            <div className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] space-y-4">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-full bg-[#12102A] text-[#F5A623] font-bold text-sm flex items-center justify-center font-mono">
                   {verification.smeReviewer.avatarInitials}
@@ -293,7 +293,7 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
         </div>
 
         {/* Modal Footer Actions */}
-        <div className="px-6 py-4 bg-[#FAF9FC] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
+        <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
           <span className="text-xs text-[#12102A]/60 font-mono hidden sm:inline">
             Status: Authentic production artifact
           </span>

@@ -298,7 +298,7 @@ export default function App() {
 
   return (
     <div 
-      className="flex flex-col min-h-screen w-full overflow-x-hidden bg-[#FAF9FC] text-[#12102A]"
+      className="flex flex-col min-h-screen w-full overflow-x-hidden bg-[#F0EEF6] text-[#12102A]"
       style={{ fontFamily: "'Satoshi', sans-serif" }}
     >
       {/* Upgrade Toast Notification */}

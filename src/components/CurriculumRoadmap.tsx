@@ -33,7 +33,7 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-[#12102A]/70 font-mono bg-[#FAF9FC] px-2.5 py-1 rounded-md border border-[#12102A]/10">
+          <span className="text-[10px] font-bold text-[#12102A]/70 font-mono bg-[#F0EEF6] px-2.5 py-1 rounded-md border border-[#12102A]/10">
             {completedCount} OF {totalCount} STEPS COMPLETED
           </span>
         </div>
@@ -138,7 +138,7 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
             <div
               key={step.id}
               onClick={() => onSelectStep(step)}
-              className="flex items-center gap-4 p-4 rounded-xl bg-[#FAF9FC] border border-[#12102A]/10 hover:border-[#F5A623] transition-all cursor-pointer group"
+              className="flex items-center gap-4 p-4 rounded-xl bg-[#F0EEF6] border border-[#12102A]/10 hover:border-[#F5A623] transition-all cursor-pointer group"
             >
               <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-[10px] font-bold shrink-0 font-mono">
                 {step.number}

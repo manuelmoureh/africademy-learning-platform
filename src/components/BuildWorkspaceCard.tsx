@@ -26,7 +26,7 @@ export const BuildWorkspaceCard: React.FC<BuildWorkspaceCardProps> = ({
       className={`rounded-2xl p-6 text-[#12102A] flex flex-col justify-between cursor-pointer transition-all duration-200 group shadow-xs relative overflow-hidden ${
         isUnlocked 
           ? 'bg-[#F5A623] hover:bg-[#efa11e]' 
-          : 'bg-[#FAF9FC] border-2 border-dashed border-[#12102A]/20 hover:border-[#F5A623]'
+          : 'bg-[#F0EEF6] border-2 border-dashed border-[#12102A]/20 hover:border-[#F5A623]'
       }`}
     >
       {/* Decorative subtle background pattern */}

@@ -28,7 +28,7 @@ const ModuleRow: React.FC<{ step: Track['steps'][number]; isProUser: boolean }> 
 
       <button
         onClick={() => setShowReviews((v) => !v)}
-        className="w-full flex items-center justify-between px-3 py-2 border-t border-[#12102A]/5 bg-[#FAF9FC] text-[11px] font-semibold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 border-t border-[#12102A]/5 bg-[#F0EEF6] text-[11px] font-semibold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors"
       >
         <span className="flex items-center gap-1.5">
           {reviews.length > 0 ? (
@@ -132,7 +132,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
               Course Modules
             </h2>
             {track.steps.length === 0 ? (
-              <p className="text-xs text-[#12102A]/60 font-medium p-4 rounded-xl bg-[#FAF9FC] border border-[#12102A]/10">
+              <p className="text-xs text-[#12102A]/60 font-medium p-4 rounded-xl bg-[#F0EEF6] border border-[#12102A]/10">
                 Full lesson-by-lesson content for this course is still being written. Join the waitlist by starting free on another track, we'll let you know the moment this one opens.
               </p>
             ) : (
@@ -167,7 +167,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
             {!isProUser && (
               <button
                 onClick={onOpenPricing}
-                className="w-full py-2.5 border border-[#12102A]/10 hover:bg-[#FAF9FC] text-[#12102A] text-xs font-bold rounded-xl cursor-pointer transition-all active:scale-[0.97]"
+                className="w-full py-2.5 border border-[#12102A]/10 hover:bg-[#F0EEF6] text-[#12102A] text-xs font-bold rounded-xl cursor-pointer transition-all active:scale-[0.97]"
               >
                 See what Pro unlocks
               </button>

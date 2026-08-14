@@ -94,14 +94,14 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ user }) => {
           value={newPostTitle}
           onChange={(e) => setNewPostTitle(e.target.value)}
           placeholder="Topic / Question title (e.g. Daraja STK Push Callback Handling)"
-          className="w-full text-xs font-bold text-[#12102A] p-2.5 bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl focus:outline-hidden focus:border-[#F5A623]"
+          className="w-full text-xs font-bold text-[#12102A] p-2.5 bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl focus:outline-hidden focus:border-[#F5A623]"
         />
         <textarea
           value={newPostText}
           onChange={(e) => setNewPostText(e.target.value)}
           placeholder="Share your breakthrough, prompt technique, or question for Nairobi AI engineers..."
           rows={3}
-          className="w-full text-xs text-[#12102A] p-2.5 bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl focus:outline-hidden focus:border-[#F5A623] leading-relaxed resize-none font-medium"
+          className="w-full text-xs text-[#12102A] p-2.5 bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl focus:outline-hidden focus:border-[#F5A623] leading-relaxed resize-none font-medium"
         />
         <div className="flex items-center justify-between pt-1">
           <span className="text-[11px] text-[#12102A]/50 font-mono">

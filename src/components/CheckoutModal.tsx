@@ -63,7 +63,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       >
         
         {/* Top Header */}
-        <div className="p-6 bg-[#FAF9FC] border-b border-[#12102A]/10 flex items-center justify-between">
+        <div className="p-6 bg-[#F0EEF6] border-b border-[#12102A]/10 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-bold text-[#F5A623] uppercase tracking-widest font-mono">
@@ -153,7 +153,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   Safaricom M-Pesa Phone Number
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold font-mono px-3 py-2.5 bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl text-[#12102A]">
+                  <span className="text-xs font-bold font-mono px-3 py-2.5 bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl text-[#12102A]">
                     +254
                   </span>
                   <input
@@ -162,7 +162,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="712 345 678"
                     required
-                    className="flex-1 bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-mono font-bold focus:outline-hidden focus:border-[#00A859]"
+                    className="flex-1 bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-mono font-bold focus:outline-hidden focus:border-[#00A859]"
                   />
                 </div>
                 <p className="text-[11px] text-[#12102A]/60 mt-1.5">
@@ -180,13 +180,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   onChange={(e) => setCardNumber(e.target.value)}
                   placeholder="Card Number"
                   required
-                  className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-mono font-bold focus:outline-hidden focus:border-[#F5A623]"
+                  className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-mono font-bold focus:outline-hidden focus:border-[#F5A623]"
                 />
               </div>
             )}
 
             {/* Included feature list */}
-            <div className="p-3.5 rounded-xl bg-[#FAF9FC] border border-[#12102A]/5 space-y-2">
+            <div className="p-3.5 rounded-xl bg-[#F0EEF6] border border-[#12102A]/5 space-y-2">
               <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
                 <Check className="w-3.5 h-3.5 text-[#10B981]" />
                 Unlocks all 12 production steps across all tracks
@@ -227,7 +227,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </p>
             </div>
 
-            <div className="p-3 bg-[#FAF9FC] rounded-xl border border-[#12102A]/10 max-w-xs mx-auto text-xs font-mono text-[#12102A]/60">
+            <div className="p-3 bg-[#F0EEF6] rounded-xl border border-[#12102A]/10 max-w-xs mx-auto text-xs font-mono text-[#12102A]/60">
               Awaiting Daraja confirmation... ({countdown}s)
             </div>
 

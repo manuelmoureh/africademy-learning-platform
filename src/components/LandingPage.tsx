@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search, Megaphone, Brain, MessageSquare, Coins
+  Check, Users, Star, Search, Megaphone, Brain, MessageSquare, Coins, Bell
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -108,7 +108,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9FC] text-[#12102A] flex flex-col">
+    <div className="min-h-screen bg-[#F0EEF6] text-[#12102A] flex flex-col">
       {/* Top Navbar — translucent, stays legible over whatever scrolls beneath it */}
       <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between gap-6">
@@ -186,13 +186,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 value={navSearch}
                 onChange={(e) => setNavSearch(e.target.value)}
                 placeholder="Search courses"
-                className="w-40 focus:w-56 pl-9 pr-3 py-2 rounded-full border border-[#12102A]/10 bg-[#FAF9FC] text-xs font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all duration-300"
+                className="w-40 focus:w-56 pl-9 pr-3 py-2 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-xs font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all duration-300"
               />
             </form>
 
             <button
               onClick={onOpenAuth}
-              className="px-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#FAF9FC] text-xs font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
+              className="px-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#F0EEF6] text-xs font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
             >
               Sign In
             </button>
@@ -267,7 +267,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                 <button
                   onClick={onOpenCaseStudies}
-                  className="px-6 py-3.5 bg-white hover:bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] font-bold text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-2xs"
+                  className="px-6 py-3.5 bg-white hover:bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A] font-bold text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-2xs"
                 >
                   <Play className="w-4 h-4 text-[#F5A623] fill-current" />
                   See What Our Students Are Building
@@ -301,13 +301,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b]">
-                <img
-                  src="/hero-photo.jpg"
-                  alt="A learner building a real AI system"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
+              <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] p-1.5 grid grid-cols-5 grid-rows-2 gap-1.5">
+                <div className="col-span-3 row-span-2 relative rounded-xl overflow-hidden">
+                  <img
+                    src="/hero-photo.jpg"
+                    alt="A learner building a real AI system on her laptop"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                </div>
+                <div className="col-span-2 relative rounded-xl overflow-hidden">
+                  <img
+                    src="/hero-photo-2.jpg"
+                    alt="A learner studying in a school library"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                </div>
+                <div className="col-span-2 relative rounded-xl overflow-hidden">
+                  <img
+                    src="/hero-photo-3.jpg"
+                    alt="A learner studying at home with a laptop and notebook"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                </div>
               </div>
 
               {/* Top-right diagonal pill pair, straddling the top and right edges */}
@@ -369,9 +387,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick what to build</p>
                 <div className="flex flex-wrap gap-1">
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Sales</span>
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Finance</span>
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Sales</span>
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Finance</span>
                 </div>
               </motion.div>
 
@@ -384,6 +402,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 <p className="text-2xl font-black leading-none">80K+</p>
                 <p className="text-[10px] font-bold leading-tight mt-1">KES earned per system installed</p>
+              </motion.div>
+
+              {/* Bottom-left "success feels close" notification card, straddling the corner */}
+              <motion.div
+                initial={reduce ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute -bottom-4 -left-3 sm:-left-4 bg-white rounded-xl shadow-lg p-2.5 pr-4 flex items-center gap-2.5 z-10 max-w-[210px]"
+              >
+                <span className="w-8 h-8 rounded-full bg-[#12102A] flex items-center justify-center shrink-0">
+                  <Bell className="w-3.5 h-3.5 text-[#F5A623]" />
+                </span>
+                <p className="text-[11px] font-bold leading-tight text-[#12102A]">
+                  Start today. Get paid this month.
+                </p>
               </motion.div>
             </motion.div>
           </div>
@@ -459,7 +492,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 viewport={{ once: true, amount: 0.3 }}
                 variants={fadeUp}
                 transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className="rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col overflow-hidden hover:border-[#F5A623] transition-all group"
+                className="rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col overflow-hidden hover:border-[#F5A623] transition-all group"
               >
                 <div className="relative h-24 bg-gradient-to-br from-[#12102A] to-[#3f3a6b] flex items-center justify-center">
                   <TrackIcon name={track.icon} className="w-8 h-8 text-white/80" />
@@ -580,7 +613,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               viewport={{ once: true, amount: 0.4 }}
               variants={fadeUp}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col justify-between"
             >
               <div>
                 <h3 className="font-bold text-lg text-[#12102A]">Learner Free</h3>

@@ -212,7 +212,7 @@ Check the LIVE INVENTORY table before answering.
       transition={{ duration: 0.2 }}
     >
       <motion.div
-        className="bg-[#FAF9FC] border border-[#12102A]/10 rounded-2xl w-full max-w-5xl h-[85vh] max-h-[760px] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-[#F0EEF6] border border-[#12102A]/10 rounded-2xl w-full max-w-5xl h-[85vh] max-h-[760px] flex flex-col shadow-2xl overflow-hidden"
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
@@ -240,7 +240,7 @@ Check the LIVE INVENTORY table before answering.
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex bg-[#FAF9FC] p-1 rounded-lg border border-[#12102A]/10 text-xs font-bold font-mono">
+            <div className="hidden sm:flex bg-[#F0EEF6] p-1 rounded-lg border border-[#12102A]/10 text-xs font-bold font-mono">
               <button
                 onClick={() => setActiveTab('chat')}
                 className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
@@ -269,7 +269,7 @@ Check the LIVE INVENTORY table before answering.
 
             <button
               onClick={onClose}
-              className="p-2 text-[#12102A]/40 hover:text-[#12102A] hover:bg-[#FAF9FC] rounded-lg transition-colors cursor-pointer"
+              className="p-2 text-[#12102A]/40 hover:text-[#12102A] hover:bg-[#F0EEF6] rounded-lg transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -372,19 +372,19 @@ Check the LIVE INVENTORY table before answering.
               </span>
               <button
                 onClick={() => handleSendMessage("Habari! Do you have the Maasai Beaded Sandals in stock, and how much is it in KES?")}
-                className="text-xs bg-[#FAF9FC] hover:bg-[#F5A623]/20 border border-[#12102A]/10 px-2.5 py-1 rounded-md text-[#12102A] whitespace-nowrap transition-colors cursor-pointer font-medium"
+                className="text-xs bg-[#F0EEF6] hover:bg-[#F5A623]/20 border border-[#12102A]/10 px-2.5 py-1 rounded-md text-[#12102A] whitespace-nowrap transition-colors cursor-pointer font-medium"
               >
                 Inquire Maasai Sandals
               </button>
               <button
                 onClick={() => handleSendMessage("Do you have the Kisii Soapstone Decor in Kilimani?")}
-                className="text-xs bg-[#FAF9FC] hover:bg-[#F5A623]/20 border border-[#12102A]/10 px-2.5 py-1 rounded-md text-[#12102A] whitespace-nowrap transition-colors cursor-pointer font-medium"
+                className="text-xs bg-[#F0EEF6] hover:bg-[#F5A623]/20 border border-[#12102A]/10 px-2.5 py-1 rounded-md text-[#12102A] whitespace-nowrap transition-colors cursor-pointer font-medium"
               >
                 Test Out-of-Stock Fallback
               </button>
               <button
                 onClick={() => handleSendMessage("I want to buy 1 pair of sandals please! Can you send M-Pesa prompt?")}
-                className="text-xs bg-[#FAF9FC] hover:bg-[#F5A623]/20 border border-[#12102A]/10 px-2.5 py-1 rounded-md text-[#12102A] whitespace-nowrap transition-colors cursor-pointer font-medium"
+                className="text-xs bg-[#F0EEF6] hover:bg-[#F5A623]/20 border border-[#12102A]/10 px-2.5 py-1 rounded-md text-[#12102A] whitespace-nowrap transition-colors cursor-pointer font-medium"
               >
                 Trigger M-Pesa Checkout
               </button>
@@ -412,7 +412,7 @@ Check the LIVE INVENTORY table before answering.
 
           {/* Right Inspector & Settings Drawer */}
           <div className="w-full md:w-80 lg:w-96 bg-white border-l border-[#12102A]/10 flex flex-col overflow-y-auto">
-            <div className="p-4 border-b border-[#12102A]/10 bg-[#FAF9FC]">
+            <div className="p-4 border-b border-[#12102A]/10 bg-[#F0EEF6]">
               <h4 className="text-xs font-bold text-[#12102A] uppercase tracking-wider font-mono">
                 Store Live Memory & State
               </h4>
@@ -435,7 +435,7 @@ Check the LIVE INVENTORY table before answering.
                   {inventory.map((item) => (
                     <div
                       key={item.id}
-                      className="p-2.5 rounded-xl border border-[#12102A]/10 bg-[#FAF9FC] hover:border-[#12102A]/20 transition-all text-xs"
+                      className="p-2.5 rounded-xl border border-[#12102A]/10 bg-[#F0EEF6] hover:border-[#12102A]/20 transition-all text-xs"
                     >
                       <div className="flex items-start justify-between gap-1">
                         <span className="font-bold text-[#12102A] leading-snug">{item.name}</span>
@@ -486,7 +486,7 @@ Check the LIVE INVENTORY table before answering.
                   value={systemPrompt}
                   onChange={(e) => setSystemPrompt(e.target.value)}
                   rows={5}
-                  className="w-full text-xs font-mono bg-[#FAF9FC] border border-[#12102A]/10 rounded-lg p-2.5 text-[#12102A]/80 focus:outline-hidden focus:border-[#F5A623] leading-relaxed"
+                  className="w-full text-xs font-mono bg-[#F0EEF6] border border-[#12102A]/10 rounded-lg p-2.5 text-[#12102A]/80 focus:outline-hidden focus:border-[#F5A623] leading-relaxed"
                 />
               </div>
             </div>

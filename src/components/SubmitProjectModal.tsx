@@ -75,7 +75,7 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       >
 
-        <div className="p-6 bg-[#FAF9FC] border-b border-[#12102A]/10 flex items-center justify-between">
+        <div className="p-6 bg-[#F0EEF6] border-b border-[#12102A]/10 flex items-center justify-between">
           <div>
             <h3 className="font-bold text-base text-[#12102A]">Submit Your Project</h3>
             <p className="text-xs text-[#12102A]/60 mt-0.5">{trackTitle}</p>
@@ -111,7 +111,7 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
             </p>
             <button
               onClick={handleClose}
-              className="px-5 py-2.5 bg-white border border-[#12102A]/10 hover:bg-[#FAF9FC] text-[#12102A] text-xs font-bold rounded-xl cursor-pointer transition-colors"
+              className="px-5 py-2.5 bg-white border border-[#12102A]/10 hover:bg-[#F0EEF6] text-[#12102A] text-xs font-bold rounded-xl cursor-pointer transition-colors"
             >
               Close
             </button>
@@ -128,7 +128,7 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
                 onChange={(e) => setProjectUrl(e.target.value)}
                 placeholder="e.g. your WhatsApp business number, or a live link"
                 required
-                className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
+                className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
               />
             </div>
 
@@ -141,7 +141,7 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
                 value={demoUrl}
                 onChange={(e) => setDemoUrl(e.target.value)}
                 placeholder="Loom or video link showing it working"
-                className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
+                className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
               />
             </div>
 
@@ -154,7 +154,7 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder="Anything they should know before testing it"
-                className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623] resize-none"
+                className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623] resize-none"
               />
             </div>
 

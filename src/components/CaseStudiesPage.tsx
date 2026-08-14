@@ -47,7 +47,7 @@ interface CaseStudiesPageProps {
 
 export const CaseStudiesPage: React.FC<CaseStudiesPageProps> = ({ onBack }) => {
   return (
-    <div className="min-h-screen bg-[#FAF9FC] text-[#12102A]">
+    <div className="min-h-screen bg-[#F0EEF6] text-[#12102A]">
       <nav className="flex items-center gap-4 px-6 lg:px-12 h-20 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10 sticky top-0 z-30">
         <button
           onClick={onBack}

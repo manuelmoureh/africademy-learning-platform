@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <li
               key={track.id}
               onClick={() => onSelectTrack(track.id)}
-              className="p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-[#FAF9FC] border border-[#12102A]/5 hover:border-[#F5A623] group"
+              className="p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-[#F0EEF6] border border-[#12102A]/5 hover:border-[#F5A623] group"
             >
               <div className="flex items-center gap-2 min-w-0 pr-2">
                 <div className="w-7 h-7 rounded-md bg-[#12102A]/5 flex items-center justify-center shrink-0 group-hover:bg-[#F5A623]/15 transition-colors">
@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           type="button"
           onClick={onOpenPortfolio}
-          className="w-full text-left mt-6 p-4 rounded-xl bg-[#FAF9FC] border border-[#10B981]/30 hover:border-[#10B981] transition-all cursor-pointer group"
+          className="w-full text-left mt-6 p-4 rounded-xl bg-[#F0EEF6] border border-[#10B981]/30 hover:border-[#10B981] transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#12102A]">
@@ -130,15 +130,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             Stack Specifications
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#F0EEF6] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
               <MessageCircle className="w-2.5 h-2.5" />
               Meta WhatsApp v21.0
             </span>
-            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#F0EEF6] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
               <Sparkles className="w-2.5 h-2.5" />
               Gemini 3.7 Flash
             </span>
-            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#FAF9FC] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
+            <span className="flex items-center gap-1 text-[10px] font-mono bg-[#F0EEF6] border border-[#12102A]/10 px-2 py-0.5 rounded text-[#12102A]/70">
               <Smartphone className="w-2.5 h-2.5" />
               Safaricom Daraja
             </span>

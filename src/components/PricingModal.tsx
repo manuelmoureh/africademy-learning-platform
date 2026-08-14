@@ -34,7 +34,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       >
         
         {/* Header */}
-        <div className="p-6 md:p-8 bg-[#FAF9FC] border-b border-[#12102A]/10 flex items-center justify-between">
+        <div className="p-6 md:p-8 bg-[#F0EEF6] border-b border-[#12102A]/10 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-bold text-[#F5A623] uppercase tracking-widest font-mono">
@@ -69,7 +69,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg text-[#12102A]">Learner Free</h3>
                 {!isProUser && (
-                  <span className="text-[10px] font-bold font-mono px-2 py-0.5 bg-[#FAF9FC] rounded border border-[#12102A]/10 text-[#12102A]">
+                  <span className="text-[10px] font-bold font-mono px-2 py-0.5 bg-[#F0EEF6] rounded border border-[#12102A]/10 text-[#12102A]">
                     CURRENT PLAN
                   </span>
                 )}
@@ -106,7 +106,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
             <button
               onClick={onClose}
-              className="w-full mt-6 py-2.5 bg-[#FAF9FC] border border-[#12102A]/10 text-xs font-bold text-[#12102A] rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+              className="w-full mt-6 py-2.5 bg-[#F0EEF6] border border-[#12102A]/10 text-xs font-bold text-[#12102A] rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
             >
               {isProUser ? 'Switch to Free' : 'Continue Free'}
             </button>

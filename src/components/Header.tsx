@@ -57,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search courses"
-            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-[#12102A]/10 bg-[#FAF9FC] text-sm font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white focus:shadow-sm transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-sm font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white focus:shadow-sm transition-all"
           />
         </div>
       </form>
@@ -120,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           type="button"
           onClick={onOpenAuth}
-          className="flex items-center gap-2.5 cursor-pointer p-1 pr-1.5 rounded-full hover:bg-[#FAF9FC] transition-colors"
+          className="flex items-center gap-2.5 cursor-pointer p-1 pr-1.5 rounded-full hover:bg-[#F0EEF6] transition-colors"
           title="Click to Switch Profile / Edit Account"
         >
           <div className="text-right hidden lg:block">

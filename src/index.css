@@ -90,11 +90,11 @@
   --popover-foreground: #12102A;
   --primary: #12102A;
   --primary-foreground: #FFFFFF;
-  --secondary: #FAF9FC;
+  --secondary: #F0EEF6;
   --secondary-foreground: #12102A;
-  --muted: #FAF9FC;
+  --muted: #F0EEF6;
   --muted-foreground: rgb(18 16 42 / 0.6);
-  --accent: #FAF9FC;
+  --accent: #F0EEF6;
   --accent-foreground: #12102A;
   --destructive: oklch(0.577 0.245 27.325);
   --border: rgb(18 16 42 / 0.1);

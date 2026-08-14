@@ -125,7 +125,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       >
 
         {/* Header */}
-        <div className="p-6 bg-[#FAF9FC] border-b border-[#12102A]/10 flex items-center justify-between">
+        <div className="p-6 bg-[#F0EEF6] border-b border-[#12102A]/10 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#12102A] text-[#F5A623] flex items-center justify-center">
               <User className="w-4 h-4" />
@@ -150,7 +150,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {isAuthenticated ? (
           <div className="p-6 space-y-4">
-            <div className="p-4 rounded-xl bg-[#FAF9FC] border border-[#12102A]/10 flex items-center gap-3">
+            <div className="p-4 rounded-xl bg-[#F0EEF6] border border-[#12102A]/10 flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-[#12102A] text-[#F5A623] flex items-center justify-center font-black text-xs shrink-0">
                 {currentUser.initials}
               </div>
@@ -162,7 +162,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => { onSignOut?.(); onClose(); }}
-              className="w-full py-3 bg-white hover:bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              className="w-full py-3 bg-white hover:bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               Sign Out
@@ -181,7 +181,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Wanjiku Muthoni"
                 required={isSignUp}
-                className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
+                className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
               />
             </div>
           )}
@@ -196,7 +196,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. wanjiku@gmail.com"
               required
-              className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
+              className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
             />
           </div>
 
@@ -211,7 +211,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               placeholder="At least 6 characters"
               required
               minLength={6}
-              className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
+              className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
             />
           </div>
 
@@ -223,7 +223,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <select
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
+                className="w-full bg-[#F0EEF6] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
               >
                 <option value="Nairobi, Kenya">Nairobi, Kenya</option>
                 <option value="Mombasa, Kenya">Mombasa, Kenya</option>

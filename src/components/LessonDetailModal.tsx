@@ -42,7 +42,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
       >
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#12102A]/10 bg-[#FAF9FC]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#12102A]/10 bg-[#F0EEF6]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#12102A] text-[#F5A623] flex items-center justify-center font-mono font-bold text-xs">
               {step.number}
@@ -99,7 +99,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
             </div>
 
             {/* What's inside preview */}
-            <div className="p-4 rounded-xl bg-[#FAF9FC] border border-[#12102A]/10 text-left w-full max-w-md space-y-2">
+            <div className="p-4 rounded-xl bg-[#F0EEF6] border border-[#12102A]/10 text-left w-full max-w-md space-y-2">
               <span className="text-[10px] font-mono font-bold uppercase text-[#12102A]/50 block">
                 Modules in this step:
               </span>
@@ -143,7 +143,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
               </h4>
               <div className="space-y-2">
                 {step.content.keyLearnings.map((learning, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-[#FAF9FC] border border-[#12102A]/5">
+                  <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-[#F0EEF6] border border-[#12102A]/5">
                     <div className="w-5 h-5 rounded-full bg-[#10B981]/15 text-[#10B981] flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                       ✓
                     </div>
@@ -207,7 +207,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
         {/* Footer Actions */}
         {!isLocked && (
-          <div className="px-6 py-4 bg-[#FAF9FC] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
+          <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
             <button
               onClick={() => onToggleComplete(step.id)}
               className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
