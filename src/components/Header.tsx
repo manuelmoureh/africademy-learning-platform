@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ShieldCheck, Terminal, User, ArrowUpRight, Globe, Search, Info } from 'lucide-react';
+import { ShieldCheck, Search } from 'lucide-react';
 import { UserAccount } from '../types';
 
 interface HeaderProps {
@@ -32,39 +32,50 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchSubmit,
 }) => {
   return (
-    <header className="flex items-center justify-between px-6 lg:px-8 h-20 bg-white border-b border-[#12102A]/10 select-none shrink-0 z-20">
-      {/* Brand Logo */}
-      <div className="flex items-center gap-3 cursor-pointer" onClick={onGoHome}>
-        <img src="/logo-dark.png" alt="Afridemy" className="h-8 w-auto transition-transform hover:scale-105" />
-      </div>
+    <header className="flex items-center justify-between gap-4 px-6 lg:px-8 h-20 bg-white border-b border-[#12102A]/10 select-none shrink-0 z-20">
+      {/* Brand Logo, larger, and Home */}
+      <button
+        type="button"
+        onClick={onGoHome}
+        className="flex items-center shrink-0 cursor-pointer"
+      >
+        <img src="/logo-dark.png" alt="Afridemy" className="h-11 w-auto transition-transform hover:scale-105" />
+      </button>
 
-      {/* Search */}
+      {/* Search, softer rounded pill treatment */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           onSearchSubmit();
         }}
-        className="hidden lg:flex items-center flex-1 max-w-xs mx-4"
+        className="hidden lg:flex items-center flex-1 max-w-sm"
       >
         <div className="relative w-full">
-          <Search className="w-4 h-4 text-[#12102A]/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#12102A]/35 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search courses"
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#12102A]/10 bg-[#FAF9FC] text-xs font-semibold text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 rounded-full border border-[#12102A]/10 bg-[#FAF9FC] text-sm font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white focus:shadow-sm transition-all"
           />
         </div>
       </form>
 
       {/* Navigation Links */}
-      <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+      <nav className="hidden md:flex items-center gap-5 lg:gap-7 shrink-0">
+        <button
+          onClick={onGoHome}
+          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] transition-colors cursor-pointer"
+        >
+          Home
+        </button>
+
         <button
           onClick={() => setActiveNav('catalog')}
           className={`text-sm font-bold transition-all cursor-pointer ${
             activeNav === 'catalog' || activeNav === 'course-detail' || activeNav === 'curriculum'
-              ? 'text-[#12102A] border-b-2 border-[#F5A623] pb-1'
+              ? 'text-[#12102A]'
               : 'text-[#12102A]/60 hover:text-[#12102A]'
           }`}
         >
@@ -73,97 +84,90 @@ export const Header: React.FC<HeaderProps> = ({
 
         <button
           onClick={onOpenWorkspace}
-          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] flex items-center gap-1.5 transition-colors cursor-pointer"
+          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] transition-colors cursor-pointer"
         >
-          <Terminal className="w-4 h-4 text-[#F5A623]" />
-          Simulator Lab
+          See It Work
         </button>
 
         <button
           onClick={onOpenPortfolio}
-          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] flex items-center gap-1.5 transition-colors cursor-pointer"
+          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] transition-colors cursor-pointer"
         >
-          <ShieldCheck className="w-4 h-4 text-[#10B981]" />
-          Verified Portfolio
+          Verified Work
         </button>
 
         <button
-          onClick={() => setActiveNav('community')}
-          className={`text-sm font-semibold transition-all cursor-pointer ${
-            activeNav === 'community' 
-              ? 'text-[#12102A] border-b-2 border-[#F5A623] pb-1' 
-              : 'text-[#12102A]/60 hover:text-[#12102A]'
-          }`}
+          onClick={onOpenPricing}
+          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] transition-colors cursor-pointer"
         >
-          Community
+          Pricing
         </button>
 
         <button
           onClick={onOpenAbout}
-          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] flex items-center gap-1.5 transition-colors cursor-pointer"
+          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] transition-colors cursor-pointer"
         >
-          <Info className="w-4 h-4 text-[#12102A]/40" />
           About
         </button>
+      </nav>
 
-        {/* User profile & Actions */}
-        <div className="flex items-center gap-3 pl-4 lg:pl-6 border-l border-[#12102A]/10">
-          <button 
-            onClick={onOpenPricing}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
+      {/* User profile & Actions, rounded-pill treatment matching the reference */}
+      <div className="hidden md:flex items-center gap-2.5 shrink-0">
+        <button
+          onClick={onOpenPricing}
+          className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer active:scale-[0.97] ${
+            user.plan === 'pro'
+              ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30'
+              : 'bg-[#12102A] text-white hover:bg-[#1c1940]'
+          }`}
+        >
+          {user.plan === 'pro' ? 'Pro Active' : 'Upgrade'}
+        </button>
+
+        <button
+          type="button"
+          onClick={onOpenAuth}
+          className="flex items-center gap-2.5 cursor-pointer p-1 pr-1.5 rounded-full hover:bg-[#FAF9FC] transition-colors"
+          title="Click to Switch Profile / Edit Account"
+        >
+          <div className="text-right hidden lg:block">
+            <p className="text-xs font-bold leading-none text-[#12102A]">{user.name}</p>
+            <p className="text-[10px] text-[#12102A]/50 font-semibold mt-0.5">
+              {user.plan === 'pro' ? 'Pro Member' : 'Free Learner'}
+            </p>
+          </div>
+          <div
+            className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs transition-all ${
               user.plan === 'pro'
-                ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30'
-                : 'bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] hover:border-[#F5A623]'
+                ? 'bg-[#12102A] text-[#F5A623] ring-2 ring-[#F5A623]/30'
+                : 'bg-[#12102A]/10 text-[#12102A]'
             }`}
           >
-            {user.plan === 'pro' ? 'PRO ACTIVE' : 'UPGRADE PRO'}
-          </button>
-
-          <button
-            type="button"
-            onClick={onOpenAuth}
-            className="flex items-center gap-2.5 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition-colors"
-            title="Click to Switch Profile / Edit Account"
-          >
-            <div className="text-right hidden sm:block">
-              <p className="text-xs font-bold leading-none text-[#12102A]">{user.name}</p>
-              <p className="text-[10px] uppercase tracking-widest text-[#12102A]/50 font-bold font-mono mt-0.5">
-                {user.plan === 'pro' ? 'PRO MEMBER' : 'FREE LEARNER'}
-              </p>
-            </div>
-            <div 
-              className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs transition-all ${
-                user.plan === 'pro'
-                  ? 'bg-[#12102A] text-[#F5A623] ring-2 ring-[#F5A623]/30'
-                  : 'bg-[#12102A]/10 text-[#12102A]'
-              }`}
-            >
-              {user.initials}
-            </div>
-          </button>
-        </div>
-      </nav>
+            {user.initials}
+          </div>
+        </button>
+      </div>
 
       {/* Mobile Action buttons */}
       <div className="flex md:hidden items-center gap-2.5">
         <button
           onClick={onOpenWorkspace}
-          className="px-2.5 py-1.5 bg-[#F5A623] text-[#12102A] text-xs font-bold rounded-lg"
+          className="px-2.5 py-1.5 bg-[#F5A623] text-[#12102A] text-xs font-bold rounded-full"
         >
-          Lab
+          Demo
         </button>
         <button
           onClick={onOpenPortfolio}
-          className="p-1.5 rounded-lg border border-[#12102A]/10 text-[#10B981]"
+          className="p-1.5 rounded-full border border-[#12102A]/10 text-[#10B981]"
         >
           <ShieldCheck className="w-4 h-4" />
         </button>
-        <div 
+        <button
           onClick={onOpenAuth}
           className="w-8 h-8 rounded-full bg-[#12102A] text-[#F5A623] flex items-center justify-center font-black text-xs cursor-pointer"
         >
           {user.initials}
-        </div>
+        </button>
       </div>
     </header>
   );

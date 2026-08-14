@@ -91,10 +91,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Left Column: Heading & CTAs */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5A623]/10 border border-[#F5A623]/20">
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-              <span className="text-[11px] font-bold font-mono uppercase tracking-wider text-[#12102A]">
-                Now Enrolling: Nairobi Cohort
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/20">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#12102A]">
+                Every build independently verified, never self-reported
               </span>
             </div>
 
@@ -103,102 +103,118 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </h1>
 
             <p className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl">
-              No diploma to hang on a wall. You build a real AI system, WhatsApp orders, M-Pesa payments, for a real Kenyan business, then show it off with a verified link instead of a resume that just claims you can do it.
+              No diploma to hang on a wall. You build a real AI system for a real African business, customer support, sales, invoicing, scheduling, whatever that business actually needs, then show it off with a verified link instead of a resume that just claims you can do it.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-              <button
-                onClick={onEnterApp}
-                className="px-6 py-3.5 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] font-black text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-all active:scale-[0.97]"
-              >
-                Start Free, No Card Needed
-                <ArrowRight className="w-4 h-4" />
-              </button>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <button
+                  onClick={onEnterApp}
+                  className="px-6 py-3.5 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] font-black text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-all active:scale-[0.97]"
+                >
+                  Start Now
+                  <ArrowRight className="w-4 h-4" />
+                </button>
 
-              <button
-                onClick={onOpenSandbox}
-                className="px-6 py-3.5 bg-white hover:bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] font-bold text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-2xs"
-              >
-                <Play className="w-4 h-4 text-[#F5A623] fill-current" />
-                Watch It Answer a Customer
-              </button>
+                <button
+                  onClick={onOpenSandbox}
+                  className="px-6 py-3.5 bg-white hover:bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] font-bold text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-2xs"
+                >
+                  <Play className="w-4 h-4 text-[#F5A623] fill-current" />
+                  See a Real System in Action
+                </button>
+              </div>
+              <span className="text-[11px] text-[#12102A]/50 font-semibold pl-1">No card needed to start</span>
             </div>
 
-            {/* Value checklist — outcomes, not spec sheets */}
+            {/* Value checklist — outcomes, not spec sheets, and not one course's feature list */}
             <div className="grid grid-cols-2 gap-3 pt-4 border-t border-[#12102A]/10">
               <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
                 <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                Works on WhatsApp, where customers already are
+                Real businesses, not practice exercises
               </div>
               <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
                 <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                Takes M-Pesa payments on its own
+                10 systems to choose from: sales, support, finance, ops
               </div>
               <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
                 <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                Answers customers instantly, day or night
+                Checked by a real business, not self-reported
               </div>
               <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
                 <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                Your work is the proof, not a certificate
+                A link a client can click and test themselves
               </div>
             </div>
+
+            {/* Stat row — honest numbers only, no invented user counts */}
+            <div className="grid grid-cols-3 gap-4 pt-6">
+              <div>
+                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">10</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Real business systems to build</p>
+              </div>
+              <div>
+                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">100%</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Independently verified, never self-reported</p>
+              </div>
+              <div>
+                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">80K&ndash;400K</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">KES/month this skillset already commands in Nairobi*</p>
+              </div>
+            </div>
+            <p className="text-[10px] text-[#12102A]/40 -mt-4">*Based on current Nairobi freelance market rates for AI automation builders. Not a guaranteed income.</p>
           </div>
 
-          {/* Right Column: Authentic WhatsApp preview, not a dev terminal */}
+          {/* Right Column: image tile grid, not one dominant chat mockup */}
           <div className="lg:col-span-5">
-            <div className="bg-[#E5DDD5] rounded-2xl shadow-2xl border border-[#12102A]/10 overflow-hidden">
-              {/* WhatsApp-style header */}
-              <div className="bg-[#075E54] px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-[#12102A] flex items-center justify-center text-[#F5A623] font-bold text-xs">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Large photo tile — spans both rows. Drop hero-photo.jpg into public/ to fill this in. */}
+              <div className="col-span-2 sm:col-span-1 sm:row-span-2 relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] min-h-[220px] sm:min-h-[360px]">
+                <img
+                  src="/hero-photo.jpg"
+                  alt="A learner building a real AI system"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+                <div className="absolute top-3 left-3 bg-white text-[#12102A] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-[#10B981]" />
+                  Verified builds
+                </div>
+                <div className="absolute bottom-3 left-3 bg-white text-[#12102A] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                  10 real systems
+                </div>
+              </div>
+
+              {/* Illustration tile — drop hero-illustration.png into public/ to fill this in */}
+              <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-lg bg-[#FAF9FC] min-h-[160px] flex items-center justify-center">
+                <img
+                  src="/hero-illustration.png"
+                  alt="An AI automation workflow"
+                  className="absolute inset-0 w-full h-full object-contain p-4"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+
+              {/* Demoted WhatsApp preview — now one tile among several, not the whole hero */}
+              <div className="bg-[#E5DDD5] rounded-2xl shadow-lg border border-[#12102A]/10 overflow-hidden">
+                <div className="bg-[#075E54] px-3 py-2 flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-[#12102A] flex items-center justify-center text-[#F5A623] font-bold text-[9px] shrink-0">
                     AB
                   </div>
-                  <div>
-                    <p className="text-white text-sm font-bold leading-none">AfrikBot</p>
-                    <p className="text-white/70 text-[10px] mt-0.5">online</p>
-                  </div>
+                  <p className="text-white text-[10px] font-bold truncate">One of 10 systems: WhatsApp orders</p>
                 </div>
-                <span className="text-[9px] font-bold text-[#F5A623] bg-white/10 px-2 py-1 rounded-full">
-                  Built by a learner
-                </span>
-              </div>
-
-              {/* Chat body */}
-              <div className="p-4 space-y-3">
-                <div className="flex justify-start">
-                  <div className="max-w-[85%] bg-white rounded-xl rounded-tl-none px-3 py-2 text-sm text-[#12102A] shadow-sm">
-                    Habari! Do you have Maasai beaded sandals, size 40? Can I pay by M-Pesa?
-                    <div className="text-[10px] text-[#12102A]/40 mt-1">10:41 AM</div>
+                <div className="p-2.5">
+                  <div className="bg-[#DCF8C6] rounded-lg rounded-tr-none px-2.5 py-1.5 text-[10px] text-[#12102A] shadow-sm mb-1.5">
+                    "18 pairs in stock at KES 2,800. Pay via M-Pesa?"
                   </div>
+                  <button
+                    onClick={onOpenSandbox}
+                    className="text-[10px] font-black text-[#075E54] hover:underline cursor-pointer"
+                  >
+                    Try this one &rarr;
+                  </button>
                 </div>
-
-                <div className="flex justify-end">
-                  <div className="max-w-[85%] bg-[#DCF8C6] rounded-xl rounded-tr-none px-3 py-2 text-sm text-[#12102A] shadow-sm">
-                    Karibu! Yes, 18 pairs in stock at KES 2,800. Reply "pay" and I'll send you the M-Pesa prompt right now.
-                    <div className="text-[10px] text-[#12102A]/40 mt-1 flex items-center justify-end gap-1">
-                      10:41 AM
-                      <Check className="w-3 h-3 text-[#34B7F1]" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center">
-                  <div className="bg-white/70 text-[#12102A]/70 text-[11px] font-semibold px-3 py-1.5 rounded-full">
-                    M-Pesa payment received, order confirmed
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-4 py-3 bg-white/60 border-t border-[#12102A]/5 flex items-center justify-between">
-                <span className="text-[11px] text-[#12102A]/60 font-semibold">This is a real, live conversation</span>
-                <button
-                  onClick={onOpenSandbox}
-                  className="px-3 py-1.5 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-black rounded-lg transition-all active:scale-[0.97] cursor-pointer"
-                >
-                  Try It Yourself
-                </button>
               </div>
             </div>
           </div>
