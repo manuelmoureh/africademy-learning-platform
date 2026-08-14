@@ -99,7 +99,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.05]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.1]">
               We Help You Build Skills <span className="text-[#F5A623]">Real</span> Businesses Pay For.
             </h1>
 
