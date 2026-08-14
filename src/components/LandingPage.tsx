@@ -286,8 +286,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned by our students</p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={15} prefix="KES " suffix="K+" /></p>
-                <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Per system built</p>
+                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={30} prefix="KES " suffix="K+" /></p>
+                <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned monthly by active students</p>
               </div>
             </div>
           </div>
