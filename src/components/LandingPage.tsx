@@ -97,7 +97,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/20">
               <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
               <span className="text-[11px] font-bold text-[#12102A]">
-                Every build independently verified, never self-reported
+                Every build checked and confirmed by a real business
               </span>
             </div>
 
