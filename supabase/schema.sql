@@ -97,11 +97,21 @@ alter table public.enrollments enable row level security;
 alter table public.progress enable row level security;
 alter table public.portfolio_submissions enable row level security;
 
+-- SECURITY DEFINER so this bypasses RLS internally — calling it FROM a policy on
+-- profiles would otherwise re-trigger that same policy and recurse infinitely.
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin');
+$$;
+
 create policy "profiles: read own" on public.profiles for select using (auth.uid() = id);
 create policy "profiles: update own" on public.profiles for update using (auth.uid() = id);
-create policy "profiles: admin read all" on public.profiles for select using (
-  exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')
-);
+create policy "profiles: admin read all" on public.profiles for select using (public.is_admin());
 
 create policy "tracks: public read" on public.tracks for select using (true);
 
@@ -114,12 +124,8 @@ create policy "progress: update own" on public.progress for update using (auth.u
 
 create policy "submissions: read own" on public.portfolio_submissions for select using (auth.uid() = user_id);
 create policy "submissions: insert own" on public.portfolio_submissions for insert with check (auth.uid() = user_id);
-create policy "submissions: admin read all" on public.portfolio_submissions for select using (
-  exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')
-);
-create policy "submissions: admin update" on public.portfolio_submissions for update using (
-  exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')
-);
+create policy "submissions: admin read all" on public.portfolio_submissions for select using (public.is_admin());
+create policy "submissions: admin update" on public.portfolio_submissions for update using (public.is_admin());
 
 -- Seed the 10 tracks so enrollments/progress have something to reference.
 -- IDs/titles must match src/data/courses.ts INITIAL_TRACKS — keep in sync if courses.ts changes.

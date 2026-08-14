@@ -52,7 +52,10 @@ function applyProgressToTracks(baseTracks: Track[], rows: { track_id: string; st
     const steps = track.steps.map((step) => {
       const isCompleted = stepStates.get(step.id);
       if (isCompleted === undefined) return step;
-      return { ...step, status: (isCompleted ? 'completed' : step.status) as Step['status'] };
+      if (isCompleted) return { ...step, status: 'completed' as Step['status'] };
+      // Explicit "not completed" row — honor it even if the mock baseline had this
+      // step pre-marked complete, instead of silently falling back to that mock status.
+      return { ...step, status: (step.status === 'completed' ? 'current' : step.status) as Step['status'] };
     });
     const completedSteps = steps.filter((s) => s.status === 'completed').length;
     return { ...track, steps, completedSteps, progress: Math.round((completedSteps / track.totalSteps) * 100) };
