@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  X, ShieldCheck, CheckCircle2, Share2, ExternalLink, Code2, 
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  X, ShieldCheck, CheckCircle2, Share2, ExternalLink, Code2,
   Terminal, Check, Copy, Sparkles, Building2, UserCheck, Activity, Award
 } from 'lucide-react';
 import { PortfolioVerification } from '../types';
@@ -23,8 +24,6 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'rubric' | 'architecture' | 'reviewer'>('rubric');
 
-  if (!isOpen) return null;
-
   const handleCopyLink = () => {
     navigator.clipboard?.writeText(verification.liveUrl);
     setCopied(true);
@@ -32,8 +31,22 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white border border-[#12102A]/10 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <AnimatePresence>
+      {isOpen && (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="bg-white border border-[#12102A]/10 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      >
         
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#12102A]/10 bg-[#FAF9FC]">
@@ -302,7 +315,9 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
           </div>
         </div>
 
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

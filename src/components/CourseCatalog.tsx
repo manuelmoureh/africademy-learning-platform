@@ -1,7 +1,13 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Users, TrendingUp, Star, BookOpen, Clock } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+};
 
 function estimateHours(track: Track): string {
   const totalMinutes = track.steps.reduce((sum, s) => sum + (parseInt(s.duration, 10) || 0), 0);
@@ -17,6 +23,7 @@ interface CourseCatalogProps {
 }
 
 export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuery = '', onSelectCourse }) => {
+  const reduce = useReducedMotion();
   const q = searchQuery.trim().toLowerCase();
   const visibleTracks = q
     ? tracks.filter(
@@ -46,11 +53,18 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {visibleTracks.map((track) => (
-          <button
+        {visibleTracks.map((track, i) => (
+          <motion.button
             key={track.id}
             onClick={() => onSelectCourse(track.id)}
-            className="text-left rounded-2xl border border-[#12102A]/10 bg-white flex flex-col overflow-hidden hover:border-[#F5A623] hover:shadow-md transition-all active:scale-[0.98] cursor-pointer group"
+            initial={reduce ? false : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={cardVariants}
+            transition={{ duration: 0.4, delay: Math.min(i, 5) * 0.05, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={reduce ? undefined : { y: -4 }}
+            whileTap={reduce ? undefined : { scale: 0.98 }}
+            className="text-left rounded-2xl border border-[#12102A]/10 bg-white flex flex-col overflow-hidden hover:border-[#F5A623] hover:shadow-lg transition-colors cursor-pointer group"
           >
             {/* Thumbnail: real image if provided (/course-thumbs/{id}.jpg), otherwise a colored icon tile */}
             <div className="relative h-36 bg-gradient-to-br from-[#12102A] to-[#3f3a6b] flex items-center justify-center overflow-hidden">
@@ -118,7 +132,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
                 </span>
               </div>
             </div>
-          </button>
+          </motion.button>
         ))}
       </div>
     </section>

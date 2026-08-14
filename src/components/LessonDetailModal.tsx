@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Step } from '../types';
 import { X, CheckCircle2, Play, Code2, BookOpen, Sparkles, ArrowRight, Lock } from 'lucide-react';
 
@@ -19,14 +20,26 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
   onToggleComplete,
   isProUser,
 }) => {
-  if (!step) return null;
-
-  const isLocked = step.isGated && !isProUser;
-  const isCompleted = step.status === 'completed';
+  const isLocked = step ? step.isGated && !isProUser : false;
+  const isCompleted = step?.status === 'completed';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white border border-[#12102A]/10 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+    <AnimatePresence>
+      {step && (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="bg-white border border-[#12102A]/10 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      >
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#12102A]/10 bg-[#FAF9FC]">
@@ -222,7 +235,9 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
           </div>
         )}
 
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

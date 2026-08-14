@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { X, Send, Loader2, CheckCircle2 } from 'lucide-react';
 import { submitPortfolioProject } from '../lib/db';
 
@@ -25,8 +26,6 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-
-  if (!isOpen) return null;
 
   const handleClose = () => {
     setSubmitted(false);
@@ -59,8 +58,22 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white border border-[#12102A]/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+    <AnimatePresence>
+      {isOpen && (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="bg-white border border-[#12102A]/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      >
 
         <div className="p-6 bg-[#FAF9FC] border-b border-[#12102A]/10 flex items-center justify-between">
           <div>
@@ -165,7 +178,9 @@ export const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({
             </button>
           </form>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

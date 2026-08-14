@@ -300,10 +300,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {tracks.map((track) => {
             const isFeatured = track.id === 'whatsapp-retail-agent';
             return (
-              <button
+              <motion.button
                 key={track.id}
                 onClick={onEnterApp}
-                className={`text-left shrink-0 snap-start w-[220px] sm:w-[240px] rounded-2xl border p-5 flex flex-col gap-3 transition-all cursor-pointer active:scale-[0.98] ${
+                whileHover={reduce ? undefined : { y: -3 }}
+                whileTap={reduce ? undefined : { scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className={`group text-left shrink-0 snap-start w-[220px] sm:w-[240px] rounded-2xl border p-5 flex flex-col gap-3 cursor-pointer transition-colors ${
                   isFeatured
                     ? 'bg-[#F5A623]/8 border-[#F5A623]'
                     : 'bg-white border-[#12102A]/10 hover:border-[#F5A623] hover:shadow-sm'
@@ -320,8 +323,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     For {track.whoBuysThis.charAt(0).toLowerCase() + track.whoBuysThis.slice(1)}.
                   </p>
                 </div>
-                <ArrowRight className="w-4 h-4 mt-auto text-[#F5A623]" />
-              </button>
+                <ArrowRight className="w-4 h-4 mt-auto text-[#F5A623] transition-transform group-hover:translate-x-1" />
+              </motion.button>
             );
           })}
         </div>
@@ -464,7 +467,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             {/* Free Tier */}
-            <div className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col justify-between">
+            <motion.div
+              initial={reduce ? false : 'hidden'}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={fadeUp}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#FAF9FC] flex flex-col justify-between"
+            >
               <div>
                 <h3 className="font-bold text-lg text-[#12102A]">Learner Free</h3>
                 <div className="my-4">
@@ -493,10 +503,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 Start Free
               </button>
-            </div>
+            </motion.div>
 
             {/* Pro Tier */}
-            <div className="p-6 rounded-2xl border-2 border-[#F5A623] bg-[#F5A623]/5 flex flex-col justify-between relative shadow-sm">
+            <motion.div
+              initial={reduce ? false : 'hidden'}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={fadeUp}
+              transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={reduce ? undefined : { y: -4 }}
+              className="p-6 rounded-2xl border-2 border-[#F5A623] bg-[#F5A623]/5 flex flex-col justify-between relative shadow-sm"
+            >
               <div className="absolute -top-3 right-6 bg-[#12102A] text-[#F5A623] px-3 py-0.5 rounded-full text-[10px] font-black font-mono">
                 MOST POPULAR
               </div>
@@ -533,7 +551,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 Upgrade to Pro
               </button>
-            </div>
+            </motion.div>
 
           </div>
         </div>
