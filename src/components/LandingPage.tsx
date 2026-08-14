@@ -102,11 +102,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.1]">
-              We Help You Build <span className="text-[#F5A623]">Skills</span>, <span className="text-[#F5A623]">Real</span> Businesses Pay For.
+              We Help You Build <span className="text-[#F5A623]">AI Systems</span> That Businesses Pay For.
             </h1>
 
             <p className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl">
-              Learn how to build the on-demand AI skills African businesses need, and start earning.
+              Learn how to build on-demand AI skills that African businesses need and start earning.
             </p>
 
             {/* CTAs */}
