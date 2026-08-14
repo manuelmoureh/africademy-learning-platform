@@ -100,7 +100,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.05]">
-              Build AI Tools. Get Paid by <span className="italic text-[#F5A623]">Real</span> Businesses.
+              Learn to Build AI. Get Paid by <span className="italic text-[#F5A623]">Real</span> Businesses.
             </h1>
 
             <p className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl">
