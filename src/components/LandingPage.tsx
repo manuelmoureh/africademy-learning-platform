@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search
+  Check, Users, Star, Search, Megaphone, Brain, MessageSquare, Coins
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -19,6 +19,13 @@ const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
+
+const workflowSteps = [
+  { key: 'ads', icon: Megaphone },
+  { key: 'ai', icon: Brain },
+  { key: 'whatsapp', icon: MessageSquare },
+  { key: 'sale', icon: Coins },
+];
 
 interface CounterProps {
   target: number;
@@ -39,8 +46,10 @@ const Counter: React.FC<CounterProps> = ({ target, prefix = '', suffix = '' }) =
       return;
     }
     const controls = animate(0, target, {
-      duration: 1.4,
-      ease: 'easeOut',
+      type: 'spring',
+      stiffness: 40,
+      damping: 12,
+      restDelta: 0.5,
       onUpdate: (v) => setDisplay(v),
     });
     return () => controls.stop();
@@ -227,13 +236,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-[11px] font-bold text-[#12102A]">4.9 on Trustpilot</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.1]">
+            <motion.h1
+              initial={reduce ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className="text-3xl sm:text-4xl md:text-5xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.1]"
+            >
               We Help You Build <span className="text-[#F5A623]">AI Systems</span> That Businesses Pay For.
-            </h1>
+            </motion.h1>
 
-            <p className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl">
-              Learn how to build on-demand AI skills that African businesses need and start earning.
-            </p>
+            <motion.p
+              initial={reduce ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl"
+            >
+              Build for a real business first. Once they confirm it works, you're ready to get paid to do it again.
+            </motion.p>
 
             {/* CTAs */}
             <div className="flex flex-col gap-2">
@@ -275,7 +294,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Right Column: one dominant photo with floating badges, top-right pill pair + stacked left cards + bottom-right stat */}
           <div className="lg:col-span-5">
-            <motion.div className="relative min-h-[420px] sm:min-h-[520px]" style={{ x: springX, y: springY }}>
+            <motion.div
+              className="relative min-h-[420px] sm:min-h-[520px]"
+              style={{ x: springX, y: springY }}
+              initial={reduce ? false : { opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            >
               <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b]">
                 <img
                   src="/hero-photo.jpg"
@@ -286,35 +311,80 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Top-right diagonal pill pair, straddling the top and right edges */}
-              <div className="absolute -top-3 right-10 sm:right-12 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10">
+              <motion.div
+                initial={reduce ? false : { opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute -top-3 right-10 sm:right-12 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
+              >
                 <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
-                Verified, not self-reported
-              </div>
-              <div className="absolute top-10 sm:top-12 -right-3 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10">
+                Checked by real businesses
+              </motion.div>
+              <motion.div
+                initial={reduce ? false : { opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute top-10 sm:top-12 -right-3 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
+              >
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
                 First 5 Lessons Free
-              </div>
+              </motion.div>
 
-              {/* Left side, stacked amber stat card + white track-picker card, straddling the left edge */}
-              <div className="absolute top-[34%] -left-5 sm:-left-6 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[128px] z-10">
-                <p className="text-2xl font-black leading-none">10</p>
-                <p className="text-[10px] font-bold leading-tight mt-1">Business systems to build</p>
-              </div>
+              {/* Left side: how-it-works flow diagram + skill picker, straddling the left edge */}
+              <motion.div
+                initial={reduce ? false : { opacity: 0, x: -14 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute top-[30%] -left-5 sm:-left-6 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[196px] z-10"
+              >
+                <p className="text-[9px] font-bold uppercase tracking-wider opacity-70 mb-2">What you'll build</p>
+                <div className="flex items-center">
+                  {workflowSteps.map((step, i) => (
+                    <React.Fragment key={step.key}>
+                      <div className="w-6 h-6 rounded-full bg-[#12102A] flex items-center justify-center shrink-0">
+                        <step.icon className="w-3 h-3 text-[#F5A623]" />
+                      </div>
+                      {i < workflowSteps.length - 1 && (
+                        <div className="flex-1 h-[2px] mx-1 rounded-full bg-[#12102A]/20 relative overflow-hidden">
+                          {!reduce && (
+                            <motion.div
+                              className="absolute inset-y-0 w-2.5 rounded-full bg-[#12102A]"
+                              animate={{ x: ['-100%', '900%'] }}
+                              transition={{ duration: 1.4, repeat: Infinity, ease: 'linear', delay: i * 0.25 }}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+                <p className="text-[9px] font-bold leading-tight mt-2">Ads to AI agent to WhatsApp to sale</p>
+              </motion.div>
 
-              <div className="absolute top-[54%] -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10">
-                <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick your track</p>
+              <motion.div
+                initial={reduce ? false : { opacity: 0, x: -14 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute top-[58%] -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10"
+              >
+                <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick what to build</p>
                 <div className="flex flex-wrap gap-1">
                   <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
                   <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Sales</span>
                   <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Finance</span>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Bottom-right amber stat card, straddling the corner */}
-              <div className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[150px] z-10">
+              <motion.div
+                initial={reduce ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[150px] z-10"
+              >
                 <p className="text-2xl font-black leading-none">80K+</p>
                 <p className="text-[10px] font-bold leading-tight mt-1">KES earned per system installed</p>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
 
