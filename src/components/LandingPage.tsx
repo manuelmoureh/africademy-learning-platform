@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, MessageSquare
+  Check, Users
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -147,10 +147,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
-          {/* Right Column: main photo plus two supporting boxes, bento-style */}
-          <div className="lg:col-span-5 space-y-3">
-            {/* Main photo with floating badges straddling its edges — half in, half out */}
-            <div className="relative min-h-[260px] sm:min-h-[320px]">
+          {/* Right Column: one dominant photo with floating badges, top-right pill pair + stacked left cards + bottom-right stat */}
+          <div className="lg:col-span-5">
+            <div className="relative min-h-[420px] sm:min-h-[520px]">
               <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b]">
                 <img
                   src="/hero-photo.jpg"
@@ -160,7 +159,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 />
               </div>
 
-              <div className="absolute top-[30%] -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10">
+              {/* Top-right diagonal pill pair, straddling the top and right edges */}
+              <div className="absolute -top-3 right-10 sm:right-12 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
+                Verified, not self-reported
+              </div>
+              <div className="absolute top-10 sm:top-12 -right-3 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                First 5 Lessons Free
+              </div>
+
+              {/* Left side, stacked amber stat card + white track-picker card, straddling the left edge */}
+              <div className="absolute top-[34%] -left-5 sm:-left-6 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[128px] z-10">
+                <p className="text-2xl font-black leading-none">10</p>
+                <p className="text-[10px] font-bold leading-tight mt-1">Business systems to build</p>
+              </div>
+
+              <div className="absolute top-[54%] -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10">
                 <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick your track</p>
                 <div className="flex flex-wrap gap-1">
                   <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
@@ -169,48 +184,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
 
-              <div className="absolute top-[55%] -right-5 sm:-right-6 bg-white text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 z-10 max-w-[180px]">
-                <MessageSquare className="w-3.5 h-3.5 text-[#F5A623] shrink-0" />
-                WhatsApp + M-Pesa Native
-              </div>
-
-              <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-white text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 z-10">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
-                Verified, not self-reported
-              </div>
-
-              <div className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] text-[10px] leading-tight font-bold px-3.5 py-2 rounded-xl shadow-lg z-10 max-w-[170px]">
-                Earn from KES 80K+ per system installed for clients
-              </div>
-            </div>
-
-            {/* Two supporting boxes — real photos to be dropped in, gradient fallback until then */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative min-h-[140px] sm:min-h-[170px] rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-lg bg-gradient-to-br from-[#F5A623] to-[#c97e13]">
-                <img
-                  src="/hero-photo-2.jpg"
-                  alt="A learner presenting a finished AI system"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-transparent" />
-                <div className="absolute bottom-3 left-3 right-3 text-white text-xs font-bold">
-                  10 Business Systems
-                </div>
-              </div>
-
-              <div className="relative min-h-[140px] sm:min-h-[170px] rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-lg bg-gradient-to-br from-[#12102A] to-[#3f3a6b]">
-                <img
-                  src="/hero-photo-3.jpg"
-                  alt="A learner in a lesson, building a real system"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-transparent" />
-                <div className="absolute bottom-3 left-3 right-3 text-white text-xs font-bold flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
-                  First 5 Lessons Free
-                </div>
+              {/* Bottom-right amber stat card, straddling the corner */}
+              <div className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[150px] z-10">
+                <p className="text-2xl font-black leading-none">80K+</p>
+                <p className="text-[10px] font-bold leading-tight mt-1">KES earned per system installed</p>
               </div>
             </div>
           </div>
