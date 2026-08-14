@@ -240,6 +240,11 @@ export default function App() {
           onOpenAbout={() => setViewMode('about')}
           onOpenPrivacy={() => setViewMode('privacy')}
           onOpenTerms={() => setViewMode('terms')}
+          onSearch={(query) => {
+            setSearchQuery(query);
+            setActiveNav('catalog');
+            setViewMode('app');
+          }}
           tracks={tracks}
         />
 

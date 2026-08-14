@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star
+  Check, Users, Star, Search
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -51,6 +51,7 @@ interface LandingPageProps {
   onOpenAbout: () => void;
   onOpenPrivacy: () => void;
   onOpenTerms: () => void;
+  onSearch: (query: string) => void;
   tracks: Track[];
 }
 
@@ -64,9 +65,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenAbout,
   onOpenPrivacy,
   onOpenTerms,
+  onSearch,
   tracks,
 }) => {
   const reduce = useReducedMotion();
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
+  const [navSearch, setNavSearch] = useState('');
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -90,40 +94,70 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <div className="min-h-screen bg-[#FAF9FC] text-[#12102A] flex flex-col">
       {/* Top Navbar — translucent, stays legible over whatever scrolls beneath it */}
-      <nav className="flex items-center justify-between px-6 lg:px-12 h-20 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10 sticky top-0 z-30">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={onEnterApp}>
-          <img src="/logo-dark.png" alt="Afridemy" className="h-16 w-auto" />
-        </div>
+      <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={onEnterApp}>
+            <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
+          </div>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-semibold">
-          <button onClick={onEnterApp} className="text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors">
-            Courses
-          </button>
-          <button onClick={onOpenSandbox} className="text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors">
-            See It Work
-          </button>
-          <button onClick={onOpenPortfolio} className="text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors">
-            Verified Work
-          </button>
-          <button onClick={onOpenPricing} className="text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors">
-            Pricing
-          </button>
-        </div>
+          <div
+            className="hidden md:flex items-center gap-0.5"
+            onMouseLeave={() => setHoveredNav(null)}
+          >
+            {[
+              { key: 'courses', label: 'Courses', onClick: onEnterApp },
+              { key: 'demo', label: 'See It Work', onClick: onOpenSandbox },
+              { key: 'verified', label: 'Verified Work', onClick: onOpenPortfolio },
+              { key: 'pricing', label: 'Pricing', onClick: onOpenPricing },
+              { key: 'about', label: 'About', onClick: onOpenAbout },
+            ].map((link) => (
+              <button
+                key={link.key}
+                onClick={link.onClick}
+                onMouseEnter={() => setHoveredNav(link.key)}
+                className="relative px-4 py-2 text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors"
+              >
+                {hoveredNav === link.key && !reduce && (
+                  <motion.span
+                    layoutId="nav-hover-pill"
+                    className="absolute inset-0 bg-[#FAF9FC] rounded-full -z-10"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                  />
+                )}
+                {link.label}
+              </button>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onOpenAuth}
-            className="px-4 py-2 rounded-lg border border-[#12102A]/10 bg-white hover:bg-[#FAF9FC] text-xs font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
-          >
-            Sign In
-          </button>
-          <button
-            onClick={onEnterApp}
-            className="px-4 py-2 rounded-lg bg-[#12102A] hover:bg-[#1c1940] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all active:scale-[0.97] shadow-xs"
-          >
-            Start Learning
-            <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <form
+              onSubmit={(e) => { e.preventDefault(); onSearch(navSearch); }}
+              className="hidden lg:block relative"
+            >
+              <Search className="w-3.5 h-3.5 text-[#12102A]/35 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={navSearch}
+                onChange={(e) => setNavSearch(e.target.value)}
+                placeholder="Search courses"
+                className="w-40 focus:w-56 pl-9 pr-3 py-2 rounded-full border border-[#12102A]/10 bg-[#FAF9FC] text-xs font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all duration-300"
+              />
+            </form>
+
+            <button
+              onClick={onOpenAuth}
+              className="px-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#FAF9FC] text-xs font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={onEnterApp}
+              className="px-4 py-2 rounded-full bg-[#12102A] hover:bg-[#1c1940] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all active:scale-[0.97] shadow-xs"
+            >
+              Start Learning
+              <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
+            </button>
+          </div>
         </div>
       </nav>
 
