@@ -282,7 +282,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <div>
                 <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={60} prefix="KES " suffix="K+" /></p>
-                <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned monthly by active students</p>
+                <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned per month</p>
               </div>
             </div>
           </div>
@@ -377,7 +377,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Category Strip */}
-      <section className="px-6 lg:px-12 py-14 max-w-6xl mx-auto w-full">
+      <section className="px-6 lg:px-12 pt-6 pb-14 max-w-6xl mx-auto w-full">
         <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
           <p className="text-[11px] font-bold text-[#F5A623] uppercase tracking-wider">Categories</p>
           <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">Explore AI Systems by Category</h2>

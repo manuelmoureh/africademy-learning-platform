@@ -552,7 +552,7 @@ function MotionNavigationMenuContent({
           exit="exit"
           transition={context.spring}
           className={cn(
-            "bg-background/90 text-popover-foreground absolute top-full left-0 z-50 mt-1.5 rounded-md border p-2 pr-2.5 shadow",
+            "bg-background/90 text-popover-foreground absolute top-full left-0 z-50 mt-1.5 rounded-md border p-1.5 pr-2 shadow",
             className,
           )}
         >
@@ -684,7 +684,7 @@ function MotionNavigationMenuViewport({
               animate="active"
               exit="exit"
               transition={context.spring}
-              className={cn("p-2 pr-2.5", activeContent.className)}
+              className={cn("p-1.5 pr-2", activeContent.className)}
             >
               <MotionNavigationMenuContentInner
                 highlightClassName={activeContent.highlightClassName}
@@ -704,7 +704,7 @@ function MotionNavigationMenuViewport({
         className="pointer-events-none invisible absolute top-1.5 left-0 w-max"
       >
         {activeContent && (
-          <div className={cn("p-2 pr-2.5", activeContent.className)}>
+          <div className={cn("p-1.5 pr-2", activeContent.className)}>
             <MotionNavigationMenuContentInner
               highlightClassName={activeContent.highlightClassName}
               innerClassName={activeContent.innerClassName}
