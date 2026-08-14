@@ -1,14 +1,16 @@
 import React from 'react';
-import { ShieldCheck, ArrowUpRight, CheckCircle2, Award } from 'lucide-react';
+import { ShieldCheck, ArrowUpRight, CheckCircle2, Award, Send } from 'lucide-react';
 
 interface PortfolioStatusProps {
   onOpenPortfolio: () => void;
+  onSubmitProject?: () => void;
   completedSteps: number;
   totalSteps: number;
 }
 
 export const PortfolioStatus: React.FC<PortfolioStatusProps> = ({
   onOpenPortfolio,
+  onSubmitProject,
   completedSteps,
   totalSteps,
 }) => {
@@ -40,13 +42,22 @@ export const PortfolioStatus: React.FC<PortfolioStatusProps> = ({
         </div>
       </div>
 
-      <div className="pt-4 border-t border-[#12102A]/5 mt-2">
+      <div className="pt-4 border-t border-[#12102A]/5 mt-2 space-y-2">
+        {onSubmitProject && (
+          <button
+            onClick={onSubmitProject}
+            className="w-full py-2.5 px-3 rounded-xl bg-[#12102A] hover:bg-[#1c1940] text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Send className="w-3.5 h-3.5 text-[#F5A623]" />
+            Submit Your Project
+          </button>
+        )}
         <button
           onClick={onOpenPortfolio}
           className="w-full py-2.5 px-3 rounded-xl bg-[#FAF9FC] hover:bg-[#FAF9FC]/80 border border-[#12102A]/10 text-xs font-bold text-[#12102A] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
         >
           <ShieldCheck className="w-4 h-4 text-[#10B981]" />
-          View Verified Portfolio
+          View Example Verified Portfolio
           <ArrowUpRight className="w-3.5 h-3.5 text-[#12102A]/40" />
         </button>
       </div>

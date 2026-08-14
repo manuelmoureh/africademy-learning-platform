@@ -1,12 +1,37 @@
 import React, { useState } from 'react';
-import { X, User, Mail, MapPin, Check, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { X, User, Lock, ArrowRight, Loader2, LogOut } from 'lucide-react';
 import { UserAccount } from '../types';
+import { supabase } from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUser: UserAccount;
   onLogin: (user: UserAccount) => void;
+  isAuthenticated?: boolean;
+  onSignOut?: () => void;
+}
+
+interface ProfileRow {
+  name: string;
+  email: string;
+  plan: string;
+  location: string | null;
+}
+
+function buildUserAccount(profile: ProfileRow): UserAccount {
+  const parts = profile.name.trim().split(' ');
+  const initials = parts.length > 1
+    ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    : profile.name.slice(0, 2).toUpperCase();
+  return {
+    name: profile.name,
+    email: profile.email,
+    role: profile.plan === 'pro' ? 'Pro Member' : 'Learner',
+    initials,
+    plan: profile.plan === 'pro' ? 'pro' : 'free',
+    location: profile.location || 'Nairobi, Kenya',
+  };
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -14,59 +39,78 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   currentUser,
   onLogin,
+  isAuthenticated,
+  onSignOut,
 }) => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [name, setName] = useState(currentUser.name);
-  const [email, setEmail] = useState(currentUser.email);
-  const [location, setLocation] = useState(currentUser.location || 'Nairobi, Kenya');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [location, setLocation] = useState('Nairobi, Kenya');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) return;
+    setError(null);
+    if (!email.trim() || !password) return;
+    setLoading(true);
 
-    const parts = name.trim().split(' ');
-    const initials = parts.length > 1 
-      ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-      : name.slice(0, 2).toUpperCase();
-
-    onLogin({
-      name: name.trim(),
-      email: email.trim(),
-      role: currentUser.plan === 'pro' ? 'Pro Member' : 'Learner',
-      initials,
-      plan: currentUser.plan,
-      location: location.trim()
-    });
-
-    onClose();
-  };
-
-  const handleQuickProfile = (profileName: string, profileEmail: string, profileLoc: string) => {
-    setName(profileName);
-    setEmail(profileEmail);
-    setLocation(profileLoc);
-    
-    const parts = profileName.split(' ');
-    const initials = `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-
-    onLogin({
-      name: profileName,
-      email: profileEmail,
-      role: currentUser.plan === 'pro' ? 'Pro Member' : 'Learner',
-      initials,
-      plan: currentUser.plan,
-      location: profileLoc
-    });
-
-    onClose();
+    try {
+      if (isSignUp) {
+        if (!name.trim()) {
+          setError('Enter your full name.');
+          setLoading(false);
+          return;
+        }
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { data: { name: name.trim() } },
+        });
+        if (signUpError) throw signUpError;
+        if (!data.user) {
+          setError('Check your email to confirm your account, then sign in.');
+          setLoading(false);
+          return;
+        }
+        await supabase.from('profiles').update({ location }).eq('id', data.user.id);
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('name, email, plan, location')
+          .eq('id', data.user.id)
+          .single();
+        if (profileError) throw profileError;
+        onLogin(buildUserAccount(profile as ProfileRow));
+        onClose();
+      } else {
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (signInError) throw signInError;
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('name, email, plan, location')
+          .eq('id', data.user.id)
+          .single();
+        if (profileError) throw profileError;
+        onLogin(buildUserAccount(profile as ProfileRow));
+        onClose();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-white border border-[#12102A]/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-        
+
         {/* Header */}
         <div className="p-6 bg-[#FAF9FC] border-b border-[#12102A]/10 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -91,23 +135,43 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </button>
         </div>
 
-        {/* Form */}
+        {isAuthenticated ? (
+          <div className="p-6 space-y-4">
+            <div className="p-4 rounded-xl bg-[#FAF9FC] border border-[#12102A]/10 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#12102A] text-[#F5A623] flex items-center justify-center font-black text-xs shrink-0">
+                {currentUser.initials}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[#12102A] truncate">{currentUser.name}</p>
+                <p className="text-xs text-[#12102A]/60 truncate">{currentUser.email}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => { onSignOut?.(); onClose(); }}
+              className="w-full py-3 bg-white hover:bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Sign Out
+            </button>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="text-xs font-bold uppercase font-mono text-[#12102A]/60 block mb-1.5">
-              Full Name
-            </label>
-            <div className="relative">
+          {isSignUp && (
+            <div>
+              <label className="text-xs font-bold uppercase font-mono text-[#12102A]/60 block mb-1.5">
+                Full Name
+              </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Wanjiku Muthoni"
-                required
+                required={isSignUp}
                 className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
               />
             </div>
-          </div>
+          )}
 
           <div>
             <label className="text-xs font-bold uppercase font-mono text-[#12102A]/60 block mb-1.5">
@@ -125,65 +189,71 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           <div>
             <label className="text-xs font-bold uppercase font-mono text-[#12102A]/60 block mb-1.5">
-              Location / City
+              Password
             </label>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 6 characters"
+              required
+              minLength={6}
               className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
-            >
-              <option value="Nairobi, Kenya">Nairobi, Kenya</option>
-              <option value="Mombasa, Kenya">Mombasa, Kenya</option>
-              <option value="Kisumu, Kenya">Kisumu, Kenya</option>
-              <option value="Nakuru, Kenya">Nakuru, Kenya</option>
-              <option value="Eldoret, Kenya">Eldoret, Kenya</option>
-              <option value="International / Remote">International / Remote</option>
-            </select>
+            />
           </div>
+
+          {isSignUp && (
+            <div>
+              <label className="text-xs font-bold uppercase font-mono text-[#12102A]/60 block mb-1.5">
+                Location / City
+              </label>
+              <select
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full bg-[#FAF9FC] border border-[#12102A]/10 rounded-xl px-3.5 py-2.5 text-xs text-[#12102A] font-semibold focus:outline-hidden focus:border-[#F5A623]"
+              >
+                <option value="Nairobi, Kenya">Nairobi, Kenya</option>
+                <option value="Mombasa, Kenya">Mombasa, Kenya</option>
+                <option value="Kisumu, Kenya">Kisumu, Kenya</option>
+                <option value="Nakuru, Kenya">Nakuru, Kenya</option>
+                <option value="Eldoret, Kenya">Eldoret, Kenya</option>
+                <option value="International / Remote">International / Remote</option>
+              </select>
+            </div>
+          )}
+
+          {error && (
+            <p className="text-xs font-semibold text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
-            className="w-full py-3 bg-[#12102A] hover:bg-[#1c1940] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+            disabled={loading}
+            className="w-full py-3 bg-[#12102A] hover:bg-[#1c1940] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-xs disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isSignUp ? 'Create Free Account' : 'Sign In'}
-            <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
+            {loading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <>
+                {isSignUp ? 'Create Free Account' : 'Sign In'}
+                <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
+              </>
+            )}
           </button>
-
-          {/* Quick profile switchers for easy evaluation */}
-          <div className="pt-4 border-t border-[#12102A]/10">
-            <span className="text-[10px] font-mono font-bold uppercase text-[#12102A]/40 block mb-2">
-              Quick Test Profiles:
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickProfile('Wanjiku Muthoni', 'wanjiku@afridemy.ke', 'Nairobi, Kenya')}
-                className="p-2 rounded-lg border border-[#12102A]/10 bg-[#FAF9FC] hover:border-[#F5A623] text-left transition-colors cursor-pointer"
-              >
-                <p className="text-xs font-bold text-[#12102A] leading-tight">Wanjiku Muthoni</p>
-                <p className="text-[10px] text-[#12102A]/50 font-mono">Nairobi, Kenya</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickProfile('Juma Omondi', 'juma@afridemy.ke', 'Mombasa, Kenya')}
-                className="p-2 rounded-lg border border-[#12102A]/10 bg-[#FAF9FC] hover:border-[#F5A623] text-left transition-colors cursor-pointer"
-              >
-                <p className="text-xs font-bold text-[#12102A] leading-tight">Juma Omondi</p>
-                <p className="text-[10px] text-[#12102A]/50 font-mono">Mombasa, Kenya</p>
-              </button>
-            </div>
-          </div>
 
           <div className="text-center pt-2">
             <button
               type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={() => { setIsSignUp(!isSignUp); setError(null); }}
               className="text-xs font-bold text-[#12102A]/70 hover:text-[#12102A] underline cursor-pointer"
             >
               {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up Free"}
             </button>
           </div>
         </form>
+        )}
 
       </div>
     </div>

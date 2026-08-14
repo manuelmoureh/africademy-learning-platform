@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { CurriculumRoadmap } from './components/CurriculumRoadmap';
@@ -15,6 +15,7 @@ import { PricingModal } from './components/PricingModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { AuthModal } from './components/AuthModal';
 import { VerifiedPortfolioModal } from './components/VerifiedPortfolioModal';
+import { SubmitProjectModal } from './components/SubmitProjectModal';
 import { LandingPage } from './components/LandingPage';
 import { CourseCatalog } from './components/CourseCatalog';
 import { CourseDetailPage } from './components/CourseDetailPage';
@@ -26,6 +27,37 @@ import { CommunityView } from './components/CommunityView';
 import { INITIAL_TRACKS, INITIAL_PORTFOLIO_VERIFICATION } from './data/courses';
 import { Step, Track, UserAccount, PortfolioVerification } from './types';
 import { Play, Sparkles, CheckCheck, ShieldCheck, Check } from 'lucide-react';
+import { supabase } from './lib/supabase';
+import { fetchUserProgress, setStepProgress } from './lib/db';
+
+const GUEST_USER: UserAccount = {
+  name: 'Guest',
+  email: '',
+  role: 'Learner',
+  initials: 'GU',
+  plan: 'free',
+  location: 'Nairobi, Kenya',
+};
+
+function applyProgressToTracks(baseTracks: Track[], rows: { track_id: string; step_id: string; is_completed: boolean }[]): Track[] {
+  if (rows.length === 0) return baseTracks;
+  const byTrack = new Map<string, Map<string, boolean>>();
+  for (const row of rows) {
+    if (!byTrack.has(row.track_id)) byTrack.set(row.track_id, new Map());
+    byTrack.get(row.track_id)!.set(row.step_id, row.is_completed);
+  }
+  return baseTracks.map((track) => {
+    const stepStates = byTrack.get(track.id);
+    if (!stepStates) return track;
+    const steps = track.steps.map((step) => {
+      const isCompleted = stepStates.get(step.id);
+      if (isCompleted === undefined) return step;
+      return { ...step, status: (isCompleted ? 'completed' : step.status) as Step['status'] };
+    });
+    const completedSteps = steps.filter((s) => s.status === 'completed').length;
+    return { ...track, steps, completedSteps, progress: Math.round((completedSteps / track.totalSteps) * 100) };
+  });
+}
 
 export default function App() {
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
@@ -34,15 +66,70 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'landing' | 'app' | 'about' | 'privacy' | 'terms' | 'case-studies'>('landing');
 
-  // User Account State
-  const [user, setUser] = useState<UserAccount>({
-    name: 'Wanjiku Muthoni',
-    email: 'wanjiku@afridemy.ke',
-    role: 'Learner',
-    initials: 'WM',
-    plan: 'free',
-    location: 'Nairobi, Kenya'
-  });
+  // User Account State — starts as guest, replaced by the real Supabase session on mount
+  const [user, setUser] = useState<UserAccount>(GUEST_USER);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+
+  // Bootstrap the real auth session and any saved progress
+  useEffect(() => {
+    let active = true;
+
+    async function loadProfileAndProgress(userId: string) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name, email, plan, location')
+        .eq('id', userId)
+        .single();
+      if (!active) return;
+      if (profile) {
+        const parts = profile.name.trim().split(' ');
+        const initials = parts.length > 1
+          ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+          : profile.name.slice(0, 2).toUpperCase();
+        setUser({
+          name: profile.name,
+          email: profile.email,
+          role: profile.plan === 'pro' ? 'Pro Member' : 'Learner',
+          initials,
+          plan: profile.plan === 'pro' ? 'pro' : 'free',
+          location: profile.location || 'Nairobi, Kenya',
+        });
+      }
+      const progressRows = await fetchUserProgress(userId);
+      if (!active) return;
+      if (progressRows.length > 0) {
+        setTracks((prev) => applyProgressToTracks(prev, progressRows));
+      }
+    }
+
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        if (data.session?.user) {
+          setAuthUserId(data.session.user.id);
+          loadProfileAndProgress(data.session.user.id);
+        }
+      })
+      .catch((err) => console.warn('Supabase session check failed', err));
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setAuthUserId(null);
+        setUser(GUEST_USER);
+        setTracks(INITIAL_TRACKS);
+      } else if (session?.user) {
+        setAuthUserId(session.user.id);
+      }
+    });
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   // Portfolio Verification State
   const [portfolioData, setPortfolioData] = useState<PortfolioVerification>(INITIAL_PORTFOLIO_VERIFICATION);
@@ -54,6 +141,7 @@ export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
+  const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [showUpgradeToast, setShowUpgradeToast] = useState(false);
 
   const activeTrack = tracks.find(t => t.id === selectedTrackId) || tracks[0];
@@ -65,12 +153,14 @@ export default function App() {
   const progressPercent = Math.round((completedStepsCount / totalStepsCount) * 100);
 
   const handleToggleCompleteStep = (stepId: string) => {
+    let newlyCompleted = false;
     setTracks(prevTracks => prevTracks.map(track => {
       if (track.id !== selectedTrackId) return track;
 
       const updatedSteps = track.steps.map(step => {
         if (step.id === stepId) {
           const newStatus: Step['status'] = step.status === 'completed' ? 'current' : 'completed';
+          newlyCompleted = newStatus === 'completed';
           return { ...step, status: newStatus };
         }
         return step;
@@ -84,6 +174,10 @@ export default function App() {
         progress: Math.round((newCompleted / track.totalSteps) * 100)
       };
     }));
+
+    if (authUserId) {
+      setStepProgress(authUserId, selectedTrackId, stepId, newlyCompleted);
+    }
 
     if (selectedStep && selectedStep.id === stepId) {
       setSelectedStep(prev => prev ? {
@@ -172,6 +266,8 @@ export default function App() {
           isOpen={isAuthOpen}
           onClose={() => setIsAuthOpen(false)}
           currentUser={user}
+          isAuthenticated={!!authUserId}
+          onSignOut={handleSignOut}
           onLogin={(updatedUser) => {
             setUser(updatedUser);
             setPortfolioData(prev => ({
@@ -321,6 +417,7 @@ export default function App() {
                 <div className="flex flex-col gap-6">
                   <PortfolioStatus
                     onOpenPortfolio={() => setIsPortfolioOpen(true)}
+                    onSubmitProject={() => setIsSubmitOpen(true)}
                     completedSteps={completedStepsCount}
                     totalSteps={totalStepsCount}
                   />
@@ -379,6 +476,8 @@ export default function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         currentUser={user}
+        isAuthenticated={!!authUserId}
+        onSignOut={handleSignOut}
         onLogin={(updatedUser) => {
           setUser(updatedUser);
           setPortfolioData(prev => ({
@@ -394,6 +493,15 @@ export default function App() {
         verification={portfolioData}
         completedSteps={completedStepsCount}
         totalSteps={totalStepsCount}
+      />
+
+      <SubmitProjectModal
+        isOpen={isSubmitOpen}
+        onClose={() => setIsSubmitOpen(false)}
+        userId={authUserId}
+        trackId={activeTrack.id}
+        trackTitle={activeTrack.title}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
     </div>
   );
