@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users
+  Check, Users, MessageSquare
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -100,11 +100,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.05]">
-              Learn to Build AI. Get Paid by <span className="italic text-[#F5A623]">Real</span> Businesses.
+              We Help You Build Skills <span className="text-[#F5A623]">Real</span> Businesses Pay For.
             </h1>
 
             <p className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl">
-              Build a real AI system for a real African business. Show it off with a verified link, not a resume that just claims you can.
+              Learn to build real AI systems for real African businesses, no guesswork, just hands-on work that gets you paid.
             </p>
 
             {/* CTAs */}
@@ -123,45 +123,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   className="px-6 py-3.5 bg-white hover:bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A] font-bold text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-2xs"
                 >
                   <Play className="w-4 h-4 text-[#F5A623] fill-current" />
-                  See a Real System in Action
+                  See What Students Built
                 </button>
               </div>
-              <span className="text-[11px] text-[#12102A]/50 font-semibold pl-1">No card needed to start</span>
             </div>
 
-            {/* Stat row — honest numbers only, no invented user counts. Replaces the old checklist to cut clutter. */}
-            <div className="grid grid-cols-3 gap-4 pt-5 border-t border-[#12102A]/10">
+            {/* Stat row — placeholder figures per founder direction, swap for real numbers before launch */}
+            <div className="grid grid-cols-2 gap-4 pt-5 border-t border-[#12102A]/10">
               <div>
-                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">10</p>
-                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Business systems to build</p>
+                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">100+</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Revenue-ready systems built</p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">100%</p>
-                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Independently verified</p>
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">80K&ndash;400K</p>
-                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">KES/month this skillset commands*</p>
+                <p className="text-2xl sm:text-3xl font-black text-[#12102A]">KES 8M+</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned by our students</p>
               </div>
             </div>
           </div>
 
-          {/* Right Column: one dominant photo with floating proof badges, not a tile grid */}
+          {/* Right Column: one dominant photo with floating proof badges straddling its edges */}
           <div className="lg:col-span-5">
-            <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] min-h-[420px] sm:min-h-[520px]">
-              <img
-                src="/hero-photo.jpg"
-                alt="A learner building a real AI system"
-                className="absolute inset-0 w-full h-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              />
+            <div className="relative min-h-[420px] sm:min-h-[520px]">
+              <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b]">
+                <img
+                  src="/hero-photo.jpg"
+                  alt="A learner building a real AI system"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
 
-              {/* Floating badges, referencing the reference layouts */}
-              <div className="absolute top-4 right-4 bg-[#12102A] text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg">
+              {/* Floating badges, each straddling the photo's edge — half in, half out */}
+              <div className="absolute -top-4 -right-3 sm:-right-4 bg-[#12102A] text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg z-10">
                 10 Business Systems
               </div>
 
-              <div className="absolute top-20 left-4 bg-white rounded-xl shadow-lg p-3 max-w-[170px]">
+              <div className="absolute -top-4 -left-3 sm:-left-4 bg-white text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 z-10">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                First 5 Lessons Free
+              </div>
+
+              <div className="absolute top-[36%] -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10">
                 <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick your track</p>
                 <div className="flex flex-wrap gap-1">
                   <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#FAF9FC] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
@@ -170,12 +172,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
 
-              <div className="absolute bottom-4 left-4 bg-white text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5">
+              <div className="absolute top-[58%] -right-5 sm:-right-6 bg-white text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 z-10 max-w-[180px]">
+                <MessageSquare className="w-3.5 h-3.5 text-[#F5A623] shrink-0" />
+                WhatsApp + M-Pesa Native
+              </div>
+
+              <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-white text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 z-10">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
                 Verified, not self-reported
               </div>
 
-              <div className="absolute bottom-4 right-4 bg-[#F5A623] text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg">
+              <div className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg z-10">
                 80K&ndash;400K KES/mo*
               </div>
             </div>
