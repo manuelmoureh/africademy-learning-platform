@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users
+  Check, Users, Star
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -94,11 +94,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Left Column: Heading & CTAs */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/20">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
-              <span className="text-[11px] font-bold text-[#12102A]">
-                Every build checked and confirmed by a real business
-              </span>
+            {/* Placeholder rating — swap for the real embedded Trustpilot widget once the account exists */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#12102A]/10 shadow-sm">
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="w-3.5 h-3.5 fill-[#F5A623] text-[#F5A623]" />
+                ))}
+              </div>
+              <span className="text-[11px] font-bold text-[#12102A]">4.9 on Trustpilot</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.1]">
