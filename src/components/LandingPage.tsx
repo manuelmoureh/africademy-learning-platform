@@ -197,20 +197,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Category Strip */}
-      <section className="px-6 lg:px-12 py-10 max-w-6xl mx-auto w-full">
-        <p className="text-[11px] font-bold text-[#12102A]/50 uppercase tracking-wider mb-4">Browse by Category</p>
-        <div className="flex flex-wrap gap-2.5">
-          {tracks.map((track) => (
-            <div
-              key={track.id}
-              className="flex items-center gap-2 pl-2.5 pr-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:border-[#F5A623] transition-colors"
-            >
-              <span className="w-7 h-7 rounded-full bg-[#F5A623]/15 flex items-center justify-center shrink-0">
-                <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
-              </span>
-              <span className="text-xs font-bold text-[#12102A]">{track.category}</span>
-            </div>
-          ))}
+      <section className="px-6 lg:px-12 py-14 max-w-6xl mx-auto w-full">
+        <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
+          <p className="text-[11px] font-bold text-[#F5A623] uppercase tracking-wider">Categories</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">Explore Courses by Category</h2>
+          <p className="text-xs sm:text-sm text-[#12102A]/60">Browse by what real African businesses are hiring for.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {tracks.map((track) => {
+            const isFeatured = track.id === 'whatsapp-retail-agent';
+            const lessonCount = track.steps.length || track.totalSteps;
+            return (
+              <div
+                key={track.id}
+                className={`rounded-2xl border p-4 flex items-center gap-3 transition-colors ${
+                  isFeatured
+                    ? 'bg-[#F5A623] border-[#F5A623]'
+                    : 'bg-white border-[#12102A]/10 hover:border-[#F5A623]'
+                }`}
+              >
+                <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                  isFeatured ? 'bg-white/25' : 'bg-[#F5A623]/15'
+                }`}>
+                  <TrackIcon name={track.icon} className={`w-5 h-5 ${isFeatured ? 'text-[#12102A]' : 'text-[#F5A623]'}`} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold leading-tight truncate text-[#12102A]">
+                    {track.category}
+                  </p>
+                  <p className={`text-[11px] font-semibold mt-0.5 ${isFeatured ? 'text-[#12102A]/70' : 'text-[#12102A]/50'}`}>
+                    {lessonCount} lessons
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
