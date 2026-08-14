@@ -6,6 +6,14 @@ import {
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
+import {
+  MotionNavigationMenu,
+  MotionNavigationMenuContent,
+  MotionNavigationMenuItem,
+  MotionNavigationMenuLink,
+  MotionNavigationMenuList,
+  MotionNavigationMenuTrigger,
+} from './ui/motion-navigation-menu';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -69,7 +77,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   tracks,
 }) => {
   const reduce = useReducedMotion();
-  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const [navSearch, setNavSearch] = useState('');
 
   const mouseX = useMotionValue(0);
@@ -100,34 +107,64 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
           </div>
 
-          <div
-            className="hidden md:flex items-center gap-0.5"
-            onMouseLeave={() => setHoveredNav(null)}
-          >
-            {[
-              { key: 'courses', label: 'Courses', onClick: onEnterApp },
-              { key: 'demo', label: 'See It Work', onClick: onOpenSandbox },
-              { key: 'verified', label: 'Verified Work', onClick: onOpenPortfolio },
-              { key: 'pricing', label: 'Pricing', onClick: onOpenPricing },
-              { key: 'about', label: 'About', onClick: onOpenAbout },
-            ].map((link) => (
-              <button
-                key={link.key}
-                onClick={link.onClick}
-                onMouseEnter={() => setHoveredNav(link.key)}
-                className="relative px-4 py-2 text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors"
-              >
-                {hoveredNav === link.key && !reduce && (
-                  <motion.span
-                    layoutId="nav-hover-pill"
-                    className="absolute inset-0 bg-[#FAF9FC] rounded-full -z-10"
-                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                  />
-                )}
-                {link.label}
-              </button>
-            ))}
-          </div>
+          <MotionNavigationMenu className="hidden md:flex" viewportClassName="border-[#12102A]/10">
+            <MotionNavigationMenuList>
+              <MotionNavigationMenuItem value="courses">
+                <MotionNavigationMenuTrigger className="text-[#12102A]/70 data-[state=open]:text-[#12102A]">
+                  Courses
+                </MotionNavigationMenuTrigger>
+                <MotionNavigationMenuContent>
+                  <div className="grid w-[420px] grid-cols-2 gap-1 p-1">
+                    {tracks.slice(0, 4).map((track) => (
+                      <MotionNavigationMenuLink key={track.id} onClick={onEnterApp} className="cursor-pointer">
+                        <span className="flex items-center gap-2 text-sm font-bold text-[#12102A]">
+                          <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
+                          {track.category}
+                        </span>
+                        <span className="text-[#12102A]/60 text-xs line-clamp-1">{track.title}</span>
+                      </MotionNavigationMenuLink>
+                    ))}
+                  </div>
+                </MotionNavigationMenuContent>
+              </MotionNavigationMenuItem>
+
+              <MotionNavigationMenuItem>
+                <MotionNavigationMenuLink
+                  onClick={onOpenSandbox}
+                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
+                >
+                  See It Work
+                </MotionNavigationMenuLink>
+              </MotionNavigationMenuItem>
+
+              <MotionNavigationMenuItem>
+                <MotionNavigationMenuLink
+                  onClick={onOpenPortfolio}
+                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
+                >
+                  Verified Work
+                </MotionNavigationMenuLink>
+              </MotionNavigationMenuItem>
+
+              <MotionNavigationMenuItem>
+                <MotionNavigationMenuLink
+                  onClick={onOpenPricing}
+                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
+                >
+                  Pricing
+                </MotionNavigationMenuLink>
+              </MotionNavigationMenuItem>
+
+              <MotionNavigationMenuItem>
+                <MotionNavigationMenuLink
+                  onClick={onOpenAbout}
+                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
+                >
+                  About
+                </MotionNavigationMenuLink>
+              </MotionNavigationMenuItem>
+            </MotionNavigationMenuList>
+          </MotionNavigationMenu>
 
           <div className="flex items-center gap-3 shrink-0">
             <form
