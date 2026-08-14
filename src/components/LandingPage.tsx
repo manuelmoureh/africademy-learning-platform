@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search, Megaphone, Brain, MessageSquare, Coins, Bell
+  Check, Users, Star, Search, Megaphone, Brain, MessageSquare, Coins
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -286,7 +286,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned by our students</p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={80} prefix="KES " suffix="K+" /></p>
+                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={15} prefix="KES " suffix="K+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Per system built</p>
               </div>
             </div>
@@ -336,7 +336,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 className="absolute -top-3 right-10 sm:right-12 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
-                Checked by real businesses
+                Build market ready AI systems
               </motion.div>
               <motion.div
                 initial={reduce ? false : { opacity: 0, y: -8 }}
@@ -376,7 +376,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     </React.Fragment>
                   ))}
                 </div>
-                <p className="text-[9px] font-bold leading-tight mt-2">Ads to AI agent to WhatsApp to sale</p>
+                <p className="text-[9px] font-bold leading-tight mt-2">Build once, install to many businesses</p>
               </motion.div>
 
               <motion.div
@@ -385,11 +385,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute top-[58%] -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10"
               >
-                <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick what to build</p>
+                <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick your field</p>
                 <div className="flex flex-wrap gap-1">
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
                   <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Sales</span>
                   <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Finance</span>
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
+                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Marketing</span>
                 </div>
               </motion.div>
 
@@ -398,25 +399,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 initial={reduce ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[150px] z-10"
+                className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[160px] z-10"
               >
-                <p className="text-2xl font-black leading-none">80K+</p>
+                <p className="text-2xl font-black leading-none">15K+</p>
                 <p className="text-[10px] font-bold leading-tight mt-1">KES earned per system installed</p>
-              </motion.div>
-
-              {/* Bottom-left "success feels close" notification card, straddling the corner */}
-              <motion.div
-                initial={reduce ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -bottom-4 -left-3 sm:-left-4 bg-white rounded-xl shadow-lg p-2.5 pr-4 flex items-center gap-2.5 z-10 max-w-[210px]"
-              >
-                <span className="w-8 h-8 rounded-full bg-[#12102A] flex items-center justify-center shrink-0">
-                  <Bell className="w-3.5 h-3.5 text-[#F5A623]" />
-                </span>
-                <p className="text-[11px] font-bold leading-tight text-[#12102A]">
-                  Start today. Get paid this month.
-                </p>
               </motion.div>
             </motion.div>
           </div>
