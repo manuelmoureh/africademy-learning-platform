@@ -41,13 +41,13 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
           Pick What You Want to Build
         </h1>
         <p className="text-sm text-[#12102A]/70 mt-2 max-w-xl font-medium">
-          Every course ends with a real, working system for a real business, checked and confirmed by the person using it.
+          Every system ends up working for a real business, checked and confirmed by the person using it.
         </p>
       </div>
 
       {visibleTracks.length === 0 && (
         <div className="p-8 rounded-2xl border border-dashed border-[#12102A]/20 text-center">
-          <p className="text-sm font-bold text-[#12102A]">No courses match "{searchQuery}"</p>
+          <p className="text-sm font-bold text-[#12102A]">No systems match "{searchQuery}"</p>
           <p className="text-xs text-[#12102A]/60 mt-1">Try WhatsApp, leads, invoicing, or support.</p>
         </div>
       )}
@@ -128,7 +128,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
                   First 5 lessons free
                 </span>
                 <span className="text-xs font-bold text-[#12102A] flex items-center gap-1">
-                  View Course <ArrowRight className="w-3.5 h-3.5" />
+                  View System <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
             </div>

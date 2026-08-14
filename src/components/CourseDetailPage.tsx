@@ -88,7 +88,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
         className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/60 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
       >
         <ArrowLeft className="w-4 h-4" />
-        All courses
+        All systems
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -129,11 +129,11 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
 
           <div>
             <h2 className="text-sm font-bold uppercase tracking-wider text-[#12102A]/50 mb-3">
-              Course Modules
+              System Modules
             </h2>
             {track.steps.length === 0 ? (
               <p className="text-xs text-[#12102A]/60 font-medium p-4 rounded-xl bg-[#F0EEF6] border border-[#12102A]/10">
-                Full lesson-by-lesson content for this course is still being written. Join the waitlist by starting free on another track, we'll let you know the moment this one opens.
+                Full lesson-by-lesson content for this system is still being written. Join the waitlist by starting free on another track, we'll let you know the moment this one opens.
               </p>
             ) : (
               <div className="space-y-2">
@@ -152,7 +152,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
               <p className="text-xs font-bold text-[#12102A]/50 uppercase tracking-wider mb-1">Cost</p>
               <p className="text-2xl font-black text-[#12102A]">Free to start</p>
               <p className="text-xs text-[#12102A]/60 mt-1">
-                First 5 lessons free. Full course and the live sandbox are KES 3,800/month on Pro.
+                First 5 lessons free. Full system and the live sandbox are KES 3,800/month on Pro.
               </p>
             </div>
 
@@ -160,7 +160,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
               onClick={onStart}
               className="w-full py-3 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-sm font-black rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-xs"
             >
-              Start This Course
+              Start This System
               <ArrowRight className="w-4 h-4" />
             </button>
 

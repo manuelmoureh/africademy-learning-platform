@@ -9,7 +9,7 @@ export const TermsOfServicePage: React.FC<{ onBack: () => void }> = ({ onBack })
     </p>
     <h2>The service</h2>
     <p>
-      Afridemy provides AI Systems Builder courses, a live agent sandbox, and a verification process that turns
+      Afridemy provides AI Systems Builder training, a live agent sandbox, and a verification process that turns
       completed projects into a public, verified portfolio page.
     </p>
     <h2>Your work stays yours</h2>

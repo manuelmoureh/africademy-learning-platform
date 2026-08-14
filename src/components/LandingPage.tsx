@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search, Megaphone, Brain, MessageSquare, Coins
+  Check, Users, Star, Search
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -19,13 +19,6 @@ const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
-
-const workflowSteps = [
-  { key: 'ads', icon: Megaphone },
-  { key: 'ai', icon: Brain },
-  { key: 'whatsapp', icon: MessageSquare },
-  { key: 'sale', icon: Coins },
-];
 
 interface CounterProps {
   target: number;
@@ -120,7 +113,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <MotionNavigationMenuList>
               <MotionNavigationMenuItem value="courses">
                 <MotionNavigationMenuTrigger className="text-[#12102A]/70 data-[state=open]:text-[#12102A]">
-                  Courses
+                  Systems
                 </MotionNavigationMenuTrigger>
                 <MotionNavigationMenuContent>
                   <div className="grid w-[420px] grid-cols-2 gap-1 p-1">
@@ -185,7 +178,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 type="text"
                 value={navSearch}
                 onChange={(e) => setNavSearch(e.target.value)}
-                placeholder="Search courses"
+                placeholder="Search systems"
                 className="w-40 focus:w-56 pl-9 pr-3 py-2 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-xs font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all duration-300"
               />
             </form>
@@ -209,7 +202,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Hero Section */}
       <section
-        className="relative px-6 lg:px-12 pt-6 pb-10 md:pt-8 md:pb-14 max-w-6xl mx-auto w-full overflow-hidden"
+        className="relative px-6 lg:px-12 pt-4 pb-6 md:pt-6 md:pb-10 max-w-6xl mx-auto w-full overflow-hidden"
         onMouseMove={handleHeroMouseMove}
         onMouseLeave={handleHeroMouseLeave}
       >
@@ -222,10 +215,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
-        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
 
           {/* Left Column: Heading & CTAs */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-6 space-y-5">
             {/* Placeholder rating — swap for the real embedded Trustpilot widget once the account exists */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#12102A]/10 shadow-sm">
               <div className="flex items-center gap-0.5">
@@ -281,7 +274,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="grid grid-cols-3 gap-3 pt-5 border-t border-[#12102A]/10 text-center">
               <div>
                 <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={100} suffix="+" /></p>
-                <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">On-demand courses</p>
+                <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">On-demand systems</p>
               </div>
               <div>
                 <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={10} prefix="KES " suffix="M+" /></p>
@@ -295,9 +288,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Right Column: one dominant photo with floating badges, top-right pill pair + stacked left cards + bottom-right stat */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-6">
             <motion.div
-              className="relative min-h-[340px] sm:min-h-[400px]"
+              className="relative min-h-[300px] sm:min-h-[360px]"
               style={{ x: springX, y: springY }}
               initial={reduce ? false : { opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -350,42 +343,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 First 5 Lessons Free
               </motion.div>
 
-              {/* Left side: how-it-works flow diagram + skill picker, straddling the left edge */}
-              <motion.div
-                initial={reduce ? false : { opacity: 0, x: -14 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute top-[30%] -left-5 sm:-left-6 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[196px] z-10"
-              >
-                <p className="text-[9px] font-bold uppercase tracking-wider opacity-70 mb-2">What you'll build</p>
-                <div className="flex items-center">
-                  {workflowSteps.map((step, i) => (
-                    <React.Fragment key={step.key}>
-                      <div className="w-6 h-6 rounded-full bg-[#12102A] flex items-center justify-center shrink-0">
-                        <step.icon className="w-3 h-3 text-[#F5A623]" />
-                      </div>
-                      {i < workflowSteps.length - 1 && (
-                        <div className="flex-1 h-[2px] mx-1 rounded-full bg-[#12102A]/20 relative overflow-hidden">
-                          {!reduce && (
-                            <motion.div
-                              className="absolute inset-y-0 w-2.5 rounded-full bg-[#12102A]"
-                              animate={{ x: ['-100%', '900%'] }}
-                              transition={{ duration: 1.4, repeat: Infinity, ease: 'linear', delay: i * 0.25 }}
-                            />
-                          )}
-                        </div>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
-                <p className="text-[9px] font-bold leading-tight mt-2">Build once, install to many businesses</p>
-              </motion.div>
-
+              {/* Left side: skill picker, straddling the bottom-left edge so it clears the subject */}
               <motion.div
                 initial={reduce ? false : { opacity: 0, x: -14 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute top-[58%] -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10"
+                className="absolute bottom-6 -left-5 sm:-left-6 bg-white rounded-xl shadow-lg p-3 max-w-[170px] z-10"
               >
                 <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick your field</p>
                 <div className="flex flex-wrap gap-1">
@@ -417,7 +380,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="px-6 lg:px-12 py-14 max-w-6xl mx-auto w-full">
         <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
           <p className="text-[11px] font-bold text-[#F5A623] uppercase tracking-wider">Categories</p>
-          <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">Explore Courses by Category</h2>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">Explore AI Systems by Category</h2>
           <p className="text-xs sm:text-sm text-[#12102A]/60">Browse by what real African businesses are hiring for.</p>
         </div>
 
@@ -519,7 +482,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onEnterApp}
               className="px-6 py-3 rounded-xl border border-[#12102A]/10 bg-white hover:border-[#F5A623] text-sm font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97] inline-flex items-center gap-2"
             >
-              Browse All {tracks.length} Courses
+              Browse All {tracks.length} Systems
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

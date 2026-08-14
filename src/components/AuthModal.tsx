@@ -135,7 +135,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 {isSignUp ? 'Create Learner Account' : 'Sign In to Afridemy'}
               </h3>
               <p className="text-xs text-[#12102A]/60">
-                Track your course progress & verified portfolios
+                Track your progress & verified portfolios
               </p>
             </div>
           </div>
