@@ -73,7 +73,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ user }) => {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] font-bold text-[#F5A623] uppercase tracking-widest font-mono">
-            Africademy Community Hub
+            Afridemy Community Hub
           </span>
           <span className="text-[9px] font-bold font-mono px-2 py-0.5 bg-[#12102A] text-white rounded">
             NAIROBI & REGIONAL DEVELOPERS

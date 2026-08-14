@@ -54,14 +54,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-bold text-[#F5A623] uppercase tracking-widest font-mono">
-                Africademy Pro Checkout
+                Afridemy Pro Checkout
               </span>
               <span className="text-[9px] font-bold font-mono px-2 py-0.5 bg-[#10B981]/15 text-[#10B981] rounded">
                 SECURE 256-BIT
               </span>
             </div>
             <h3 className="font-black text-xl text-[#12102A]">
-              {stage === 'confirmed' ? 'Payment Confirmed' : 'Upgrade to Africademy Pro'}
+              {stage === 'confirmed' ? 'Payment Confirmed' : 'Upgrade to Afridemy Pro'}
             </h3>
           </div>
 
@@ -210,7 +210,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 Check Your Phone (+254 {phoneNumber})
               </h4>
               <p className="text-xs text-[#12102A]/70 mt-1 max-w-sm mx-auto leading-relaxed">
-                Safaricom STK Push has been dispatched. Enter your M-Pesa PIN to complete payment of <b>KES 3,800</b> to Till Number <b>542109</b> (Africademy Kenya).
+                Safaricom STK Push has been dispatched. Enter your M-Pesa PIN to complete payment of <b>KES 3,800</b> to Till Number <b>542109</b> (Afridemy Kenya).
               </p>
             </div>
 
@@ -239,7 +239,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 Transaction Verified • Daraja Ref: QK918237
               </span>
               <h4 className="text-2xl font-black text-[#12102A]">
-                Welcome to Africademy Pro
+                Welcome to Afridemy Pro
               </h4>
               <p className="text-xs text-[#12102A]/70 mt-2 max-w-sm mx-auto leading-relaxed font-medium">
                 Your account has been upgraded. All 12 production steps, the live Gemini AI sandbox, and verified developer portfolio are now fully unlocked.

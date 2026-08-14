@@ -35,22 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="flex items-center justify-between px-6 lg:px-8 h-20 bg-white border-b border-[#12102A]/10 select-none shrink-0 z-20">
       {/* Brand Logo */}
       <div className="flex items-center gap-3 cursor-pointer" onClick={onGoHome}>
-        <div 
-          className="w-10 h-10 rounded-lg flex items-center justify-center shadow-xs transition-transform hover:scale-105"
-          style={{ backgroundColor: '#12102A' }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 6L9 17L4 12" stroke="#F5A623" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <div>
-          <span className="text-2xl font-black tracking-tighter text-[#12102A] block leading-none">
-            AFRICADEMY
-          </span>
-          <span className="text-[9px] font-bold text-[#F5A623] uppercase tracking-widest font-mono block mt-0.5">
-            Kenya AI Engineering Hub
-          </span>
-        </div>
+        <img src="/logo-dark.png" alt="Afridemy" className="h-8 w-auto transition-transform hover:scale-105" />
       </div>
 
       {/* Search */}

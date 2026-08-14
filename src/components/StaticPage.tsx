@@ -19,7 +19,7 @@ export const StaticPage: React.FC<StaticPageProps> = ({ title, onBack, children 
           Back
         </button>
         <div className="w-px h-5 bg-[#12102A]/10" />
-        <span className="text-2xl font-black tracking-tighter text-[#12102A]">AFRICADEMY</span>
+        <img src="/logo-dark.png" alt="Afridemy" className="h-7 w-auto" />
       </nav>
 
       <div className="max-w-3xl mx-auto px-6 py-16">

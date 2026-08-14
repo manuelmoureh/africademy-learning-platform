@@ -41,19 +41,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Top Navbar — translucent, stays legible over whatever scrolls beneath it */}
       <nav className="flex items-center justify-between px-6 lg:px-12 h-20 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10 sticky top-0 z-30">
         <div className="flex items-center gap-3 cursor-pointer" onClick={onEnterApp}>
-          <div className="w-10 h-10 rounded-lg bg-[#12102A] flex items-center justify-center shadow-xs">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F5A623" strokeWidth="3">
-              <path d="M20 6L9 17L4 12" />
-            </svg>
-          </div>
-          <div>
-            <span className="text-2xl font-black tracking-tighter text-[#12102A] block leading-none">
-              AFRICADEMY
-            </span>
-            <span className="text-[9px] font-bold text-[#F5A623] uppercase tracking-widest font-mono block mt-0.5">
-              Learn. Build. Get Paid.
-            </span>
-          </div>
+          <img src="/logo-dark.png" alt="Afridemy" className="h-8 w-auto" />
         </div>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-semibold">
@@ -293,7 +281,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Not a Certificate. A Working System, Live, With Your Name on It.
             </h2>
             <p className="text-xs sm:text-sm text-white/75 leading-relaxed font-medium">
-              Anyone can print a PDF. Africademy gives you a real, live link to something a business is actually using, checked and confirmed by that business, not just claimed by you.
+              Anyone can print a PDF. Afridemy gives you a real, live link to something a business is actually using, checked and confirmed by that business, not just claimed by you.
             </p>
             <div className="pt-2">
               <button
@@ -385,7 +373,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               <div>
-                <h3 className="font-bold text-lg text-[#12102A]">Africademy Pro</h3>
+                <h3 className="font-bold text-lg text-[#12102A]">Afridemy Pro</h3>
                 <div className="my-4 flex items-baseline gap-1">
                   <span className="text-3xl font-black text-[#12102A]">KES 3,800</span>
                   <span className="text-xs text-[#12102A]/60 font-mono">/ month (or $29)</span>
@@ -425,8 +413,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Footer */}
       <footer className="px-6 lg:px-12 py-10 bg-[#12102A] text-white/60 text-xs flex flex-col gap-6 border-t border-white/10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="font-semibold text-white/80">
-            Africademy, based in Nairobi, Kenya
+          <div className="flex items-center gap-3">
+            <img src="/logo-light.png" alt="Afridemy" className="h-6 w-auto" />
+            <span className="font-semibold text-white/80">Based in Nairobi, Kenya</span>
           </div>
           <div className="flex items-center gap-6">
             <button onClick={onOpenAbout} className="hover:text-white transition-colors cursor-pointer">About</button>

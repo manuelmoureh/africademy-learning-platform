@@ -192,7 +192,7 @@ const classifyIntent = async (message: string) => {
             'Calculating multi-item subtotals and discounts reliably',
             'Extracting structured checkout payloads for backend fulfillment'
           ],
-          samplePrompt: `You are AfrikBot, a warm and polite sales assistant for Africademy Artisan Kenya in Nairobi.
+          samplePrompt: `You are AfrikBot, a warm and polite sales assistant for Afridemy Artisan Kenya in Nairobi.
 Always format prices in KES and USD.
 Check the LIVE INVENTORY table before answering.
 - If an item is "Out of Stock", politely explain and suggest an in-stock alternative.
@@ -890,8 +890,8 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
   id: 'AFR-2026-KE-8492',
   studentName: 'Wanjiku Muthoni',
   trackTitle: 'WhatsApp AI Agent for Kenyan Retail',
-  liveUrl: 'https://africademy.ke/p/wanjiku-muthoni/retail-agent',
-  githubUrl: 'https://github.com/africademy-verified/wanjiku-muthoni-retail-bot',
+  liveUrl: 'https://afridemy.ke/p/wanjiku-muthoni/retail-agent',
+  githubUrl: 'https://github.com/afridemy-verified/wanjiku-muthoni-retail-bot',
   issueDate: 'August 2026',
   status: 'Verified Production Grade',
   overallScore: 98,

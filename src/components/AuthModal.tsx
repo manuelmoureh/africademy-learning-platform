@@ -75,7 +75,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-base text-[#12102A]">
-                {isSignUp ? 'Create Learner Account' : 'Sign In to Africademy'}
+                {isSignUp ? 'Create Learner Account' : 'Sign In to Afridemy'}
               </h3>
               <p className="text-xs text-[#12102A]/60">
                 Track your course progress & verified portfolios
@@ -157,7 +157,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => handleQuickProfile('Wanjiku Muthoni', 'wanjiku@africademy.ke', 'Nairobi, Kenya')}
+                onClick={() => handleQuickProfile('Wanjiku Muthoni', 'wanjiku@afridemy.ke', 'Nairobi, Kenya')}
                 className="p-2 rounded-lg border border-[#12102A]/10 bg-[#FAF9FC] hover:border-[#F5A623] text-left transition-colors cursor-pointer"
               >
                 <p className="text-xs font-bold text-[#12102A] leading-tight">Wanjiku Muthoni</p>
@@ -165,7 +165,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickProfile('Juma Omondi', 'juma@africademy.ke', 'Mombasa, Kenya')}
+                onClick={() => handleQuickProfile('Juma Omondi', 'juma@afridemy.ke', 'Mombasa, Kenya')}
                 className="p-2 rounded-lg border border-[#12102A]/10 bg-[#FAF9FC] hover:border-[#F5A623] text-left transition-colors cursor-pointer"
               >
                 <p className="text-xs font-bold text-[#12102A] leading-tight">Juma Omondi</p>

@@ -22,7 +22,7 @@ export const WhatsAppSandboxModal: React.FC<WhatsAppSandboxModalProps> = ({ isOp
     isReal: true
   });
 
-  const [systemPrompt, setSystemPrompt] = useState(`You are AfrikBot, a warm and polite sales assistant for Africademy Artisan Kenya in Nairobi.
+  const [systemPrompt, setSystemPrompt] = useState(`You are AfrikBot, a warm and polite sales assistant for Afridemy Artisan Kenya in Nairobi.
 Always format prices in KES (Kenyan Shillings) and USD ($1 = 128 KES).
 Check the LIVE INVENTORY table before answering.
 - If an item is "Out of Stock", politely explain and recommend an in-stock alternative.
@@ -34,7 +34,7 @@ Check the LIVE INVENTORY table before answering.
     {
       id: 'msg-1',
       sender: 'bot',
-      text: 'Karibu! Welcome to *Africademy Artisan Kenya* (Nairobi) ✨ How can I assist you with handcrafted Maasai sandals, Mombasa kikoys, or Kericho black tea today?',
+      text: 'Karibu! Welcome to *Afridemy Artisan Kenya* (Nairobi) ✨ How can I assist you with handcrafted Maasai sandals, Mombasa kikoys, or Kericho black tea today?',
       timestamp: '12:15 PM',
       meta: {
         intent: 'GREETING',
@@ -158,7 +158,7 @@ Check the LIVE INVENTORY table before answering.
           modelUsed: 'Kenya Retail Engine'
         };
       } else if (lower.includes('buy') || lower.includes('order') || lower.includes('reserve') || lower.includes('pay') || lower.includes('yes')) {
-        reply = `Order Confirmed! [ORDER_CONFIRMED]\n*Item:* Maasai Beaded Sandals (Size 40)\n*Total:* KES 2,800 (Incl. Nairobi dispatch)\n\nPlease trigger M-Pesa STK Push via Till *542109* or visit: *pay.africademy.ke/mpesa-254*`;
+        reply = `Order Confirmed! [ORDER_CONFIRMED]\n*Item:* Maasai Beaded Sandals (Size 40)\n*Total:* KES 2,800 (Incl. Nairobi dispatch)\n\nPlease trigger M-Pesa STK Push via Till *542109* or visit: *pay.afridemy.ke/mpesa-254*`;
         meta = {
           intent: 'CHECKOUT_TRIGGER',
           confidence: 0.99,
@@ -166,7 +166,7 @@ Check the LIVE INVENTORY table before answering.
           modelUsed: 'Kenya Retail Engine'
         };
       } else {
-        reply = `Karibu to Africademy Artisan Kenya! I can check live stock for *Maasai Sandals*, *Mombasa Kikoys*, *Kericho Black Tea*, and *Mt. Kenya Macadamia Oil*. What would you like to explore?`;
+        reply = `Karibu to Afridemy Artisan Kenya! I can check live stock for *Maasai Sandals*, *Mombasa Kikoys*, *Kericho Black Tea*, and *Mt. Kenya Macadamia Oil*. What would you like to explore?`;
         meta = {
           intent: 'GENERAL_HELP',
           confidence: 0.92,

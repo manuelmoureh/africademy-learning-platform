@@ -2,13 +2,13 @@ import React from 'react';
 import { StaticPage } from './StaticPage';
 
 export const AboutPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <StaticPage title="About Africademy" onBack={onBack}>
+  <StaticPage title="About Afridemy" onBack={onBack}>
     <p>
-      Africademy trains young Kenyans to build real AI automation systems, WhatsApp agents, lead-capture tools,
+      Afridemy trains young Kenyans to build real AI automation systems, WhatsApp agents, lead-capture tools,
       invoicing assistants, for real small businesses. Not practice exercises, not a certificate at the end.
     </p>
     <p>
-      The problem we set out to fix: a resume lists skills you claim, not skills you've demonstrated. Africademy
+      The problem we set out to fix: a resume lists skills you claim, not skills you've demonstrated. Afridemy
       replaces that with a verified portfolio, a real, live system you built, checked against an objective rubric,
       confirmed by the business actually using it. That's the credential. One link, not a claim.
     </p>

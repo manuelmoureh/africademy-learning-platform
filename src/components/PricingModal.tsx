@@ -25,7 +25,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-bold text-[#F5A623] uppercase tracking-widest font-mono">
-                Africademy Membership Plans
+                Afridemy Membership Plans
               </span>
               <span className="bg-[#12102A] text-white text-[9px] font-bold px-2 py-0.5 rounded font-mono">
                 KENYA EDITION
@@ -109,7 +109,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[#F5A623]" />
-                  <h3 className="font-bold text-lg text-[#12102A]">Africademy Pro</h3>
+                  <h3 className="font-bold text-lg text-[#12102A]">Afridemy Pro</h3>
                 </div>
               </div>
               

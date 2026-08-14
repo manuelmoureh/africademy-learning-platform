@@ -246,7 +246,7 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
 
               <div className="flex items-center gap-2 text-[10px] font-mono text-[#10B981]">
                 <UserCheck className="w-4 h-4" />
-                Audited & Digitally Signed via Africademy Verification Protocol
+                Audited & Digitally Signed via Afridemy Verification Protocol
               </div>
             </div>
           )}

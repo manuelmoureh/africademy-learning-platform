@@ -1,5 +1,5 @@
 {
-  "name": "Africademy Learning Platform",
+  "name": "Afridemy Learning Platform",
   "description": "Interactive AI and automation academy featuring tracks for building retail WhatsApp agents, prompt engineering, and API pipelines with the Professional Polish design.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

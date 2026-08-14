@@ -153,7 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex items-center gap-1.5 mb-1.5">
               <Sparkles className="w-3 h-3 text-[#F5A623]" />
               <p className="text-[10px] font-bold text-[#F5A623] uppercase font-mono tracking-widest">
-                Africademy Pro
+                Afridemy Pro
               </p>
             </div>
             <p className="text-xs leading-relaxed text-white/80 mb-3.5 font-medium">

@@ -36,7 +36,7 @@ export default function App() {
   // User Account State
   const [user, setUser] = useState<UserAccount>({
     name: 'Wanjiku Muthoni',
-    email: 'wanjiku@africademy.ke',
+    email: 'wanjiku@afridemy.ke',
     role: 'Learner',
     initials: 'WM',
     plan: 'free',
@@ -196,7 +196,7 @@ export default function App() {
         <div className="bg-[#10B981] text-white px-6 py-2.5 text-xs font-bold font-mono flex items-center justify-between shadow-md sticky top-0 z-50 animate-in slide-in-from-top duration-300">
           <div className="flex items-center gap-2">
             <Check className="w-4 h-4" />
-            <span>Africademy Pro is now Active! All 12 production steps & Safaricom Daraja webhooks unlocked.</span>
+            <span>Afridemy Pro is now Active! All 12 production steps & Safaricom Daraja webhooks unlocked.</span>
           </div>
           <button 
             onClick={() => setShowUpgradeToast(false)}

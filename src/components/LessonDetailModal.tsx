@@ -75,7 +75,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
             <div className="max-w-md space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#F5A623]">
-                Africademy Pro Content
+                Afridemy Pro Content
               </span>
               <h4 className="text-2xl font-black text-[#12102A]">
                 Step {step.number} is Locked
