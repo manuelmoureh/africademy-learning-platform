@@ -44,7 +44,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Top Navbar — translucent, stays legible over whatever scrolls beneath it */}
       <nav className="flex items-center justify-between px-6 lg:px-12 h-20 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10 sticky top-0 z-30">
         <div className="flex items-center gap-3 cursor-pointer" onClick={onEnterApp}>
-          <img src="/logo-dark.png" alt="Afridemy" className="h-8 w-auto" />
+          <img src="/logo-dark.png" alt="Afridemy" className="h-16 w-auto" />
         </div>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-semibold">
@@ -204,33 +204,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className="text-xs sm:text-sm text-[#12102A]/60">Browse by what real African businesses are hiring for.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {tracks.map((track) => {
             const isFeatured = track.id === 'whatsapp-retail-agent';
-            const lessonCount = track.steps.length || track.totalSteps;
             return (
-              <div
+              <button
                 key={track.id}
-                className={`rounded-2xl border p-4 flex items-center gap-3 transition-colors ${
+                onClick={onEnterApp}
+                className={`text-left rounded-2xl border p-5 flex flex-col gap-3 transition-all cursor-pointer active:scale-[0.98] ${
                   isFeatured
                     ? 'bg-[#F5A623] border-[#F5A623]'
-                    : 'bg-white border-[#12102A]/10 hover:border-[#F5A623]'
+                    : 'bg-white border-[#12102A]/10 hover:border-[#F5A623] hover:shadow-sm'
                 }`}
               >
-                <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                <span className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
                   isFeatured ? 'bg-white/25' : 'bg-[#F5A623]/15'
                 }`}>
-                  <TrackIcon name={track.icon} className={`w-5 h-5 ${isFeatured ? 'text-[#12102A]' : 'text-[#F5A623]'}`} />
+                  <TrackIcon name={track.icon} className={`w-6 h-6 ${isFeatured ? 'text-[#12102A]' : 'text-[#F5A623]'}`} />
                 </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold leading-tight truncate text-[#12102A]">
+                <div>
+                  <p className="text-base font-bold leading-snug text-[#12102A]">
                     {track.category}
                   </p>
-                  <p className={`text-[11px] font-semibold mt-0.5 ${isFeatured ? 'text-[#12102A]/70' : 'text-[#12102A]/50'}`}>
-                    {lessonCount} lessons
+                  <p className={`text-xs font-medium leading-relaxed mt-1.5 ${isFeatured ? 'text-[#12102A]/75' : 'text-[#12102A]/60'}`}>
+                    For {track.whoBuysThis.charAt(0).toLowerCase() + track.whoBuysThis.slice(1)}.
                   </p>
                 </div>
-              </div>
+                <ArrowRight className={`w-4 h-4 mt-auto ${isFeatured ? 'text-[#12102A]' : 'text-[#F5A623]'}`} />
+              </button>
             );
           })}
         </div>
