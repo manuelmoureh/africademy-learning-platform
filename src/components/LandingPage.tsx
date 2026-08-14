@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
   Check, Users, Star
@@ -10,6 +10,35 @@ import { TrackIcon } from '../utils/trackIcons';
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
+};
+
+interface CounterProps {
+  target: number;
+  prefix?: string;
+  suffix?: string;
+}
+
+const Counter: React.FC<CounterProps> = ({ target, prefix = '', suffix = '' }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-40px' });
+  const [display, setDisplay] = useState(0);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    if (!isInView) return;
+    if (reduce) {
+      setDisplay(target);
+      return;
+    }
+    const controls = animate(0, target, {
+      duration: 1.4,
+      ease: 'easeOut',
+      onUpdate: (v) => setDisplay(v),
+    });
+    return () => controls.stop();
+  }, [isInView, target, reduce]);
+
+  return <span ref={ref}>{prefix}{Math.round(display)}{suffix}</span>;
 };
 
 interface LandingPageProps {
@@ -38,6 +67,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   tracks,
 }) => {
   const reduce = useReducedMotion();
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 150, damping: 20, mass: 0.5 });
+  const springY = useSpring(mouseY, { stiffness: 150, damping: 20, mass: 0.5 });
+
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (reduce) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width - 0.5;
+    const relY = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(relX * 20);
+    mouseY.set(relY * 20);
+  };
+
+  const handleHeroMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF9FC] text-[#12102A] flex flex-col">
@@ -80,7 +128,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 lg:px-12 pt-6 pb-10 md:pt-8 md:pb-14 max-w-6xl mx-auto w-full overflow-hidden">
+      <section
+        className="relative px-6 lg:px-12 pt-6 pb-10 md:pt-8 md:pb-14 max-w-6xl mx-auto w-full overflow-hidden"
+        onMouseMove={handleHeroMouseMove}
+        onMouseLeave={handleHeroMouseLeave}
+      >
         {/* Subtle living background: a soft amber glow that breathes, motivated by the "still alive" ask, not decoration for its own sake */}
         {!reduce && (
           <motion.div
@@ -136,15 +188,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Stat row — placeholder figures per founder direction, swap for real numbers before launch */}
             <div className="grid grid-cols-3 gap-3 pt-5 border-t border-[#12102A]/10 text-center">
               <div>
-                <p className="text-xl sm:text-2xl font-black text-[#12102A]">100+</p>
+                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={100} suffix="+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">On-demand courses</p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl font-black text-[#12102A]">KES 10M+</p>
+                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={10} prefix="KES " suffix="M+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Earned by our students</p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl font-black text-[#12102A]">KES 80K+</p>
+                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={80} prefix="KES " suffix="K+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Per system built</p>
               </div>
             </div>
@@ -152,7 +204,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Right Column: one dominant photo with floating badges, top-right pill pair + stacked left cards + bottom-right stat */}
           <div className="lg:col-span-5">
-            <div className="relative min-h-[420px] sm:min-h-[520px]">
+            <motion.div className="relative min-h-[420px] sm:min-h-[520px]" style={{ x: springX, y: springY }}>
               <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b]">
                 <img
                   src="/hero-photo.jpg"
@@ -192,7 +244,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <p className="text-2xl font-black leading-none">80K+</p>
                 <p className="text-[10px] font-bold leading-tight mt-1">KES earned per system installed</p>
               </div>
-            </div>
+            </motion.div>
           </div>
 
         </div>
@@ -207,33 +259,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className="text-xs sm:text-sm text-[#12102A]/60">Browse by what real African businesses are hiring for.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div
+          className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: 'none' }}
+        >
           {tracks.map((track) => {
             const isFeatured = track.id === 'whatsapp-retail-agent';
             return (
               <button
                 key={track.id}
                 onClick={onEnterApp}
-                className={`text-left rounded-2xl border p-5 flex flex-col gap-3 transition-all cursor-pointer active:scale-[0.98] ${
+                className={`text-left shrink-0 snap-start w-[220px] sm:w-[240px] rounded-2xl border p-5 flex flex-col gap-3 transition-all cursor-pointer active:scale-[0.98] ${
                   isFeatured
-                    ? 'bg-[#F5A623] border-[#F5A623]'
+                    ? 'bg-[#F5A623]/8 border-[#F5A623]'
                     : 'bg-white border-[#12102A]/10 hover:border-[#F5A623] hover:shadow-sm'
                 }`}
               >
-                <span className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                  isFeatured ? 'bg-white/25' : 'bg-[#F5A623]/15'
-                }`}>
-                  <TrackIcon name={track.icon} className={`w-6 h-6 ${isFeatured ? 'text-[#12102A]' : 'text-[#F5A623]'}`} />
+                <span className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#F5A623]/15">
+                  <TrackIcon name={track.icon} className="w-6 h-6 text-[#F5A623]" />
                 </span>
                 <div>
                   <p className="text-base font-bold leading-snug text-[#12102A]">
                     {track.category}
                   </p>
-                  <p className={`text-xs font-medium leading-relaxed mt-1.5 ${isFeatured ? 'text-[#12102A]/75' : 'text-[#12102A]/60'}`}>
+                  <p className="text-xs font-medium leading-relaxed mt-1.5 text-[#12102A]/60">
                     For {track.whoBuysThis.charAt(0).toLowerCase() + track.whoBuysThis.slice(1)}.
                   </p>
                 </div>
-                <ArrowRight className={`w-4 h-4 mt-auto ${isFeatured ? 'text-[#12102A]' : 'text-[#F5A623]'}`} />
+                <ArrowRight className="w-4 h-4 mt-auto text-[#F5A623]" />
               </button>
             );
           })}
