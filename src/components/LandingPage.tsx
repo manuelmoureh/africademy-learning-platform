@@ -131,7 +131,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Stat row — placeholder figures per founder direction, swap for real numbers before launch */}
-            <div className="grid grid-cols-3 gap-3 pt-5 border-t border-[#12102A]/10">
+            <div className="grid grid-cols-3 gap-3 pt-5 border-t border-[#12102A]/10 text-center">
               <div>
                 <p className="text-xl sm:text-2xl font-black text-[#12102A]">100+</p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">On-demand courses</p>
