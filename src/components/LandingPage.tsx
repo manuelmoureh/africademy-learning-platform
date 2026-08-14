@@ -78,7 +78,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 lg:px-12 py-16 md:py-24 max-w-6xl mx-auto w-full overflow-hidden">
+      <section className="relative px-6 lg:px-12 pt-6 pb-10 md:pt-8 md:pb-14 max-w-6xl mx-auto w-full overflow-hidden">
         {/* Subtle living background: a soft amber glow that breathes, motivated by the "still alive" ask, not decoration for its own sake */}
         {!reduce && (
           <motion.div
@@ -104,7 +104,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </h1>
 
             <p className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl">
-              No diploma to hang on a wall. You build a real AI system for a real African business, customer support, sales, invoicing, scheduling, whatever that business actually needs, then show it off with a verified link instead of a resume that just claims you can do it.
+              Build a real AI system for a real African business. Show it off with a verified link, not a resume that just claims you can.
             </p>
 
             {/* CTAs */}
@@ -129,49 +129,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-[11px] text-[#12102A]/50 font-semibold pl-1">No card needed to start</span>
             </div>
 
-            {/* Value checklist — outcomes, not spec sheets, and not one course's feature list */}
-            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-[#12102A]/10">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
-                <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                Real businesses, not practice exercises
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
-                <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                10 systems to choose from: sales, support, finance, ops
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
-                <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                Checked by a real business, not self-reported
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#12102A]/80">
-                <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                A link a client can click and test themselves
-              </div>
-            </div>
-
-            {/* Stat row — honest numbers only, no invented user counts */}
-            <div className="grid grid-cols-3 gap-4 pt-6">
+            {/* Stat row — honest numbers only, no invented user counts. Replaces the old checklist to cut clutter. */}
+            <div className="grid grid-cols-3 gap-4 pt-5 border-t border-[#12102A]/10">
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-[#12102A]">10</p>
-                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Real business systems to build</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Business systems to build</p>
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-[#12102A]">100%</p>
-                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Independently verified, never self-reported</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Independently verified</p>
               </div>
               <div>
                 <p className="text-2xl sm:text-3xl font-black text-[#12102A]">80K&ndash;400K</p>
-                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">KES/month this skillset already commands in Nairobi*</p>
+                <p className="text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">KES/month this skillset commands*</p>
               </div>
             </div>
-            <p className="text-[10px] text-[#12102A]/40 -mt-4">*Based on current Nairobi freelance market rates for AI automation builders. Not a guaranteed income.</p>
           </div>
 
-          {/* Right Column: image tile grid, not one dominant chat mockup */}
+          {/* Right Column: two large image tiles, not a cramped grid */}
           <div className="lg:col-span-5">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Large photo tile — spans both rows. Drop hero-photo.jpg into public/ to fill this in. */}
-              <div className="col-span-2 sm:col-span-1 sm:row-span-2 relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] min-h-[220px] sm:min-h-[360px]">
+            <div className="grid grid-cols-2 gap-4 h-full">
+              <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-gradient-to-br from-[#12102A] to-[#3f3a6b] min-h-[340px] sm:min-h-[440px]">
                 <img
                   src="/hero-photo.jpg"
                   alt="A learner building a real AI system"
@@ -182,45 +160,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <ShieldCheck className="w-3 h-3 text-[#10B981]" />
                   Verified builds
                 </div>
-                <div className="absolute bottom-3 left-3 bg-white text-[#12102A] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-                  10 real systems
-                </div>
               </div>
 
-              {/* Illustration tile — drop hero-illustration.png into public/ to fill this in */}
-              <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-lg bg-[#FAF9FC] min-h-[160px] flex items-center justify-center">
+              <div className="relative rounded-2xl overflow-hidden border border-[#12102A]/10 shadow-xl bg-[#FAF9FC] min-h-[340px] sm:min-h-[440px]">
                 <img
-                  src="/hero-illustration.png"
+                  src="/hero-illustration.jpg"
                   alt="An AI automation workflow"
-                  className="absolute inset-0 w-full h-full object-contain p-4"
+                  className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
-              </div>
-
-              {/* Demoted WhatsApp preview — now one tile among several, not the whole hero */}
-              <div className="bg-[#E5DDD5] rounded-2xl shadow-lg border border-[#12102A]/10 overflow-hidden">
-                <div className="bg-[#075E54] px-3 py-2 flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-[#12102A] flex items-center justify-center text-[#F5A623] font-bold text-[9px] shrink-0">
-                    AB
-                  </div>
-                  <p className="text-white text-[10px] font-bold truncate">One of 10 systems: WhatsApp orders</p>
-                </div>
-                <div className="p-2.5">
-                  <div className="bg-[#DCF8C6] rounded-lg rounded-tr-none px-2.5 py-1.5 text-[10px] text-[#12102A] shadow-sm mb-1.5">
-                    "18 pairs in stock at KES 2,800. Pay via M-Pesa?"
-                  </div>
-                  <button
-                    onClick={onOpenSandbox}
-                    className="text-[10px] font-black text-[#075E54] hover:underline cursor-pointer"
-                  >
-                    Try this one &rarr;
-                  </button>
+                <div className="absolute bottom-3 left-3 bg-white text-[#12102A] text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                  10 real systems
                 </div>
               </div>
             </div>
           </div>
 
         </div>
+        <p className="relative text-[10px] text-[#12102A]/40 mt-2 max-w-6xl">*Based on current Nairobi freelance market rates for AI automation builders. Not a guaranteed income.</p>
       </section>
 
       {/* Curriculum Tracks Section */}
@@ -260,7 +217,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-1">
                     {track.title}
                   </h3>
-                  <p className="text-xs text-[#10B981] font-bold mt-2">
+                  <p className="text-xs text-[#12102A]/70 font-bold mt-2">
                     {track.impactStat}
                   </p>
                   <div className="mt-auto pt-4 border-t border-[#12102A]/10 flex items-center justify-between">

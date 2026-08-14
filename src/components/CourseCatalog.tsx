@@ -1,7 +1,14 @@
 import React from 'react';
-import { ArrowRight, CheckCircle2, Users, TrendingUp, Star } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Users, TrendingUp, Star, BookOpen, Clock } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
+
+function estimateHours(track: Track): string {
+  const totalMinutes = track.steps.reduce((sum, s) => sum + (parseInt(s.duration, 10) || 0), 0);
+  if (totalMinutes === 0) return `~${Math.max(track.totalSteps, 1) * 30} min`;
+  const hours = totalMinutes / 60;
+  return hours < 1 ? `${totalMinutes} min` : `~${hours.toFixed(hours % 1 === 0 ? 0 : 1)} hrs`;
+}
 
 interface CourseCatalogProps {
   tracks: Track[];
@@ -54,12 +61,21 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
               <TrackIcon name={track.icon} className="w-10 h-10 text-white/80 relative z-10 group-hover:scale-110 transition-transform" />
-              <span className="absolute top-2.5 right-2.5 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-white/90 text-[#12102A] z-10">
-                {track.steps.length || track.totalSteps} lessons
-              </span>
             </div>
 
             <div className="p-5 flex flex-col flex-1">
+              {/* Icon-based content stats, replacing the plain text pill */}
+              <div className="flex items-center gap-3 mb-2">
+                <span className="flex items-center gap-1 text-[10px] font-bold text-[#12102A]/60">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  {track.steps.length || track.totalSteps} lessons
+                </span>
+                <span className="flex items-center gap-1 text-[10px] font-bold text-[#12102A]/60">
+                  <Clock className="w-3.5 h-3.5" />
+                  {estimateHours(track)}
+                </span>
+              </div>
+
               <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider block mb-1">
                 {track.trackNumber}
               </span>
@@ -68,7 +84,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
                 {track.title}
               </h3>
 
-              <p className="text-xs text-[#12102A]/70 mt-2 leading-relaxed font-medium">
+              <p className="text-xs text-[#12102A]/70 mt-2 leading-relaxed font-medium line-clamp-2">
                 {track.description}
               </p>
 
@@ -76,11 +92,11 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
               <div className="mt-3 space-y-1.5">
                 <div className="flex items-start gap-1.5 text-[11px] text-[#12102A]/70 font-semibold">
                   <Users className="w-3.5 h-3.5 text-[#12102A]/40 shrink-0 mt-0.5" />
-                  <span>Sells to: {track.whoBuysThis}</span>
+                  <span className="line-clamp-1">Sells to: {track.whoBuysThis}</span>
                 </div>
-                <div className="flex items-start gap-1.5 text-[11px] text-[#10B981] font-bold">
-                  <TrendingUp className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                  <span>{track.impactStat}</span>
+                <div className="flex items-start gap-1.5 text-[11px] text-[#12102A]/80 font-bold">
+                  <TrendingUp className="w-3.5 h-3.5 text-[#F5A623] shrink-0 mt-0.5" />
+                  <span className="line-clamp-1">{track.impactStat}</span>
                 </div>
               </div>
 

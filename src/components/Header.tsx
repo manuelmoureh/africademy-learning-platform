@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
         onClick={onGoHome}
         className="flex items-center shrink-0 cursor-pointer"
       >
-        <img src="/logo-dark.png" alt="Afridemy" className="h-11 w-auto transition-transform hover:scale-105" />
+        <img src="/logo-dark.png" alt="Afridemy" className="h-16 w-auto transition-transform hover:scale-105" />
       </button>
 
       {/* Search, softer rounded pill treatment */}
@@ -80,13 +80,6 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           Courses
-        </button>
-
-        <button
-          onClick={onOpenWorkspace}
-          className="text-sm font-semibold text-[#12102A]/70 hover:text-[#12102A] transition-colors cursor-pointer"
-        >
-          See It Work
         </button>
 
         <button
