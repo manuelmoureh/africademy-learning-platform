@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search
+  Check, Users, Star, Search, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -80,6 +80,58 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const reduce = useReducedMotion();
   const [navSearch, setNavSearch] = useState('');
+
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const updateCategoryScrollState = () => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  };
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === 'left' ? -260 : 260, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+    updateCategoryScrollState();
+    el.addEventListener('scroll', updateCategoryScrollState, { passive: true });
+    return () => el.removeEventListener('scroll', updateCategoryScrollState);
+  }, [tracks.length]);
+
+  useEffect(() => {
+    if (reduce) return;
+    const el = categoryScrollRef.current;
+    if (!el) return;
+    let paused = false;
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+    el.addEventListener('mouseenter', pause);
+    el.addEventListener('mouseleave', resume);
+    el.addEventListener('touchstart', pause, { passive: true });
+    const interval = setInterval(() => {
+      if (paused) return;
+      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 4;
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: 240, behavior: 'smooth' });
+      }
+    }, 3200);
+    return () => {
+      clearInterval(interval);
+      el.removeEventListener('mouseenter', pause);
+      el.removeEventListener('mouseleave', resume);
+      el.removeEventListener('touchstart', pause);
+    };
+  }, [reduce, tracks.length]);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -384,10 +436,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className="text-xs sm:text-sm text-[#12102A]/60">Browse by what real African businesses are hiring for.</p>
         </div>
 
-        <div
-          className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
-          style={{ scrollbarWidth: 'none' }}
-        >
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => scrollCategories('left')}
+            aria-label="Scroll categories left"
+            disabled={!canScrollLeft}
+            className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
+          >
+            <ChevronLeft className="w-4 h-4 text-[#12102A]" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollCategories('right')}
+            aria-label="Scroll categories right"
+            disabled={!canScrollRight}
+            className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
+          >
+            <ChevronRight className="w-4 h-4 text-[#12102A]" />
+          </button>
+
+          <div
+            ref={categoryScrollRef}
+            className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none' }}
+          >
           {tracks.map((track) => {
             const isFeatured = track.id === 'whatsapp-retail-agent';
             return (
@@ -418,6 +491,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </motion.button>
             );
           })}
+          </div>
         </div>
       </section>
 
