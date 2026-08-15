@@ -437,12 +437,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div className="relative">
+          {/* Edge fades so a card sliding under the arrows reads as intentional, not clipped */}
+          <div className="hidden md:block absolute -left-1 top-0 bottom-2 w-16 z-[5] bg-gradient-to-r from-[#F0EEF6] to-transparent pointer-events-none" />
+          <div className="hidden md:block absolute -right-1 top-0 bottom-2 w-16 z-[5] bg-gradient-to-l from-[#F0EEF6] to-transparent pointer-events-none" />
+
           <button
             type="button"
             onClick={() => scrollCategories('left')}
             aria-label="Scroll categories left"
             disabled={!canScrollLeft}
-            className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
           >
             <ChevronLeft className="w-4 h-4 text-[#12102A]" />
           </button>
@@ -451,14 +455,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             onClick={() => scrollCategories('right')}
             aria-label="Scroll categories right"
             disabled={!canScrollRight}
-            className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
           >
             <ChevronRight className="w-4 h-4 text-[#12102A]" />
           </button>
 
           <div
             ref={categoryScrollRef}
-            className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+            className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 scroll-px-6 lg:scroll-px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
           >
           {tracks.map((track) => {
