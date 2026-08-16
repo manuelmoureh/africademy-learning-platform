@@ -575,7 +575,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Not a Certificate. A Working System, Live, With Your Name on It.
             </h2>
             <p className="text-xs sm:text-sm text-white/75 leading-relaxed font-medium">
-              Anyone can print a PDF. Afridemy gives you a real, live link to something a business is actually using, checked and confirmed by that business, not just claimed by you.
+              Anyone can print a PDF. You walk away with a real portfolio you can use to start earning.
             </p>
             <div className="pt-2">
               <button
@@ -589,8 +589,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="w-full lg:w-96 bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3 shrink-0">
-            <div className="text-xs font-bold text-[#F5A623] uppercase">
-              What Gets Checked
+            <div>
+              <p className="text-xs font-bold text-[#F5A623] uppercase">
+                What A Business Checks
+              </p>
+              <p className="text-[11px] text-white/50 mt-0.5">Before confirming a WhatsApp AI agent works:</p>
             </div>
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2 text-white/90">
