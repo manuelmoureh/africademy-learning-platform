@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search, ChevronLeft, ChevronRight
+  Check, Users, Star, Search, ChevronLeft, ChevronRight, Menu, X
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -199,6 +199,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const reduce = useReducedMotion();
   const [navSearch, setNavSearch] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const categoryCarousel = useHorizontalCarousel(tracks.length, reduce, 240, 3200);
   const reviewsCarousel = useHorizontalCarousel(REVIEWS.length, reduce, 300, 3600);
@@ -307,7 +308,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={onOpenAuth}
-              className="px-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#F0EEF6] text-xs font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
+              className="hidden md:block px-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#F0EEF6] text-xs font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
             >
               Sign In
             </button>
@@ -318,8 +319,63 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Start Learning
               <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
             </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              className="md:hidden p-2 rounded-lg text-[#12102A] hover:bg-[#F0EEF6] cursor-pointer transition-colors"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {mobileMenuOpen && (
+            <div className="md:hidden border-t border-[#12102A]/10 bg-white">
+              <div className="px-6 py-4 flex flex-col gap-1">
+                <form
+                  onSubmit={(e) => { e.preventDefault(); setMobileMenuOpen(false); onSearch(navSearch); }}
+                  className="relative mb-2"
+                >
+                  <Search className="w-3.5 h-3.5 text-[#12102A]/35 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={navSearch}
+                    onChange={(e) => setNavSearch(e.target.value)}
+                    placeholder="Search systems"
+                    className="w-full pl-9 pr-3 py-2.5 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-sm font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all"
+                  />
+                </form>
+
+                {[
+                  { label: 'Systems', onClick: onEnterApp },
+                  { label: 'See It Work', onClick: onOpenSandbox },
+                  { label: 'Verified Work', onClick: onOpenPortfolio },
+                  { label: 'Pricing', onClick: onOpenPricing },
+                  { label: 'About', onClick: onOpenAbout },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => { setMobileMenuOpen(false); item.onClick(); }}
+                    className="text-left py-2.5 text-sm font-semibold text-[#12102A]/80 hover:text-[#12102A] cursor-pointer transition-colors border-b border-[#12102A]/5 last:border-b-0"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}
+                  className="mt-3 w-full py-2.5 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#F0EEF6] text-sm font-bold text-[#12102A] cursor-pointer transition-all"
+                >
+                  Sign In
+                </button>
+              </div>
+            </div>
+          )}
       </nav>
 
       {/* Hero Section */}
@@ -474,10 +530,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 <p className="text-[10px] font-bold text-[#12102A] mb-1.5">Pick your field</p>
                 <div className="flex flex-wrap gap-1">
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Sales</span>
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Finance</span>
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Support</span>
-                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70">+ Marketing</span>
+                  {['Sales', 'Finance', 'Support', 'Marketing'].map((field) => (
+                    <button
+                      key={field}
+                      type="button"
+                      onClick={() => onSearch(field)}
+                      className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A]/70 hover:border-[#F5A623] hover:text-[#12102A] cursor-pointer transition-colors"
+                    >
+                      + {field}
+                    </button>
+                  ))}
                 </div>
               </motion.div>
 
@@ -587,7 +649,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col overflow-hidden hover:border-[#F5A623] transition-all group"
               >
-                <div className="relative h-24 bg-gradient-to-br from-[#12102A] to-[#3f3a6b] flex items-center justify-center">
+                <div className="relative h-24 bg-[#12102A] flex items-center justify-center">
                   <TrackIcon name={track.icon} className="w-8 h-8 text-white/80" />
                   <span className="absolute top-2 right-2 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/90 text-[#12102A]">
                     {track.steps.length || track.totalSteps} lessons

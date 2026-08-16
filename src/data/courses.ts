@@ -343,7 +343,7 @@ Check the LIVE INVENTORY table before answering.
     badgeTitle: 'Verified Lead Automation Specialist',
     tags: ['CRM Webhooks', 'Google Sheets API', 'Calendar Scheduling', 'Property Filters'],
     whoBuysThis: 'Real estate agencies and property managers',
-    impactStat: 'Slow lead response costs African SMEs up to 25% of potential revenue',
+    impactStat: 'Slow lead response loses real estate agents the sale before they even reply',
     steps: [
       {
         id: 'lc-step-1',
@@ -686,7 +686,7 @@ Check the LIVE INVENTORY table before answering.
     badgeTitle: 'Verified Supply Chain Automation Engineer',
     tags: ['Stock Forecasting', 'Supplier Messaging', 'Reorder Triggers'],
     whoBuysThis: 'Retailers, distributors, and small manufacturers',
-    impactStat: 'AI-driven demand forecasting has improved stock accuracy by up to 35%',
+    impactStat: 'Better demand forecasting means shops stock what actually sells, not what they guess',
     steps: [
       {
         id: 'inv2-step-1',
@@ -744,7 +744,7 @@ Check the LIVE INVENTORY table before answering.
     badgeTitle: 'Verified HR Automation Specialist',
     tags: ['Resume Parsing', 'Candidate Ranking', 'Interview Scheduling'],
     whoBuysThis: 'Growing SMEs that hire regularly',
-    impactStat: 'AI screening cut one Nairobi company\'s hiring time from 3 months to 3 weeks',
+    impactStat: 'Automated screening reads every CV the same way, so no candidate gets missed in the pile',
     steps: [
       {
         id: 'hr-step-1',
