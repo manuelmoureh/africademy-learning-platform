@@ -589,28 +589,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="w-full lg:w-96 bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3 shrink-0">
-            <div>
-              <p className="text-xs font-bold text-[#F5A623] uppercase">
-                What A Business Checks
-              </p>
-              <p className="text-[11px] text-white/50 mt-0.5">Before confirming a WhatsApp AI agent works:</p>
-            </div>
+            <p className="text-xs font-bold text-[#F5A623] uppercase">
+              What You Get
+            </p>
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2 text-white/90">
                 <Check className="w-4 h-4 text-[#10B981]" />
-                Never quotes a customer the wrong price
+                A verified portfolio
               </div>
               <div className="flex items-center gap-2 text-white/90">
                 <Check className="w-4 h-4 text-[#10B981]" />
-                Never misses an M-Pesa payment
+                A system you can resell again and again
               </div>
               <div className="flex items-center gap-2 text-white/90">
                 <Check className="w-4 h-4 text-[#10B981]" />
-                Can't be tricked into giving away free stuff
+                A real skill, not just theory
               </div>
               <div className="flex items-center gap-2 text-white/90">
                 <Check className="w-4 h-4 text-[#10B981]" />
-                Understands Sheng and Swahili, not just English
+                A safe space to test it before it goes live
               </div>
             </div>
           </div>
