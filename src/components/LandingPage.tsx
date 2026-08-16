@@ -3,7 +3,7 @@ import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
   Check, Users, Star, Search, ChevronLeft, ChevronRight,
-  Wrench, Repeat, ChevronDown, Mail, Loader2, BookOpen, Rocket
+  Wrench, Repeat, ChevronDown, Mail, Loader2, BookOpen
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -424,9 +424,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
             {[
               { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
-              { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing, not a mock exercise.' },
-              { icon: Rocket, title: 'Put it to work', body: 'Install it for a business you bring on, so it is running in the real world, not a demo.' },
-              { icon: Repeat, title: 'Resell it', body: 'Use the verified link to pitch the same system to your next client.' },
+              { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing.' },
+              { icon: ShieldCheck, title: 'Get a verified portfolio', body: 'Install it for a business you bring on, and the working system becomes your portfolio.' },
+              { icon: Repeat, title: 'Sell it', body: 'Use the verified link to pitch the same system to your next client.' },
             ].map((step, i) => (
               <motion.div
                 key={step.title}
@@ -525,7 +525,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Every System Solves a Real Business Problem
             </h2>
             <p className="text-xs sm:text-sm text-[#12102A]/60">
-              Backed by real numbers, not a hypothetical exercise.
+              Backed by real numbers from the field.
             </p>
           </div>
 
@@ -641,7 +641,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <div className="flex items-center gap-2 text-white/90">
                 <Check className="w-4 h-4 text-[#10B981]" />
-                A real skill, not just theory
+                A skill you can actually use
               </div>
               <div className="flex items-center gap-2 text-white/90">
                 <Check className="w-4 h-4 text-[#10B981]" />
