@@ -258,7 +258,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                           <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
                           {track.category}
                         </span>
-                        <span className="text-[#12102A]/60 text-xs line-clamp-1">{track.title}</span>
+                        <span className="text-[#12102A]/60 text-xs">{track.title}</span>
                       </MotionNavigationMenuLink>
                     ))}
                   </div>
@@ -705,7 +705,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </span>
                 </div>
                 <div className="p-6 flex flex-col flex-1">
-                  <span className="text-[10px] font-mono font-bold text-[#F5A623] uppercase tracking-wider">
+                  <span className="text-[10px] font-mono font-bold text-[#F5A623] tracking-wider">
                     {track.trackNumber}
                   </span>
                   <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-1">
@@ -771,7 +771,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="w-full lg:w-96 bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3 shrink-0">
-            <p className="text-xs font-bold text-[#F5A623] uppercase">
+            <p className="text-xs font-bold text-[#F5A623]">
               What You Get
             </p>
             <div className="space-y-2 text-xs">
@@ -943,18 +943,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
               <div className="space-y-2.5">
-                <p className="text-white/80 font-bold text-[11px] uppercase tracking-wider">Systems</p>
+                <p className="text-white/80 font-bold text-[11px] tracking-wider">Systems</p>
                 <button onClick={onEnterApp} className="block text-left hover:text-white transition-colors cursor-pointer">All Systems</button>
                 <button onClick={onOpenSandbox} className="block text-left hover:text-white transition-colors cursor-pointer">See It Work</button>
                 <button onClick={onOpenPortfolio} className="block text-left hover:text-white transition-colors cursor-pointer">Verified Work</button>
               </div>
               <div className="space-y-2.5">
-                <p className="text-white/80 font-bold text-[11px] uppercase tracking-wider">Company</p>
+                <p className="text-white/80 font-bold text-[11px] tracking-wider">Company</p>
                 <button onClick={onOpenAbout} className="block text-left hover:text-white transition-colors cursor-pointer">About</button>
                 <button onClick={onOpenPricing} className="block text-left hover:text-white transition-colors cursor-pointer">Pricing</button>
               </div>
               <div className="space-y-2.5">
-                <p className="text-white/80 font-bold text-[11px] uppercase tracking-wider">Legal</p>
+                <p className="text-white/80 font-bold text-[11px] tracking-wider">Legal</p>
                 <button onClick={onOpenPrivacy} className="block text-left hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
                 <button onClick={onOpenTerms} className="block text-left hover:text-white transition-colors cursor-pointer">Terms of Service</button>
               </div>
