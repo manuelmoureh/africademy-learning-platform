@@ -322,7 +322,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Stat row */}
-            <div className="grid grid-cols-2 gap-x-8 gap-y-5 pt-8 border-t border-[#12102A]/10 text-left max-w-sm">
+            <div className="flex items-start gap-8 pt-8 border-t border-[#12102A]/10 text-left">
               <div>
                 <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={10} suffix="+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">On-demand systems</p>
@@ -334,10 +334,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div>
                 <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={15} prefix="KES " suffix="K+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Estimated per system sold</p>
-              </div>
-              <div>
-                <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={5} /></p>
-                <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">Free lessons per system</p>
               </div>
             </div>
           </div>
