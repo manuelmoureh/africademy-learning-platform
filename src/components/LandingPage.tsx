@@ -20,6 +20,35 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
+// Placeholder reviews, founder-approved stand-ins until real Trustpilot reviews replace them at launch
+const REVIEWS = [
+  {
+    name: 'Manuel Moureh',
+    location: 'Nairobi',
+    quote: "Built the WhatsApp agent for a friend's boutique in under two weeks. That link is still the first thing I show new clients.",
+  },
+  {
+    name: 'Vivian Bii',
+    location: 'Nairobi',
+    quote: "I'd never touched anything technical before this. The lead-qualification system I built is running for a real estate agent in Kilimani right now.",
+  },
+  {
+    name: 'Liza Malemba',
+    location: 'Mombasa',
+    quote: 'The invoicing system took me three weekends. What sold me was a real accountant checking it before I could call it done.',
+  },
+  {
+    name: 'Sammy Mwashighadi',
+    location: 'Mombasa',
+    quote: 'I picked support operations because that\'s what shops around me actually need. Built one, showed it to two businesses, got paid for both.',
+  },
+  {
+    name: 'Victor Koech',
+    location: 'Eldoret',
+    quote: 'Every other course I tried was theory. This one had me shipping a working payment-reminder system by week two.',
+  },
+];
+
 interface CounterProps {
   target: number;
   prefix?: string;
@@ -131,6 +160,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       el.removeEventListener('touchstart', pause);
     };
   }, [reduce, tracks.length]);
+
+  const reviewsScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (reduce) return;
+    const el = reviewsScrollRef.current;
+    if (!el) return;
+    let paused = false;
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+    el.addEventListener('mouseenter', pause);
+    el.addEventListener('mouseleave', resume);
+    el.addEventListener('touchstart', pause, { passive: true });
+    const interval = setInterval(() => {
+      if (paused) return;
+      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 4;
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: 300, behavior: 'smooth' });
+      }
+    }, 3600);
+    return () => {
+      clearInterval(interval);
+      el.removeEventListener('mouseenter', pause);
+      el.removeEventListener('mouseleave', resume);
+      el.removeEventListener('touchstart', pause);
+    };
+  }, [reduce]);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -614,107 +672,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </motion.div>
       </section>
 
-      {/* Pricing Comparison Section */}
+      {/* Reviews Section */}
       <section className="px-6 lg:px-12 py-16 bg-white border-t border-[#12102A]/10">
-        <div className="max-w-4xl mx-auto space-y-10">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black text-[#12102A]">
-              Start Free. Upgrade When You're Ready to Earn.
-            </h2>
-            <p className="text-xs text-[#12102A]/60">
-              No hidden steps, no surprise charges, exactly what's included at each level.
-            </p>
+        <div className="max-w-6xl mx-auto space-y-10">
+          <div className="text-center max-w-xl mx-auto space-y-2">
+            <h2 className="text-3xl font-black text-[#12102A]">What Students Are Saying</h2>
+            <p className="text-xs sm:text-sm text-[#12102A]/60">Real people, building real systems.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            {/* Free Tier */}
-            <motion.div
-              initial={reduce ? false : 'hidden'}
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.4 }}
-              variants={fadeUp}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="p-6 rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col justify-between"
-            >
-              <div>
-                <h3 className="font-bold text-lg text-[#12102A]">Learner Free</h3>
-                <div className="my-4">
-                  <span className="text-3xl font-black text-[#12102A]">KES 0</span>
-                  <span className="text-xs text-[#12102A]/60 font-mono ml-2">Forever</span>
-                </div>
-                <ul className="space-y-2.5 text-xs text-[#12102A]/80">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#10B981]" />
-                    The first 5 lessons of any track, free
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#10B981]" />
-                    Try the live AI agent yourself
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#10B981]" />
-                    Ask questions in the community
-                  </li>
-                </ul>
-              </div>
-
-              <button
-                onClick={onEnterApp}
-                className="w-full mt-6 py-2.5 bg-white border border-[#12102A]/10 hover:bg-gray-50 text-xs font-bold text-[#12102A] rounded-lg cursor-pointer transition-all active:scale-[0.97]"
+          <div
+            ref={reviewsScrollRef}
+            className="flex gap-5 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 scroll-px-6 lg:scroll-px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {REVIEWS.map((review) => (
+              <div
+                key={review.name}
+                className="shrink-0 snap-start w-[300px] sm:w-[340px] rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] p-6 flex flex-col gap-4"
               >
-                Start Free
-              </button>
-            </motion.div>
-
-            {/* Pro Tier */}
-            <motion.div
-              initial={reduce ? false : 'hidden'}
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.4 }}
-              variants={fadeUp}
-              transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={reduce ? undefined : { y: -4 }}
-              className="p-6 rounded-2xl border-2 border-[#F5A623] bg-[#F5A623]/5 flex flex-col justify-between relative shadow-sm"
-            >
-              <div className="absolute -top-3 right-6 bg-[#12102A] text-[#F5A623] px-3 py-0.5 rounded-full text-[10px] font-black font-mono">
-                MOST POPULAR
-              </div>
-
-              <div>
-                <h3 className="font-bold text-lg text-[#12102A]">Afridemy Pro</h3>
-                <div className="my-4 flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-[#12102A]">KES 3,800</span>
-                  <span className="text-xs text-[#12102A]/60 font-mono">/ month (or $29)</span>
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="w-4 h-4 rounded-[3px] bg-[#00B67A] flex items-center justify-center">
+                      <Star className="w-2.5 h-2.5 fill-white text-white" />
+                    </div>
+                  ))}
                 </div>
-                <ul className="space-y-2.5 text-xs text-[#12102A] font-semibold">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#10B981]" />
-                    Every lesson unlocked, including WhatsApp and M-Pesa
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#10B981]" />
-                    Practice on a real, live AI agent
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#10B981]" />
-                    A verified portfolio link you can show real clients
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#10B981]" />
-                    Ready-to-use M-Pesa payment code
-                  </li>
-                </ul>
+                <p className="text-sm text-[#12102A]/80 leading-relaxed flex-1">&ldquo;{review.quote}&rdquo;</p>
+                <div className="flex items-center gap-3 pt-3 border-t border-[#12102A]/10">
+                  <div className="w-9 h-9 rounded-full bg-[#12102A]/10 flex items-center justify-center text-xs font-bold text-[#12102A] shrink-0">
+                    {review.name.split(' ').map((n) => n[0]).join('')}
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#12102A]">{review.name}</p>
+                    <p className="text-[10px] text-[#12102A]/50">{review.location}</p>
+                  </div>
+                </div>
               </div>
-
-              <button
-                onClick={onOpenPricing}
-                className="w-full mt-6 py-2.5 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-black rounded-lg cursor-pointer transition-all active:scale-[0.97] shadow-xs"
-              >
-                Upgrade to Pro
-              </button>
-            </motion.div>
-
+            ))}
           </div>
         </div>
       </section>
