@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search, ChevronLeft, ChevronRight, Menu, X
+  Check, Users, Star, Search, ChevronLeft, ChevronRight, Menu, X,
+  Wrench, Repeat, ChevronDown, Mail, Loader2
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
+import { subscribeToNewsletter } from '../lib/db';
 import {
   MotionNavigationMenu,
   MotionNavigationMenuContent,
@@ -200,6 +202,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const reduce = useReducedMotion();
   const [navSearch, setNavSearch] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim() || newsletterStatus === 'loading') return;
+    setNewsletterStatus('loading');
+    const { error } = await subscribeToNewsletter(newsletterEmail.trim());
+    setNewsletterStatus(error ? 'error' : 'done');
+  };
 
   const categoryCarousel = useHorizontalCarousel(tracks.length, reduce, 240, 3200);
   const reviewsCarousel = useHorizontalCarousel(REVIEWS.length, reduce, 300, 3600);
@@ -560,6 +572,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <p className="relative text-[10px] text-[#12102A]/40 mt-2 max-w-6xl">*Based on current Nairobi freelance market rates for AI automation builders. Not a guaranteed income.</p>
       </section>
 
+      {/* How It Works */}
+      <section className="px-6 lg:px-12 py-14 bg-white border-y border-[#12102A]/10">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-xl mx-auto space-y-2 mb-10">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">How It Works</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
+              { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing, not a mock exercise.' },
+              { icon: ShieldCheck, title: 'Get it verified', body: 'Deploy it for a real business. They confirm it works, not you.' },
+              { icon: Repeat, title: 'Resell it', body: 'Use the verified link to pitch the same system to your next client.' },
+            ].map((step, i) => (
+              <motion.div
+                key={step.title}
+                initial={reduce ? false : 'hidden'}
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.4 }}
+                variants={fadeUp}
+                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-3"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#F5A623]/15 flex items-center justify-center shrink-0">
+                    <step.icon className="w-5 h-5 text-[#F5A623]" />
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-[#12102A]/30">0{i + 1}</span>
+                </div>
+                <h3 className="font-bold text-[#12102A]">{step.title}</h3>
+                <p className="text-xs text-[#12102A]/60 leading-relaxed">{step.body}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Category Strip */}
       <section className="px-6 lg:px-12 pt-6 pb-14 max-w-6xl mx-auto w-full">
         <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
@@ -812,21 +861,106 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-6 lg:px-12 py-10 bg-[#12102A] text-white/60 text-xs flex flex-col gap-6 border-t border-white/10">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img src="/logo-light.png" alt="Afridemy" className="h-6 w-auto" />
-            <span className="font-semibold text-white/80">Based in Nairobi, Kenya</span>
+      {/* FAQ */}
+      <section className="px-6 lg:px-12 py-16 bg-white border-t border-[#12102A]/10">
+        <div className="max-w-2xl mx-auto space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">Questions People Actually Ask</h2>
           </div>
-          <div className="flex items-center gap-6">
-            <button onClick={onOpenAbout} className="hover:text-white transition-colors cursor-pointer">About</button>
-            <button onClick={onOpenPrivacy} className="hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
-            <button onClick={onOpenTerms} className="hover:text-white transition-colors cursor-pointer">Terms of Service</button>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: 'Do I need any tech experience to start?',
+                a: 'No. Every system starts from zero. If you can use WhatsApp, you can follow along.',
+              },
+              {
+                q: 'What makes a verified portfolio different from a certificate?',
+                a: 'A certificate says you finished a course. A verified portfolio is a live system a real business is actually using, checked and confirmed by them, not just claimed by you.',
+              },
+              {
+                q: 'Will Afridemy get me a job?',
+                a: "No, and that's not the model. You walk away with a working system and a verified portfolio, then you use it to pitch businesses yourself.",
+              },
+              {
+                q: 'What does it cost?',
+                a: 'The first 5 lessons of every system are free, so you can try it before paying anything.',
+              },
+              {
+                q: 'Can I actually make money from this?',
+                a: "Yes, that's the point. Once a system is verified, it's yours to install for other businesses too, not just the first one.",
+              },
+            ].map((item) => (
+              <details key={item.q} className="group rounded-xl border border-[#12102A]/10 bg-[#F0EEF6] px-5 py-4">
+                <summary className="flex items-center justify-between gap-4 cursor-pointer list-none font-bold text-sm text-[#12102A]">
+                  {item.q}
+                  <ChevronDown className="w-4 h-4 text-[#12102A]/50 shrink-0 transition-transform group-open:rotate-180" />
+                </summary>
+                <p className="text-xs text-[#12102A]/70 leading-relaxed mt-3">{item.a}</p>
+              </details>
+            ))}
           </div>
         </div>
-        <div className="text-white/40 font-mono text-[10px]">
-          Built for real WhatsApp and M-Pesa agents, made for Africa, by Africans.
+      </section>
+
+      {/* Footer */}
+      <footer className="px-6 lg:px-12 pt-14 pb-10 bg-[#12102A] text-white/60 text-xs border-t border-white/10">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pb-10 border-b border-white/10">
+            <div className="space-y-3 max-w-sm">
+              <img src="/logo-light.png" alt="Afridemy" className="h-6 w-auto" />
+              <p className="text-white/50 leading-relaxed">Get notified when new systems and categories launch.</p>
+              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                <div className="relative flex-1">
+                  <Mail className="w-3.5 h-3.5 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="email"
+                    required
+                    value={newsletterEmail}
+                    onChange={(e) => { setNewsletterEmail(e.target.value); setNewsletterStatus('idle'); }}
+                    placeholder="your@email.com"
+                    disabled={newsletterStatus === 'loading' || newsletterStatus === 'done'}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-full border border-white/15 bg-white/5 text-white placeholder:text-white/30 text-xs focus:outline-none focus:border-[#F5A623] disabled:opacity-60"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={newsletterStatus === 'loading' || newsletterStatus === 'done'}
+                  className="shrink-0 px-4 py-2.5 rounded-full bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-bold cursor-pointer transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  {newsletterStatus === 'loading' && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {newsletterStatus === 'done' ? 'Subscribed' : 'Notify me'}
+                </button>
+              </form>
+              {newsletterStatus === 'error' && (
+                <p className="text-red-400 text-[11px]">Something went wrong, try again in a moment.</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+              <div className="space-y-2.5">
+                <p className="text-white/80 font-bold text-[11px] uppercase tracking-wider">Systems</p>
+                <button onClick={onEnterApp} className="block text-left hover:text-white transition-colors cursor-pointer">All Systems</button>
+                <button onClick={onOpenSandbox} className="block text-left hover:text-white transition-colors cursor-pointer">See It Work</button>
+                <button onClick={onOpenPortfolio} className="block text-left hover:text-white transition-colors cursor-pointer">Verified Work</button>
+              </div>
+              <div className="space-y-2.5">
+                <p className="text-white/80 font-bold text-[11px] uppercase tracking-wider">Company</p>
+                <button onClick={onOpenAbout} className="block text-left hover:text-white transition-colors cursor-pointer">About</button>
+                <button onClick={onOpenPricing} className="block text-left hover:text-white transition-colors cursor-pointer">Pricing</button>
+              </div>
+              <div className="space-y-2.5">
+                <p className="text-white/80 font-bold text-[11px] uppercase tracking-wider">Legal</p>
+                <button onClick={onOpenPrivacy} className="block text-left hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
+                <button onClick={onOpenTerms} className="block text-left hover:text-white transition-colors cursor-pointer">Terms of Service</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="font-semibold text-white/50">Based in Nairobi, Kenya</span>
+            <span className="text-white/30 font-mono text-[10px]">Built for real WhatsApp and M-Pesa agents, made for Africa, by Africans.</span>
+          </div>
         </div>
       </footer>
     </div>

@@ -77,3 +77,11 @@ export async function submitPortfolioProject(input: PortfolioSubmissionInput): P
   });
   return { error: error ? error.message : null };
 }
+
+export async function subscribeToNewsletter(email: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('newsletter_signups').insert({ email });
+  if (error && error.code === '23505') {
+    return { error: null }; // already subscribed, treat as success
+  }
+  return { error: error ? error.message : null };
+}
