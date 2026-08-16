@@ -335,19 +335,23 @@ export default function App() {
 
       {/* Main Learning Hub Layout */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* Left Navigation Sidebar */}
-        <Sidebar
-          tracks={tracks}
-          selectedTrackId={selectedTrackId}
-          onSelectTrack={(id) => {
-            setSelectedTrackId(id);
-            setActiveNav('course-detail');
-          }}
-          onOpenPricing={() => setIsPricingOpen(true)}
-          onOpenPortfolio={() => setIsPortfolioOpen(true)}
-          isProUser={isProUser}
-          activeTrackProgress={progressPercent}
-        />
+        {/* Left Navigation Sidebar: hidden on the Systems catalog page, it's built around an
+            already-selected track (progress, hardcoded track-specific specs) which doesn't
+            apply while someone is still browsing */}
+        {activeNav !== 'catalog' && (
+          <Sidebar
+            tracks={tracks}
+            selectedTrackId={selectedTrackId}
+            onSelectTrack={(id) => {
+              setSelectedTrackId(id);
+              setActiveNav('course-detail');
+            }}
+            onOpenPricing={() => setIsPricingOpen(true)}
+            onOpenPortfolio={() => setIsPortfolioOpen(true)}
+            isProUser={isProUser}
+            activeTrackProgress={progressPercent}
+          />
+        )}
 
         {/* Dynamic Center Stage */}
         <main className="flex-1 overflow-y-auto">
