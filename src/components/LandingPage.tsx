@@ -424,9 +424,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
             {[
               { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
-              { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing.' },
+              { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the system yourself.' },
               { icon: ShieldCheck, title: 'Get a verified portfolio', body: 'Walk away with a verified portfolio you can showcase to clients.' },
-              { icon: Repeat, title: 'Sell it', body: 'Take the same system to your next customer and sell it again.' },
+              { icon: Repeat, title: 'Sell it', body: 'Pitch the same system to a new business and get paid to build it again.' },
             ].map((step, i) => (
               <motion.div
                 key={step.title}
