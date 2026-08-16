@@ -132,7 +132,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
                 {track.title}
               </h3>
 
-              <p className="text-xs text-[#12102A]/70 mt-2 leading-relaxed font-medium line-clamp-1">
+              <p className="text-xs text-[#12102A]/70 mt-2 leading-relaxed font-medium">
                 {track.description}
               </p>
 

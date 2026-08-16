@@ -16,7 +16,7 @@ const CONFIG: Record<string, ThumbnailConfig> = {
   'lead-capture-bot': { kind: 'card-list', lines: ['Budget: KES 8M', 'Qualified'] },
   'invoicing-assistant': { kind: 'document', lines: ['INV-0142', 'Deposit: KES 15,000', 'Balance: KES 30,000', 'Total: KES 45,000'] },
   'support-ticketing-agent': { kind: 'card-list', lines: ['Ticket #204', 'Resolved'] },
-  'booking-scheduler-agent': { kind: 'calendar', label: 'AUGUST', lines: [] },
+  'booking-scheduler-agent': { kind: 'calendar', label: 'August', lines: [] },
   'social-content-agent': { kind: 'post', label: 'Kilimani Boutique', lines: ['New stock just arrived', 'Tap to shop the drop'] },
   'inventory-restock-agent': { kind: 'card-list', lines: ['Sandals (3 left)', 'Low Stock'] },
   'hr-screening-agent': { kind: 'card-list', lines: ['CV: J. Wanjiru', 'Shortlisted'] },
@@ -32,7 +32,7 @@ function ChatMockup({ lines, label }: { lines: string[]; label?: string }) {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]" />
         </span>
-        <span className="text-[8px] font-bold text-white/60 uppercase tracking-wide">{label}</span>
+        <span className="text-[8px] font-bold text-white/60">{label}</span>
       </div>
       <div className="bg-white/10 text-white/80 text-[9px] rounded-lg rounded-bl-none px-2.5 py-1.5 max-w-[85%]">{lines[0]}</div>
       <div className="bg-[#F5A623] text-[#12102A] text-[9px] font-semibold rounded-lg rounded-br-none px-2.5 py-1.5 max-w-[85%] ml-auto">{lines[1]}</div>
@@ -61,7 +61,7 @@ function CardListMockup({ lines }: { lines: string[] }) {
       <span className="w-6 h-6 rounded-full bg-[#F5A623]/15 flex items-center justify-center shrink-0">
         <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
       </span>
-      <span className="text-[9px] font-bold text-[#12102A] truncate flex-1">{lines[0]}</span>
+      <span className="text-[9px] font-bold text-[#12102A] flex-1">{lines[0]}</span>
       <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-[#10B981]/15 text-[#10B981] flex items-center gap-0.5">
         <Check className="w-2.5 h-2.5" />
         {lines[1]}
@@ -98,7 +98,7 @@ function PostMockup({ lines, label }: { lines: string[]; label?: string }) {
     <div className="w-full max-w-[170px] bg-white/95 rounded-lg overflow-hidden shadow-lg shadow-black/10">
       <div className="flex items-center gap-1.5 px-2 pt-2">
         <span className="w-4 h-4 rounded-full bg-[#F5A623]/25 shrink-0" />
-        <span className="text-[7px] font-bold text-[#12102A]/70 truncate">{label}</span>
+        <span className="text-[7px] font-bold text-[#12102A]/70">{label}</span>
       </div>
       <div className="h-9 mx-2 mt-1.5 rounded bg-gradient-to-br from-[#F5A623]/30 to-[#F5A623]/10" />
       <div className="p-2 space-y-1">
