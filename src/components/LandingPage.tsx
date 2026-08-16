@@ -247,7 +247,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <MotionNavigationMenu className="hidden md:flex" viewportClassName="border-[#12102A]/10">
             <MotionNavigationMenuList>
               <MotionNavigationMenuItem value="courses">
-                <MotionNavigationMenuTrigger className="text-[#12102A]/70 data-[state=open]:text-[#12102A]">
+                <MotionNavigationMenuTrigger onClick={onEnterApp} className="text-[#12102A]/70 data-[state=open]:text-[#12102A]">
                   Systems
                 </MotionNavigationMenuTrigger>
                 <MotionNavigationMenuContent>
