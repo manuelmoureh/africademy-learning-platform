@@ -375,12 +375,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
 
-              {/* Top-right diagonal pill pair, straddling the top and right edges */}
+              {/* Top pill pair: left one straddles the top-left edge, right one straddles the right edge at the photo seam */}
               <motion.div
                 initial={reduce ? false : { opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -top-3 -right-3 sm:-right-4 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
+                className="absolute -top-3 left-10 sm:left-14 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
                 Build market ready AI systems
@@ -389,7 +389,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 initial={reduce ? false : { opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute top-[46%] -translate-y-1/2 -right-5 sm:-right-6 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
+                className="absolute top-[46%] -translate-y-1/2 -right-9 sm:-right-11 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
                 First 5 Lessons Free
@@ -411,12 +411,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </motion.div>
 
-              {/* Bottom-right amber stat card, straddling the corner */}
+              {/* Bottom amber stat card, pulled in from the corner toward bottom-center */}
               <motion.div
                 initial={reduce ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -bottom-4 -right-3 sm:-right-4 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[160px] z-10"
+                className="absolute -bottom-4 -right-3 sm:right-28 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[160px] z-10"
               >
                 <p className="text-2xl font-black leading-none">15K+</p>
                 <p className="text-[10px] font-bold leading-tight mt-1">KES earned per system installed</p>
