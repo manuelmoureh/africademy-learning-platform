@@ -583,7 +583,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {[
               { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
               { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing, not a mock exercise.' },
-              { icon: ShieldCheck, title: 'Get it verified', body: 'Deploy it for a real business. They confirm it works, not you.' },
+              { icon: ShieldCheck, title: 'Get it verified', body: 'Install it for a business you bring on. They confirm it works, not you.' },
               { icon: Repeat, title: 'Resell it', body: 'Use the verified link to pitch the same system to your next client.' },
             ].map((step, i) => (
               <motion.div
@@ -599,7 +599,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="relative z-10 w-10 h-10 rounded-xl bg-[#F5A623]/15 ring-4 ring-white flex items-center justify-center shrink-0">
                     <step.icon className="w-5 h-5 text-[#F5A623]" />
                   </span>
-                  <span className="text-[10px] font-mono font-bold text-[#12102A]/30">0{i + 1}</span>
+                  <span className="text-sm font-bold text-[#12102A]/30">0{i + 1}</span>
                 </div>
                 <h3 className="font-bold text-[#12102A]">{step.title}</h3>
                 <p className="text-sm text-[#12102A]/60 leading-relaxed">{step.body}</p>
@@ -876,7 +876,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 q: 'What makes a verified portfolio different from a certificate?',
-                a: 'A certificate says you finished a course. A verified portfolio is a live system a real business is actually using, checked and confirmed by them, not just claimed by you.',
+                a: 'A certificate says you finished a course. A verified portfolio is a live system installed for a business you found, checked and confirmed by them, not just claimed by you.',
               },
               {
                 q: 'Will Afridemy get me a job?',
