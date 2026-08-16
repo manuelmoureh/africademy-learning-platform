@@ -498,10 +498,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <h2 className="text-3xl sm:text-4xl font-black text-[#12102A]">
-              Built Around What African Businesses Actually Pay For
+              Every System Solves a Real Business Problem
             </h2>
             <p className="text-xs sm:text-sm text-[#12102A]/60">
-              Every track ends with you building a real, working system for a real business, not a practice exercise.
+              Backed by real numbers, not a hypothetical exercise.
             </p>
           </div>
 
