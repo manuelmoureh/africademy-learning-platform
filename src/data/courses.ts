@@ -921,13 +921,14 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
   issueDate: 'August 2026',
   status: 'Verified Production Grade',
   overallScore: 98,
+  summary: 'A WhatsApp assistant that answers customer questions, checks real stock, and takes M-Pesa payments automatically.',
   rubric: [
     {
       id: 'rubric-1',
       criteria: 'Inventory Consistency & Stock Decrement',
       score: 10,
       maxScore: 10,
-      description: 'Zero hallucinated SKUs; correctly informs out-of-stock items with alternatives.',
+      description: "Never makes up a product that doesn't exist, and always suggests something else when an item is out of stock.",
       status: 'Passed'
     },
     {
@@ -935,7 +936,7 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
       criteria: 'M-Pesa STK Push Integration & Error Routing',
       score: 9.8,
       maxScore: 10,
-      description: 'Generates valid Safaricom Daraja payloads and handles cancelled push prompts gracefully.',
+      description: "Payments go through cleanly, and a cancelled payment doesn't break the conversation.",
       status: 'Passed'
     },
     {
@@ -943,15 +944,15 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
       criteria: 'Kenyan Regional Nuance & Sheng Comprehension',
       score: 9.5,
       maxScore: 10,
-      description: 'Handles English, Swahili greetings, and Nairobi slang without breaking transaction schemas.',
+      description: 'Understands English, Swahili, and everyday Nairobi slang without getting confused mid-order.',
       status: 'Passed'
     },
     {
       id: 'rubric-4',
-      criteria: 'Latency & Webhook Response Timeout (<3s)',
+      criteria: 'Response Speed Under Load',
       score: 10,
       maxScore: 10,
-      description: 'Consistently returns HTTP 200 to Meta within 1.2s; async queues for heavy LLM calls.',
+      description: 'Replies fast, even when a lot of customers are messaging at once.',
       status: 'Passed'
     },
     {
@@ -959,7 +960,7 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
       criteria: 'Guardrails & Prompt Injection Defense',
       score: 9.7,
       maxScore: 10,
-      description: 'Resists system prompt extraction and off-topic prompt hijacking.',
+      description: "Can't be tricked into ignoring its instructions or going off-script.",
       status: 'Passed'
     }
   ],
@@ -972,10 +973,10 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
     avatarInitials: 'BO'
   },
   metrics: [
-    { label: 'Response Latency', value: '1.18s' },
-    { label: 'Hallucination Rate', value: '0.0%' },
-    { label: 'Catalog Accuracy', value: '100.0%' },
-    { label: 'M-Pesa Webhook Uptime', value: '99.9%' },
+    { label: 'Reply Speed', value: '1.18s' },
+    { label: 'Mistake Rate', value: '0.0%' },
+    { label: 'Accuracy', value: '100.0%' },
+    { label: 'Payment Uptime', value: '99.9%' },
   ]
 };
 
@@ -992,10 +993,11 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     issueDate: 'June 2026',
     status: 'Verified Production Grade',
     overallScore: 94,
+    summary: 'A WhatsApp assistant that answers customer questions, checks stock, and takes M-Pesa payments for a Nairobi boutique.',
     rubric: [
-      { id: 'r1', criteria: 'Inventory Consistency & Stock Decrement', score: 9.5, maxScore: 10, description: 'Zero hallucinated SKUs; correctly informs out-of-stock items with alternatives.', status: 'Passed' },
-      { id: 'r2', criteria: 'M-Pesa STK Push Integration', score: 9.4, maxScore: 10, description: 'Generates valid Safaricom Daraja payloads and handles cancelled push prompts gracefully.', status: 'Passed' },
-      { id: 'r3', criteria: 'Kenyan Regional Nuance & Sheng Comprehension', score: 9.2, maxScore: 10, description: 'Handles English, Swahili greetings, and Nairobi slang without breaking transaction schemas.', status: 'Passed' },
+      { id: 'r1', criteria: 'Inventory Consistency & Stock Decrement', score: 9.5, maxScore: 10, description: "Never makes up a product that doesn't exist, and always suggests something else when an item is out of stock.", status: 'Passed' },
+      { id: 'r2', criteria: 'M-Pesa STK Push Integration', score: 9.4, maxScore: 10, description: "Payments go through cleanly, and a cancelled payment doesn't break the conversation.", status: 'Passed' },
+      { id: 'r3', criteria: 'Kenyan Regional Nuance & Sheng Comprehension', score: 9.2, maxScore: 10, description: 'Understands English, Swahili, and everyday Nairobi slang without getting confused mid-order.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Grace Wanjiru',
@@ -1006,10 +1008,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
       avatarInitials: 'GW',
     },
     metrics: [
-      { label: 'Response Latency', value: '1.4s' },
-      { label: 'Hallucination Rate', value: '0.2%' },
-      { label: 'Catalog Accuracy', value: '99.1%' },
-      { label: 'M-Pesa Checkout Success', value: '98.6%' },
+      { label: 'Reply Speed', value: '1.4s' },
+      { label: 'Mistake Rate', value: '0.2%' },
+      { label: 'Accuracy', value: '99.1%' },
+      { label: 'Payment Success', value: '98.6%' },
     ],
   },
   {
@@ -1021,10 +1023,11 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     issueDate: 'June 2026',
     status: 'Verified Production Grade',
     overallScore: 91,
+    summary: 'A chat assistant that qualifies real estate leads and books viewings automatically for a Nairobi agency.',
     rubric: [
-      { id: 'r1', criteria: 'Property Qualification State Engine', score: 9.1, maxScore: 10, description: 'Extracts budget, bedroom count, and neighborhood without repeat questions.', status: 'Passed' },
-      { id: 'r2', criteria: 'Calendar Appointment Scheduling', score: 9.0, maxScore: 10, description: 'Books walkthroughs directly against agent availability, no double-bookings.', status: 'Passed' },
-      { id: 'r3', criteria: 'CRM & Google Sheets Sync', score: 9.3, maxScore: 10, description: 'Qualified leads land in the sales pipeline within seconds of the conversation ending.', status: 'Passed' },
+      { id: 'r1', criteria: 'Lead Qualification', score: 9.1, maxScore: 10, description: 'Asks for budget, bedroom count, and neighborhood, and never asks the same question twice.', status: 'Passed' },
+      { id: 'r2', criteria: 'Viewing Scheduling', score: 9.0, maxScore: 10, description: "Books property viewings straight into the agent's calendar, with no double-bookings.", status: 'Passed' },
+      { id: 'r3', criteria: 'CRM & Sheets Sync', score: 9.3, maxScore: 10, description: 'A qualified lead lands in the sales pipeline within seconds, no manual data entry.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Peter Otieno',
@@ -1035,10 +1038,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
       avatarInitials: 'PO',
     },
     metrics: [
-      { label: 'Response Latency', value: '1.6s' },
+      { label: 'Reply Speed', value: '1.6s' },
       { label: 'Qualification Accuracy', value: '96.4%' },
       { label: 'Booking Success Rate', value: '92.8%' },
-      { label: 'CRM Sync Uptime', value: '99.7%' },
+      { label: 'System Uptime', value: '99.7%' },
     ],
   },
   {
@@ -1050,10 +1053,11 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     issueDate: 'May 2026',
     status: 'Verified Production Grade',
     overallScore: 89,
+    summary: 'An assistant that turns handwritten receipts into proper invoices and matches M-Pesa payments automatically.',
     rubric: [
-      { id: 'r1', criteria: 'Receipt & Invoice Image Ingestion', score: 8.8, maxScore: 10, description: 'Extracts structured line items from camera snapshots of handwritten receipts.', status: 'Passed' },
-      { id: 'r2', criteria: 'PDF Invoice Generation', score: 9.0, maxScore: 10, description: 'Generates branded, downloadable receipts within seconds of a confirmed sale.', status: 'Passed' },
-      { id: 'r3', criteria: 'M-Pesa Till Reconciliation', score: 8.9, maxScore: 10, description: 'Matches payment SMS codes to open invoice balances with minimal manual correction.', status: 'Passed' },
+      { id: 'r1', criteria: 'Receipt Reading', score: 8.8, maxScore: 10, description: 'Reads a photo of a handwritten receipt and turns it into a proper, itemized invoice.', status: 'Passed' },
+      { id: 'r2', criteria: 'Invoice Generation', score: 9.0, maxScore: 10, description: 'Creates a branded, downloadable invoice within seconds of a confirmed sale.', status: 'Passed' },
+      { id: 'r3', criteria: 'M-Pesa Payment Matching', score: 8.9, maxScore: 10, description: 'Matches M-Pesa payment messages to the right invoice automatically, with almost no manual fixing.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Halima Juma',
@@ -1064,9 +1068,9 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
       avatarInitials: 'HJ',
     },
     metrics: [
-      { label: 'Response Latency', value: '2.1s' },
-      { label: 'Extraction Accuracy', value: '95.0%' },
-      { label: 'Reconciliation Match Rate', value: '97.3%' },
+      { label: 'Reply Speed', value: '2.1s' },
+      { label: 'Reading Accuracy', value: '95.0%' },
+      { label: 'Payment Match Rate', value: '97.3%' },
       { label: 'Invoices Generated', value: '340+' },
     ],
   },
@@ -1079,9 +1083,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     issueDate: 'May 2026',
     status: 'Verified Production Grade',
     overallScore: 87,
+    summary: 'A support assistant that answers customer questions on WhatsApp and knows when to bring in a real person.',
     rubric: [
-      { id: 'r1', criteria: 'FAQ Knowledge Base & Retrieval', score: 8.6, maxScore: 10, description: "Answers from the business's real policies, not generic guesses.", status: 'Passed' },
-      { id: 'r2', criteria: 'Escalation & Human Handoff', score: 8.9, maxScore: 10, description: 'Recognizes when to stop and route to a human, without looping the customer.', status: 'Passed' },
+      { id: 'r1', criteria: 'Accurate Answers', score: 8.6, maxScore: 10, description: "Answers from the business's real policies, never a generic guess.", status: 'Passed' },
+      { id: 'r2', criteria: 'Handoff to a Human', score: 8.9, maxScore: 10, description: 'Knows when to stop and bring in a real person, instead of looping the customer.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Joseph Mwangangi',
@@ -1092,10 +1097,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
       avatarInitials: 'JM',
     },
     metrics: [
-      { label: 'Response Latency', value: '1.2s' },
-      { label: 'First-Contact Resolution', value: '81.5%' },
-      { label: 'Escalation Accuracy', value: '94.0%' },
-      { label: 'Tickets Handled', value: '600+' },
+      { label: 'Reply Speed', value: '1.2s' },
+      { label: 'Solved on First Reply', value: '81.5%' },
+      { label: 'Handoff Accuracy', value: '94.0%' },
+      { label: 'Questions Handled', value: '600+' },
     ],
   },
   {
@@ -1107,9 +1112,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     issueDate: 'April 2026',
     status: 'Verified Production Grade',
     overallScore: 92,
+    summary: 'An assistant that follows up on overdue invoices automatically, so a business gets paid without awkward phone calls.',
     rubric: [
-      { id: 'r1', criteria: 'Overdue Detection & Escalation Sequencing', score: 9.2, maxScore: 10, description: 'Polite first, firm later, with a clear escalation ladder.', status: 'Passed' },
-      { id: 'r2', criteria: 'Aging Reports & Human Escalation', score: 9.1, maxScore: 10, description: 'Flags the accounts that genuinely need a phone call instead of another message.', status: 'Passed' },
+      { id: 'r1', criteria: 'Follow-Up Messages', score: 9.2, maxScore: 10, description: 'Starts polite, gets firmer over time, following a clear set of steps.', status: 'Passed' },
+      { id: 'r2', criteria: 'Knowing When to Call', score: 9.1, maxScore: 10, description: 'Flags the accounts that genuinely need a phone call instead of another message.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Caroline Chebet',
@@ -1120,10 +1126,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
       avatarInitials: 'CC',
     },
     metrics: [
-      { label: 'Response Latency', value: '1.5s' },
+      { label: 'Reply Speed', value: '1.5s' },
       { label: 'Payment Links Sent', value: '210+' },
-      { label: 'Recovery Rate (30 days)', value: '78.4%' },
-      { label: 'Escalation Precision', value: '93.1%' },
+      { label: 'Paid Within 30 Days', value: '78.4%' },
+      { label: 'Follow-Up Accuracy', value: '93.1%' },
     ],
   },
 ];

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import {
-  X, ShieldCheck, CheckCircle2, Share2, ExternalLink, Code2,
-  Terminal, Check, Copy, Sparkles, Building2, UserCheck, Activity, Award
-} from 'lucide-react';
+import { X, ShieldCheck, CheckCircle2, Share2, Link2, Check, Copy, UserCheck } from 'lucide-react';
 import { PortfolioVerification } from '../types';
 
 interface VerifiedPortfolioModalProps {
@@ -18,11 +15,10 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
   isOpen,
   onClose,
   verification,
-  completedSteps,
-  totalSteps,
 }) => {
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'rubric' | 'architecture' | 'reviewer'>('rubric');
+  const [activeTab, setActiveTab] = useState<'rubric' | 'reviewer'>('rubric');
+  const statusLabel = verification.status === 'Verified Production Grade' ? 'Verified' : 'In Progress';
 
   const handleCopyLink = () => {
     navigator.clipboard?.writeText(verification.liveUrl);
@@ -56,13 +52,13 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-sm text-[#12102A]">Verified Developer Portfolio</h3>
-                <span className="text-[10px] font-bold font-mono px-2 py-0.5 bg-[#10B981]/15 text-[#10B981] rounded-full">
-                  {verification.status}
+                <h3 className="font-bold text-sm text-[#12102A]">Verified System</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-[#10B981]/15 text-[#10B981] rounded-full">
+                  {statusLabel}
                 </span>
               </div>
-              <p className="text-xs text-[#12102A]/60 font-mono">
-                Credential ID: {verification.id} • Issued {verification.issueDate}
+              <p className="text-xs text-[#12102A]/60">
+                Verified {verification.issueDate}
               </p>
             </div>
           </div>
@@ -81,27 +77,21 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
           {/* Top Hero Banner - Student & Artifact Summary */}
           <div className="p-6 rounded-2xl bg-[#12102A] text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
             <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#F5A623]">
-                  Candidate Artifact
-                </span>
-                <span className="text-white/40 text-xs">•</span>
-                <span className="text-xs text-white/80 font-mono">
-                  {completedSteps >= totalSteps ? '12/12 Steps Verified' : `${completedSteps}/${totalSteps} Steps Completed`}
-                </span>
-              </div>
+              <p className="text-xs text-white/60 font-semibold mb-2">
+                {verification.trackTitle}
+              </p>
               <h2 className="text-2xl font-black tracking-tight text-white">
                 {verification.studentName}
               </h2>
               <p className="text-xs text-white/70 mt-1 max-w-xl leading-relaxed">
-                Autonomous WhatsApp retail agent with live inventory memory injection, Sheng/Swahili NLP router, and Safaricom Daraja M-Pesa STK push checkouts.
+                {verification.summary}
               </p>
             </div>
 
             {/* Overall Score Badge */}
             <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/10 shrink-0 self-stretch md:self-auto justify-between md:justify-center">
               <div>
-                <span className="text-[9px] font-mono text-white/60 uppercase block">Rubric Score</span>
+                <span className="text-[9px] text-white/60 block">Score</span>
                 <span className="text-3xl font-black text-[#10B981] font-mono">
                   {verification.overallScore}<span className="text-sm text-white/60">/100</span>
                 </span>
@@ -116,11 +106,11 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
           <div className="p-4 rounded-xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-8 h-8 rounded-lg bg-[#12102A]/5 flex items-center justify-center text-[#12102A] shrink-0">
-                <Code2 className="w-4 h-4" />
+                <Link2 className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase font-mono text-[#12102A]/50">
-                  Public Verified Portfolio URL
+                <p className="text-[10px] font-bold text-[#12102A]/50">
+                  Shareable Link
                 </p>
                 <a
                   href={verification.liveUrl}
@@ -148,43 +138,33 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {verification.metrics.map((metric) => (
               <div key={metric.label} className="p-3.5 rounded-xl border border-[#12102A]/10 bg-white text-center">
-                <span className="text-[10px] font-mono text-[#12102A]/50 block">{metric.label}</span>
+                <span className="text-[10px] text-[#12102A]/50 block">{metric.label}</span>
                 <span className="text-base font-bold font-mono text-[#12102A]">{metric.value}</span>
               </div>
             ))}
           </div>
 
           {/* Section Navigation Tabs */}
-          <div className="flex border-b border-[#12102A]/10 gap-6 text-xs font-bold font-mono">
+          <div className="flex border-b border-[#12102A]/10 gap-6 text-xs font-bold">
             <button
               onClick={() => setActiveTab('rubric')}
               className={`pb-2 transition-all ${
-                activeTab === 'rubric' 
-                  ? 'text-[#12102A] border-b-2 border-[#F5A623]' 
+                activeTab === 'rubric'
+                  ? 'text-[#12102A] border-b-2 border-[#F5A623]'
                   : 'text-[#12102A]/50 hover:text-[#12102A]'
               }`}
             >
-              Evaluation Rubric ({verification.rubric.length} Criteria)
+              What Was Checked
             </button>
             <button
               onClick={() => setActiveTab('reviewer')}
               className={`pb-2 transition-all ${
-                activeTab === 'reviewer' 
-                  ? 'text-[#12102A] border-b-2 border-[#F5A623]' 
+                activeTab === 'reviewer'
+                  ? 'text-[#12102A] border-b-2 border-[#F5A623]'
                   : 'text-[#12102A]/50 hover:text-[#12102A]'
               }`}
             >
-              SME Industry Audit & Quote
-            </button>
-            <button
-              onClick={() => setActiveTab('architecture')}
-              className={`pb-2 transition-all ${
-                activeTab === 'architecture' 
-                  ? 'text-[#12102A] border-b-2 border-[#F5A623]' 
-                  : 'text-[#12102A]/50 hover:text-[#12102A]'
-              }`}
-            >
-              Architecture & Stack
+              What The Business Says
             </button>
           </div>
 
@@ -235,10 +215,10 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
                     {verification.smeReviewer.name}
                   </h4>
                   <p className="text-xs text-[#12102A]/60">
-                    {verification.smeReviewer.role} • {verification.smeReviewer.company}
+                    {verification.smeReviewer.role}, {verification.smeReviewer.company}
                   </p>
-                  <p className="text-[10px] text-[#12102A]/40 font-mono mt-0.5">
-                    Verified from {verification.smeReviewer.location}
+                  <p className="text-[10px] text-[#12102A]/40 mt-0.5">
+                    {verification.smeReviewer.location}
                   </p>
                 </div>
               </div>
@@ -247,35 +227,9 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
                 "{verification.smeReviewer.quote}"
               </div>
 
-              <div className="flex items-center gap-2 text-[10px] font-mono text-[#10B981]">
+              <div className="flex items-center gap-2 text-[10px] font-bold text-[#10B981]">
                 <UserCheck className="w-4 h-4" />
-                Audited & Digitally Signed via Afridemy Verification Protocol
-              </div>
-            </div>
-          )}
-
-          {/* Tab 3: Architecture Specs */}
-          {activeTab === 'architecture' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl border border-[#12102A]/10 bg-white">
-                <span className="text-[10px] font-mono text-[#12102A]/40 uppercase block mb-1">Model Engine</span>
-                <p className="text-xs font-bold text-[#12102A]">Gemini 3.7 Flash</p>
-                <p className="text-[11px] text-[#12102A]/60 mt-1">Structured JSON slot extraction with runtime dynamic catalog injection.</p>
-              </div>
-              <div className="p-4 rounded-xl border border-[#12102A]/10 bg-white">
-                <span className="text-[10px] font-mono text-[#12102A]/40 uppercase block mb-1">Payment Pipeline</span>
-                <p className="text-xs font-bold text-[#12102A]">Safaricom Daraja API (STK Push)</p>
-                <p className="text-[11px] text-[#12102A]/60 mt-1">Direct Lipa Na M-Pesa Online initiation with asynchronous callback reconciliation.</p>
-              </div>
-              <div className="p-4 rounded-xl border border-[#12102A]/10 bg-white">
-                <span className="text-[10px] font-mono text-[#12102A]/40 uppercase block mb-1">Messaging Protocol</span>
-                <p className="text-xs font-bold text-[#12102A]">Meta WhatsApp Cloud API v21.0</p>
-                <p className="text-[11px] text-[#12102A]/60 mt-1">Webhook signature verification, quick replies, and low-latency session caching.</p>
-              </div>
-              <div className="p-4 rounded-xl border border-[#12102A]/10 bg-white">
-                <span className="text-[10px] font-mono text-[#12102A]/40 uppercase block mb-1">State & Cache</span>
-                <p className="text-xs font-bold text-[#12102A]">Atomic Inventory Memory Hooks</p>
-                <p className="text-[11px] text-[#12102A]/60 mt-1">Real-time stock decrement locking prevents overselling during high chat volumes.</p>
+                Confirmed by the business, not self-reported
               </div>
             </div>
           )}
@@ -284,8 +238,8 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
 
         {/* Modal Footer Actions */}
         <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
-          <span className="text-xs text-[#12102A]/60 font-mono hidden sm:inline">
-            Status: Authentic production artifact
+          <span className="text-xs text-[#12102A]/60 hidden sm:inline">
+            Live and in real use
           </span>
 
           <div className="flex items-center gap-2">

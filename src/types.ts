@@ -117,6 +117,9 @@ export interface PortfolioVerification {
   issueDate: string;
   status: 'Verified Production Grade' | 'In Evaluation';
   overallScore: number;
+  // One plain-language sentence describing what the system actually does, for a
+  // non-technical visitor (a business owner, not a developer).
+  summary: string;
   rubric: RubricCriterion[];
   smeReviewer: {
     name: string;
