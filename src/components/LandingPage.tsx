@@ -871,6 +871,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="space-y-3">
             {[
               {
+                q: 'How do I find a business to install it for?',
+                a: 'Start with one you already know: a family shop, a friend\'s business, someone in your neighborhood. You\'re offering something useful for free at first, most people say yes to that.',
+              },
+              {
                 q: 'Do I need any tech experience to start?',
                 a: 'No. Every system starts from zero. If you can use WhatsApp, you can follow along.',
               },
@@ -879,16 +883,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 a: 'A certificate says you finished a course. A verified portfolio is a live system installed for a business you found, checked and confirmed by them, not just claimed by you.',
               },
               {
-                q: 'Will Afridemy get me a job?',
-                a: "No, and that's not the model. You walk away with a working system and a verified portfolio, then you use it to pitch businesses yourself.",
+                q: 'What happens if the business says it doesn\'t work?',
+                a: "Then it's not verified yet. You fix it and try again. The whole point is that it has to actually work before it counts.",
+              },
+              {
+                q: 'How long does it take to finish a system?',
+                a: 'It depends on the system. Some take a few days, others a few weeks. You move at your own pace.',
               },
               {
                 q: 'What does it cost?',
                 a: 'The first 5 lessons of every system are free, so you can try it before paying anything.',
-              },
-              {
-                q: 'Can I actually make money from this?',
-                a: "Yes, that's the point. Once a system is verified, it's yours to install for other businesses too, not just the first one.",
               },
             ].map((item) => (
               <details key={item.q} className="group rounded-xl border border-[#12102A]/10 bg-[#F0EEF6] px-5 py-4">
