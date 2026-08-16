@@ -112,15 +112,6 @@ export const Header: React.FC<HeaderProps> = ({
 
             <MotionNavigationMenuItem>
               <MotionNavigationMenuLink
-                onClick={onOpenPricing}
-                className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
-              >
-                Pricing
-              </MotionNavigationMenuLink>
-            </MotionNavigationMenuItem>
-
-            <MotionNavigationMenuItem>
-              <MotionNavigationMenuLink
                 onClick={onOpenAbout}
                 className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
               >
@@ -231,7 +222,6 @@ export const Header: React.FC<HeaderProps> = ({
               { label: 'Systems', onClick: onEnterApp },
               { label: 'See It Work', onClick: onOpenSandbox },
               { label: 'Verified Work', onClick: onOpenVerifiedWork },
-              { label: 'Pricing', onClick: onOpenPricing },
               { label: 'About', onClick: onOpenAbout },
             ].map((item) => (
               <button

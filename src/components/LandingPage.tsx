@@ -167,7 +167,6 @@ function useHorizontalCarousel(itemCount: number, reduce: boolean | null, step: 
 
 interface LandingPageProps {
   onEnterApp: () => void;
-  onOpenPricing: () => void;
   onOpenAuth: () => void;
   onOpenSandbox: () => void;
   onOpenVerifiedWork: () => void;
@@ -180,7 +179,6 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onEnterApp,
-  onOpenPricing,
   onOpenAuth,
   onOpenSandbox,
   onOpenVerifiedWork,
@@ -795,7 +793,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2.5">
                 <p className="text-white/80 font-bold text-[11px] tracking-wider">Systems</p>
                 <button onClick={onEnterApp} className="block text-left hover:text-white transition-colors cursor-pointer">All Systems</button>
@@ -805,10 +803,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="space-y-2.5">
                 <p className="text-white/80 font-bold text-[11px] tracking-wider">Company</p>
                 <button onClick={onOpenAbout} className="block text-left hover:text-white transition-colors cursor-pointer">About</button>
-                <button onClick={onOpenPricing} className="block text-left hover:text-white transition-colors cursor-pointer">Pricing</button>
-              </div>
-              <div className="space-y-2.5">
-                <p className="text-white/80 font-bold text-[11px] tracking-wider">Legal</p>
                 <button onClick={onOpenPrivacy} className="block text-left hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
                 <button onClick={onOpenTerms} className="block text-left hover:text-white transition-colors cursor-pointer">Terms of Service</button>
               </div>

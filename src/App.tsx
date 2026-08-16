@@ -281,7 +281,6 @@ export default function App() {
 
         <LandingPage
           onEnterApp={() => navigate('/systems')}
-          onOpenPricing={() => setIsPricingOpen(true)}
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenSandbox={() => setIsSandboxOpen(true)}
           onOpenVerifiedWork={() => navigate('/verified')}
