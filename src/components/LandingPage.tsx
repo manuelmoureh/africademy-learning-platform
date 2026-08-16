@@ -389,7 +389,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 initial={reduce ? false : { opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute top-[46%] -translate-y-1/2 -right-3 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
+                className="absolute top-[46%] -translate-y-1/2 -right-5 sm:-right-6 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
                 First 5 Lessons Free
