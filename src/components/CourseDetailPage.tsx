@@ -1,7 +1,59 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star, ChevronDown } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
+import { StarRating } from './StarRating';
+import { fetchUserTrackRating, submitTrackRating } from '../lib/db';
+
+const RateSystem: React.FC<{ trackId: string; userId: string | null; onOpenAuth: () => void }> = ({ trackId, userId, onOpenAuth }) => {
+  const [myRating, setMyRating] = useState<number | null>(null);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!userId) return;
+    fetchUserTrackRating(userId, trackId).then(setMyRating);
+  }, [userId, trackId]);
+
+  const handleRate = async (rating: number) => {
+    if (!userId) {
+      onOpenAuth();
+      return;
+    }
+    setSaving(true);
+    setMyRating(rating);
+    await submitTrackRating(userId, trackId, rating);
+    setSaving(false);
+  };
+
+  return (
+    <div className="p-4 rounded-xl border border-[#12102A]/10 bg-[#F0EEF6] space-y-2">
+      <p className="text-xs font-bold text-[#12102A]/60">
+        {myRating ? 'Your rating' : 'Rate this system'}
+      </p>
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <button
+            key={i}
+            type="button"
+            disabled={saving}
+            onClick={() => handleRate(i)}
+            onMouseEnter={() => setHoverRating(i)}
+            onMouseLeave={() => setHoverRating(null)}
+            className="cursor-pointer disabled:cursor-wait"
+          >
+            <Star
+              className={`w-5 h-5 transition-colors ${
+                i <= (hoverRating ?? myRating ?? 0) ? 'fill-[#F5A623] text-[#F5A623]' : 'fill-[#12102A]/10 text-[#12102A]/10'
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+      {!userId && <p className="text-[10px] text-[#12102A]/50 font-medium">Sign in to rate this system.</p>}
+    </div>
+  );
+};
 
 const ModuleRow: React.FC<{ step: Track['steps'][number]; isProUser: boolean }> = ({ step, isProUser }) => {
   const [showReviews, setShowReviews] = useState(false);
@@ -71,12 +123,13 @@ const ModuleRow: React.FC<{ step: Track['steps'][number]; isProUser: boolean }> 
 interface CourseDetailPageProps {
   track: Track;
   isProUser: boolean;
+  userId: string | null;
   onBack: () => void;
   onStart: () => void;
-  onOpenPricing: () => void;
+  onOpenAuth: () => void;
 }
 
-export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isProUser, onBack, onStart, onOpenPricing }) => {
+export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isProUser, userId, onBack, onStart, onOpenAuth }) => {
   const learnings = Array.from(
     new Set(track.steps.flatMap((s) => s.content.keyLearnings).slice(0, 6))
   );
@@ -106,6 +159,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
             <h1 className="text-3xl sm:text-4xl font-black text-[#12102A] tracking-tight mt-1">
               {track.title}
             </h1>
+            <StarRating rating={track.rating} reviewCount={track.reviewCount} className="mt-2" />
             <p className="text-sm text-[#12102A]/70 mt-3 leading-relaxed font-medium max-w-xl">
               {track.description}
             </p>
@@ -149,10 +203,10 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
         <div className="lg:col-span-1">
           <div className="sticky top-24 p-6 rounded-2xl border border-[#12102A]/10 bg-white shadow-xs space-y-5">
             <div>
-              <p className="text-xs font-bold text-[#12102A]/50 uppercase tracking-wider mb-1">Cost</p>
-              <p className="text-2xl font-black text-[#12102A]">Free to start</p>
+              <p className="text-xs font-bold text-[#12102A]/50 mb-1">Cost</p>
+              <p className="text-2xl font-black text-[#12102A]">KES {track.price.toLocaleString()}</p>
               <p className="text-xs text-[#12102A]/60 mt-1">
-                First 5 lessons free. Full system and the live sandbox are KES 3,800/month on Pro.
+                First 5 lessons free, one-time payment for the rest.
               </p>
             </div>
 
@@ -164,14 +218,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            {!isProUser && (
-              <button
-                onClick={onOpenPricing}
-                className="w-full py-2.5 border border-[#12102A]/10 hover:bg-[#F0EEF6] text-[#12102A] text-xs font-bold rounded-xl cursor-pointer transition-all active:scale-[0.97]"
-              >
-                See what Pro unlocks
-              </button>
-            )}
+            <RateSystem trackId={track.id} userId={userId} onOpenAuth={onOpenAuth} />
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 import { subscribeToNewsletter } from '../lib/db';
 import { SystemThumbnail } from './SystemThumbnail';
+import { StarRating } from './StarRating';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -552,6 +553,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-2">
                     {track.title}
                   </h3>
+                  <StarRating rating={track.rating} reviewCount={track.reviewCount} className="mt-1.5" />
                   <div className="flex flex-wrap gap-1.5 mt-2.5">
                     {track.tags.slice(0, 3).map((tag) => (
                       <span
@@ -570,7 +572,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       <span className="text-base font-black text-[#12102A]">KES {track.price.toLocaleString()}</span>
                       <span className="flex items-center gap-1 text-[10px] font-bold text-[#10B981]">
                         <CheckCircle2 className="w-3 h-3" />
-                        Verified &middot; first 5 free
+                        First 5 lessons free
                       </span>
                     </div>
                     <button

@@ -60,6 +60,10 @@ export interface Track {
   // One-time price in KES for the full system (first 5 lessons are free regardless -
   // that's a sales hook, not tied to this number). Tiered by business value, not step count.
   price: number;
+  // Placeholder rating/review count shown on cards until real submissions (track_ratings
+  // table, submitTrackRating in lib/db.ts) accumulate enough volume to compute a real average.
+  rating: number;
+  reviewCount: number;
   steps: Step[];
   // Explicit opt-in for the homepage Curriculum Tracks section, so featuring a course there
   // is a data decision on the course itself, not a hardcoded slice in LandingPage.tsx.

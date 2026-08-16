@@ -85,3 +85,26 @@ export async function subscribeToNewsletter(email: string): Promise<{ error: str
   }
   return { error: error ? error.message : null };
 }
+
+// One rating per user per track. Displayed ratings on course cards are still hardcoded
+// placeholders (see courses.ts) until enough real submissions exist to compute an average.
+export async function submitTrackRating(userId: string, trackId: string, rating: number): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('track_ratings')
+    .upsert({ user_id: userId, track_id: trackId, rating }, { onConflict: 'user_id,track_id' });
+  return { error: error ? error.message : null };
+}
+
+export async function fetchUserTrackRating(userId: string, trackId: string): Promise<number | null> {
+  const { data, error } = await supabase
+    .from('track_ratings')
+    .select('rating')
+    .eq('user_id', userId)
+    .eq('track_id', trackId)
+    .maybeSingle();
+  if (error) {
+    console.error('fetchUserTrackRating failed', error);
+    return null;
+  }
+  return data?.rating ?? null;
+}

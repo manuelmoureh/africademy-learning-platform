@@ -418,9 +418,10 @@ export default function App() {
             <CourseDetailPage
               track={activeTrack}
               isProUser={isProUser}
+              userId={authUserId}
               onBack={() => navigate('/systems')}
               onStart={() => navigate(`/systems/${activeTrack.id}/learn`)}
-              onOpenPricing={() => setIsPricingOpen(true)}
+              onOpenAuth={() => setIsAuthOpen(true)}
             />
           )}
 

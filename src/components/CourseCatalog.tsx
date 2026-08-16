@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, BookOpen, ChevronRight } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 import { SystemThumbnail } from './SystemThumbnail';
+import { StarRating } from './StarRating';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -136,10 +137,13 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
                 {track.description}
               </p>
 
-              <span className="flex items-center gap-1 text-[10px] font-bold text-[#12102A]/60 mt-3">
-                <BookOpen className="w-3.5 h-3.5" />
-                {track.steps.length || track.totalSteps} lessons
-              </span>
+              <div className="flex items-center justify-between mt-3">
+                <span className="flex items-center gap-1 text-[10px] font-bold text-[#12102A]/60">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  {track.steps.length || track.totalSteps} lessons
+                </span>
+                <StarRating rating={track.rating} reviewCount={track.reviewCount} />
+              </div>
 
               <div className="mt-4 pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
                 <div>
