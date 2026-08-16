@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, CheckCircle2, BookOpen, ChevronRight } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
+import { SystemThumbnail } from './SystemThumbnail';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -109,17 +110,14 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
             whileTap={reduce ? undefined : { scale: 0.98 }}
             className="text-left rounded-2xl border border-[#12102A]/10 bg-white flex flex-col overflow-hidden hover:border-[#F5A623] hover:shadow-lg transition-colors cursor-pointer group"
           >
-            {/* Thumbnail: real image if provided (/course-thumbs/{id}.jpg), otherwise a colored icon tile */}
-            <div className="relative h-36 bg-[#12102A] flex items-center justify-center overflow-hidden">
-              <img
-                src={`/course-thumbs/${track.id}.jpg`}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-              />
-              <TrackIcon name={track.icon} className="w-10 h-10 text-white/80 relative z-10 group-hover:scale-110 transition-transform" />
+            {/* Thumbnail: a small honest mockup of the actual interface being built, not a stock photo or bare icon */}
+            <div className="relative h-36 bg-[#12102A] flex items-center justify-center overflow-hidden p-4">
+              <SystemThumbnail trackId={track.id} />
               <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/90 text-[#12102A]">
                 {FIELD_BY_TRACK_ID[track.id]}
+              </span>
+              <span className="absolute top-2 right-2 w-6 h-6 rounded-md bg-white/10 flex items-center justify-center">
+                <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-white/70" />
               </span>
             </div>
 
