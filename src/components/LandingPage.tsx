@@ -464,7 +464,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             style={{ scrollbarWidth: 'none' }}
           >
           {tracks.map((track) => {
-            const isFeatured = track.id === 'whatsapp-retail-agent';
             return (
               <motion.button
                 key={track.id}
@@ -472,17 +471,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 whileHover={reduce ? undefined : { y: -3 }}
                 whileTap={reduce ? undefined : { scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                className={`group relative text-left shrink-0 snap-start w-[220px] sm:w-[240px] rounded-2xl border p-5 flex flex-col gap-3 cursor-pointer transition-colors ${
-                  isFeatured
-                    ? 'bg-[#F5A623]/8 border-[#F5A623]'
-                    : 'bg-white border-[#12102A]/10 hover:border-[#F5A623] hover:shadow-sm'
-                }`}
+                className="group text-left shrink-0 snap-start w-[220px] sm:w-[240px] rounded-2xl border p-5 flex flex-col gap-3 cursor-pointer transition-colors bg-white border-[#12102A]/10 hover:border-[#F5A623] hover:shadow-sm"
               >
-                {isFeatured && (
-                  <span className="absolute top-3 right-3 text-[9px] font-bold uppercase tracking-wide text-[#F5A623] bg-white px-2 py-0.5 rounded-full border border-[#F5A623]/30">
-                    Start here
-                  </span>
-                )}
                 <span className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#F5A623]/15">
                   <TrackIcon name={track.icon} className="w-6 h-6 text-[#F5A623]" />
                 </span>
