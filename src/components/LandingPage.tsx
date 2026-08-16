@@ -580,9 +580,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-            {/* Connecting line through the icon row, showing this is a sequence not 4 unrelated cards */}
-            <div className="hidden lg:block absolute top-5 left-[12.5%] right-[12.5%] h-px bg-[#12102A]/10" />
-
             {[
               { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
               { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing, not a mock exercise.' },
