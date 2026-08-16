@@ -169,7 +169,6 @@ function useHorizontalCarousel(itemCount: number, reduce: boolean | null, step: 
 interface LandingPageProps {
   onEnterApp: () => void;
   onOpenAuth: () => void;
-  onOpenSandbox: () => void;
   onOpenVerifiedWork: () => void;
   onOpenAbout: () => void;
   onOpenPrivacy: () => void;
@@ -181,7 +180,6 @@ interface LandingPageProps {
 export const LandingPage: React.FC<LandingPageProps> = ({
   onEnterApp,
   onOpenAuth,
-  onOpenSandbox,
   onOpenVerifiedWork,
   onOpenAbout,
   onOpenPrivacy,
@@ -802,7 +800,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="space-y-2.5">
                 <p className="text-white/80 font-bold text-[11px] tracking-wider">Systems</p>
                 <button onClick={onEnterApp} className="block text-left hover:text-white transition-colors cursor-pointer">All Systems</button>
-                <button onClick={onOpenSandbox} className="block text-left hover:text-white transition-colors cursor-pointer">See It Work</button>
                 <button onClick={onOpenVerifiedWork} className="block text-left hover:text-white transition-colors cursor-pointer">Verified Work</button>
               </div>
               <div className="space-y-2.5">

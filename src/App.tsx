@@ -272,7 +272,6 @@ export default function App() {
           onGoHome={() => navigate('/')}
           onEnterApp={() => navigate('/systems')}
           onSelectCourse={(id) => navigate(`/systems/${id}`)}
-          onOpenSandbox={() => setIsSandboxOpen(true)}
           onOpenVerifiedWork={() => navigate('/verified')}
           onOpenPricing={() => setIsPricingOpen(true)}
           onOpenAbout={() => navigate('/about')}
@@ -282,7 +281,6 @@ export default function App() {
         <LandingPage
           onEnterApp={() => navigate('/systems')}
           onOpenAuth={() => setIsAuthOpen(true)}
-          onOpenSandbox={() => setIsSandboxOpen(true)}
           onOpenVerifiedWork={() => navigate('/verified')}
           onOpenAbout={() => navigate('/about')}
           onOpenPrivacy={() => navigate('/privacy')}
@@ -375,7 +373,6 @@ export default function App() {
         onGoHome={() => navigate('/')}
         onEnterApp={() => navigate('/systems')}
         onSelectCourse={(id) => navigate(`/systems/${id}`)}
-        onOpenSandbox={() => setIsSandboxOpen(true)}
         onOpenVerifiedWork={() => navigate('/verified')}
         onOpenPricing={() => setIsPricingOpen(true)}
         onOpenAbout={() => navigate('/about')}
