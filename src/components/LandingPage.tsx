@@ -579,7 +579,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">How It Works</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+            {/* Connecting line through the icon row, showing this is a sequence not 4 unrelated cards */}
+            <div className="hidden lg:block absolute top-5 left-[12.5%] right-[12.5%] h-px bg-[#12102A]/10" />
+
             {[
               { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
               { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing, not a mock exercise.' },
@@ -593,16 +596,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 viewport={{ once: true, amount: 0.4 }}
                 variants={fadeUp}
                 transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-3"
+                className="relative space-y-2"
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-xl bg-[#F5A623]/15 flex items-center justify-center shrink-0">
+                  <span className="relative w-10 h-10 rounded-xl bg-[#F5A623]/15 flex items-center justify-center shrink-0">
                     <step.icon className="w-5 h-5 text-[#F5A623]" />
                   </span>
                   <span className="text-[10px] font-mono font-bold text-[#12102A]/30">0{i + 1}</span>
                 </div>
                 <h3 className="font-bold text-[#12102A]">{step.title}</h3>
-                <p className="text-xs text-[#12102A]/60 leading-relaxed">{step.body}</p>
+                <p className="text-sm text-[#12102A]/60 leading-relaxed">{step.body}</p>
               </motion.div>
             ))}
           </div>
@@ -617,9 +620,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div className="relative">
-          {/* Edge fades: wide and strong enough to fully hide the trailing half-card, not just tint it */}
-          <div className="hidden md:block absolute -left-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-r from-[#F0EEF6] via-[#F0EEF6]/90 to-transparent pointer-events-none" />
-          <div className="hidden md:block absolute -right-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-l from-[#F0EEF6] via-[#F0EEF6]/90 to-transparent pointer-events-none" />
+          {/* Edge fades: only visible when there's actually more to scroll that way, so they never wash out the first/last fully-visible card */}
+          <div className={`hidden md:block absolute -left-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-r from-[#F0EEF6] via-[#F0EEF6]/90 to-transparent pointer-events-none transition-opacity duration-300 ${categoryCarousel.canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
+          <div className={`hidden md:block absolute -right-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-l from-[#F0EEF6] via-[#F0EEF6]/90 to-transparent pointer-events-none transition-opacity duration-300 ${categoryCarousel.canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
 
           <button
             type="button"
@@ -805,8 +808,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="relative">
-            <div className="hidden md:block absolute -left-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none" />
-            <div className="hidden md:block absolute -right-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none" />
+            <div className={`hidden md:block absolute -left-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none transition-opacity duration-300 ${reviewsCarousel.canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
+            <div className={`hidden md:block absolute -right-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none transition-opacity duration-300 ${reviewsCarousel.canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
 
             <button
               type="button"
