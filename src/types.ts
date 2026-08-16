@@ -126,11 +126,9 @@ export interface PortfolioVerification {
     quote: string;
     avatarInitials: string;
   };
-  metrics: {
-    latencyAvg: string;
-    hallucinationRate: string;
-    stockAccuracy: string;
-    mpesaWebhookUptime: string;
-  };
+  // A short list of system-specific metrics. Kept generic (label/value pairs) rather than
+  // fixed fields like "stock accuracy", since those only make sense for a retail agent -
+  // an invoicing or support system has its own relevant numbers.
+  metrics: { label: string; value: string }[];
 }
 

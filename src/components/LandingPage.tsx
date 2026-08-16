@@ -170,8 +170,7 @@ interface LandingPageProps {
   onOpenPricing: () => void;
   onOpenAuth: () => void;
   onOpenSandbox: () => void;
-  onOpenPortfolio: () => void;
-  onOpenCaseStudies: () => void;
+  onOpenVerifiedWork: () => void;
   onOpenAbout: () => void;
   onOpenPrivacy: () => void;
   onOpenTerms: () => void;
@@ -184,8 +183,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenPricing,
   onOpenAuth,
   onOpenSandbox,
-  onOpenPortfolio,
-  onOpenCaseStudies,
+  onOpenVerifiedWork,
   onOpenAbout,
   onOpenPrivacy,
   onOpenTerms,
@@ -293,7 +291,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </button>
 
                 <button
-                  onClick={onOpenCaseStudies}
+                  onClick={onOpenVerifiedWork}
                   className="px-6 py-3.5 bg-white hover:bg-[#F0EEF6] border border-[#12102A]/10 text-[#12102A] font-bold text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-2xs"
                 >
                   <Play className="w-4 h-4 text-[#F5A623] fill-current" />
@@ -617,7 +615,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
             <div className="pt-2">
               <button
-                onClick={onOpenPortfolio}
+                onClick={onOpenVerifiedWork}
                 className="px-5 py-2.5 bg-[#10B981] hover:bg-[#0ea572] text-white text-xs font-bold rounded-xl flex items-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-xs"
               >
                 <ShieldCheck className="w-4 h-4" />
@@ -802,7 +800,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <p className="text-white/80 font-bold text-[11px] tracking-wider">Systems</p>
                 <button onClick={onEnterApp} className="block text-left hover:text-white transition-colors cursor-pointer">All Systems</button>
                 <button onClick={onOpenSandbox} className="block text-left hover:text-white transition-colors cursor-pointer">See It Work</button>
-                <button onClick={onOpenPortfolio} className="block text-left hover:text-white transition-colors cursor-pointer">Verified Work</button>
+                <button onClick={onOpenVerifiedWork} className="block text-left hover:text-white transition-colors cursor-pointer">Verified Work</button>
               </div>
               <div className="space-y-2.5">
                 <p className="text-white/80 font-bold text-[11px] tracking-wider">Company</p>

@@ -21,7 +21,7 @@ import { LandingPage } from './components/LandingPage';
 import { CourseCatalog } from './components/CourseCatalog';
 import { CourseDetailPage } from './components/CourseDetailPage';
 import { AboutPage } from './components/AboutPage';
-import { CaseStudiesPage } from './components/CaseStudiesPage';
+import { VerifiedWorkPage } from './components/VerifiedWorkPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { CommunityView } from './components/CommunityView';
@@ -34,11 +34,11 @@ import { fetchUserProgress, setStepProgress } from './lib/db';
 // Maps the URL to what used to be `viewMode`/`activeNav` state, so every page the app
 // can show has a real, bookmarkable, back-button-friendly URL instead of living entirely
 // in memory.
-function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'case-studies' | 'app'; activeNav: string; trackId: string | null } {
+function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'app'; activeNav: string; trackId: string | null } {
   if (pathname === '/about') return { view: 'about', activeNav: '', trackId: null };
   if (pathname === '/privacy') return { view: 'privacy', activeNav: '', trackId: null };
   if (pathname === '/terms') return { view: 'terms', activeNav: '', trackId: null };
-  if (pathname === '/case-studies') return { view: 'case-studies', activeNav: '', trackId: null };
+  if (pathname === '/verified') return { view: 'verified-work', activeNav: '', trackId: null };
   if (pathname === '/community') return { view: 'app', activeNav: 'community', trackId: null };
   if (pathname === '/systems') return { view: 'app', activeNav: 'catalog', trackId: null };
 
@@ -253,8 +253,8 @@ export default function App() {
     return <TermsOfServicePage onBack={() => navigate('/')} />;
   }
 
-  if (viewMode === 'case-studies') {
-    return <CaseStudiesPage onBack={() => navigate('/')} />;
+  if (viewMode === 'verified-work') {
+    return <VerifiedWorkPage onBack={() => navigate('/')} />;
   }
 
   // If on Landing Page view
@@ -273,7 +273,7 @@ export default function App() {
           onEnterApp={() => navigate('/systems')}
           onSelectCourse={(id) => navigate(`/systems/${id}`)}
           onOpenSandbox={() => setIsSandboxOpen(true)}
-          onOpenPortfolio={() => setIsPortfolioOpen(true)}
+          onOpenVerifiedWork={() => navigate('/verified')}
           onOpenPricing={() => setIsPricingOpen(true)}
           onOpenAbout={() => navigate('/about')}
           onOpenAuth={() => setIsAuthOpen(true)}
@@ -284,8 +284,7 @@ export default function App() {
           onOpenPricing={() => setIsPricingOpen(true)}
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenSandbox={() => setIsSandboxOpen(true)}
-          onOpenPortfolio={() => setIsPortfolioOpen(true)}
-          onOpenCaseStudies={() => navigate('/case-studies')}
+          onOpenVerifiedWork={() => navigate('/verified')}
           onOpenAbout={() => navigate('/about')}
           onOpenPrivacy={() => navigate('/privacy')}
           onOpenTerms={() => navigate('/terms')}
@@ -378,7 +377,7 @@ export default function App() {
         onEnterApp={() => navigate('/systems')}
         onSelectCourse={(id) => navigate(`/systems/${id}`)}
         onOpenSandbox={() => setIsSandboxOpen(true)}
-        onOpenPortfolio={() => setIsPortfolioOpen(true)}
+        onOpenVerifiedWork={() => navigate('/verified')}
         onOpenPricing={() => setIsPricingOpen(true)}
         onOpenAbout={() => navigate('/about')}
         onOpenAuth={() => setIsAuthOpen(true)}

@@ -26,7 +26,7 @@ interface HeaderProps {
   onEnterApp: () => void;
   onSelectCourse: (trackId: string) => void;
   onOpenSandbox: () => void;
-  onOpenPortfolio: () => void;
+  onOpenVerifiedWork: () => void;
   onOpenPricing: () => void;
   onOpenAbout: () => void;
   onOpenAuth: () => void;
@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   onEnterApp,
   onSelectCourse,
   onOpenSandbox,
-  onOpenPortfolio,
+  onOpenVerifiedWork,
   onOpenPricing,
   onOpenAbout,
   onOpenAuth,
@@ -103,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <MotionNavigationMenuItem>
               <MotionNavigationMenuLink
-                onClick={onOpenPortfolio}
+                onClick={onOpenVerifiedWork}
                 className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
               >
                 Verified Work
@@ -230,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({
             {[
               { label: 'Systems', onClick: onEnterApp },
               { label: 'See It Work', onClick: onOpenSandbox },
-              { label: 'Verified Work', onClick: onOpenPortfolio },
+              { label: 'Verified Work', onClick: onOpenVerifiedWork },
               { label: 'Pricing', onClick: onOpenPricing },
               { label: 'About', onClick: onOpenAbout },
             ].map((item) => (

@@ -971,10 +971,159 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
     quote: 'Wanjiku demonstrates exemplary discipline in conversational error handling. Her implementation of the Safaricom Daraja payment webhook coupled with strict catalog memory injection is ready for production e-commerce deployment.',
     avatarInitials: 'BO'
   },
-  metrics: {
-    latencyAvg: '1.18s',
-    hallucinationRate: '0.0%',
-    stockAccuracy: '100.0%',
-    mpesaWebhookUptime: '99.9%'
-  }
+  metrics: [
+    { label: 'Response Latency', value: '1.18s' },
+    { label: 'Hallucination Rate', value: '0.0%' },
+    { label: 'Catalog Accuracy', value: '100.0%' },
+    { label: 'M-Pesa Webhook Uptime', value: '99.9%' },
+  ]
 };
+
+// Founder-approved placeholder graduate profiles for the public Verified Work gallery,
+// reusing the same 5 people and quotes already used for the homepage reviews. Swap for
+// real student data once the first batch actually completes the program.
+export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
+  {
+    id: 'AFR-2026-KE-1001',
+    studentName: 'Manuel Moureh',
+    trackTitle: 'WhatsApp AI Agent for Kenyan Retail',
+    liveUrl: 'https://afridemy.online/verified/manuel-moureh',
+    githubUrl: 'https://github.com/afridemy-verified/manuel-moureh-retail-agent',
+    issueDate: 'June 2026',
+    status: 'Verified Production Grade',
+    overallScore: 94,
+    rubric: [
+      { id: 'r1', criteria: 'Inventory Consistency & Stock Decrement', score: 9.5, maxScore: 10, description: 'Zero hallucinated SKUs; correctly informs out-of-stock items with alternatives.', status: 'Passed' },
+      { id: 'r2', criteria: 'M-Pesa STK Push Integration', score: 9.4, maxScore: 10, description: 'Generates valid Safaricom Daraja payloads and handles cancelled push prompts gracefully.', status: 'Passed' },
+      { id: 'r3', criteria: 'Kenyan Regional Nuance & Sheng Comprehension', score: 9.2, maxScore: 10, description: 'Handles English, Swahili greetings, and Nairobi slang without breaking transaction schemas.', status: 'Passed' },
+    ],
+    smeReviewer: {
+      name: 'Grace Wanjiru',
+      role: 'Owner',
+      company: 'Nairobi Boutique',
+      location: 'Nairobi',
+      quote: "It answers customers faster than I could myself, and it never gets a price wrong. That link is the first thing I send new customers now.",
+      avatarInitials: 'GW',
+    },
+    metrics: [
+      { label: 'Response Latency', value: '1.4s' },
+      { label: 'Hallucination Rate', value: '0.2%' },
+      { label: 'Catalog Accuracy', value: '99.1%' },
+      { label: 'M-Pesa Checkout Success', value: '98.6%' },
+    ],
+  },
+  {
+    id: 'AFR-2026-KE-1002',
+    studentName: 'Vivian Bii',
+    trackTitle: 'Lead Qualification Agent for Real Estate',
+    liveUrl: 'https://afridemy.online/verified/vivian-bii',
+    githubUrl: 'https://github.com/afridemy-verified/vivian-bii-lead-agent',
+    issueDate: 'June 2026',
+    status: 'Verified Production Grade',
+    overallScore: 91,
+    rubric: [
+      { id: 'r1', criteria: 'Property Qualification State Engine', score: 9.1, maxScore: 10, description: 'Extracts budget, bedroom count, and neighborhood without repeat questions.', status: 'Passed' },
+      { id: 'r2', criteria: 'Calendar Appointment Scheduling', score: 9.0, maxScore: 10, description: 'Books walkthroughs directly against agent availability, no double-bookings.', status: 'Passed' },
+      { id: 'r3', criteria: 'CRM & Google Sheets Sync', score: 9.3, maxScore: 10, description: 'Qualified leads land in the sales pipeline within seconds of the conversation ending.', status: 'Passed' },
+    ],
+    smeReviewer: {
+      name: 'Peter Otieno',
+      role: 'Sales Director',
+      company: 'Kilimani Realty Group',
+      location: 'Kilimani, Nairobi',
+      quote: 'Every lead that reaches my phone now is already qualified. My team stopped wasting time on window-shoppers.',
+      avatarInitials: 'PO',
+    },
+    metrics: [
+      { label: 'Response Latency', value: '1.6s' },
+      { label: 'Qualification Accuracy', value: '96.4%' },
+      { label: 'Booking Success Rate', value: '92.8%' },
+      { label: 'CRM Sync Uptime', value: '99.7%' },
+    ],
+  },
+  {
+    id: 'AFR-2026-KE-1003',
+    studentName: 'Liza Malemba',
+    trackTitle: 'Invoicing & Receipt AI Assistant',
+    liveUrl: 'https://afridemy.online/verified/liza-malemba',
+    githubUrl: 'https://github.com/afridemy-verified/liza-malemba-invoicing-agent',
+    issueDate: 'May 2026',
+    status: 'Verified Production Grade',
+    overallScore: 89,
+    rubric: [
+      { id: 'r1', criteria: 'Receipt & Invoice Image Ingestion', score: 8.8, maxScore: 10, description: 'Extracts structured line items from camera snapshots of handwritten receipts.', status: 'Passed' },
+      { id: 'r2', criteria: 'PDF Invoice Generation', score: 9.0, maxScore: 10, description: 'Generates branded, downloadable receipts within seconds of a confirmed sale.', status: 'Passed' },
+      { id: 'r3', criteria: 'M-Pesa Till Reconciliation', score: 8.9, maxScore: 10, description: 'Matches payment SMS codes to open invoice balances with minimal manual correction.', status: 'Passed' },
+    ],
+    smeReviewer: {
+      name: 'Halima Juma',
+      role: 'Accountant',
+      company: 'Tembo Traders',
+      location: 'Mombasa',
+      quote: 'I checked every invoice it generated for the first month. It has not made a reconciliation error since.',
+      avatarInitials: 'HJ',
+    },
+    metrics: [
+      { label: 'Response Latency', value: '2.1s' },
+      { label: 'Extraction Accuracy', value: '95.0%' },
+      { label: 'Reconciliation Match Rate', value: '97.3%' },
+      { label: 'Invoices Generated', value: '340+' },
+    ],
+  },
+  {
+    id: 'AFR-2026-KE-1004',
+    studentName: 'Sammy Mwashighadi',
+    trackTitle: 'AI Customer Support & Ticketing Agent',
+    liveUrl: 'https://afridemy.online/verified/sammy-mwashighadi',
+    githubUrl: 'https://github.com/afridemy-verified/sammy-mwashighadi-support-agent',
+    issueDate: 'May 2026',
+    status: 'Verified Production Grade',
+    overallScore: 87,
+    rubric: [
+      { id: 'r1', criteria: 'FAQ Knowledge Base & Retrieval', score: 8.6, maxScore: 10, description: "Answers from the business's real policies, not generic guesses.", status: 'Passed' },
+      { id: 'r2', criteria: 'Escalation & Human Handoff', score: 8.9, maxScore: 10, description: 'Recognizes when to stop and route to a human, without looping the customer.', status: 'Passed' },
+    ],
+    smeReviewer: {
+      name: 'Joseph Mwangangi',
+      role: 'Operations Manager',
+      company: 'Bahari Electronics',
+      location: 'Mombasa',
+      quote: 'Our WhatsApp used to pile up overnight. Now most questions get answered before we even open the shop.',
+      avatarInitials: 'JM',
+    },
+    metrics: [
+      { label: 'Response Latency', value: '1.2s' },
+      { label: 'First-Contact Resolution', value: '81.5%' },
+      { label: 'Escalation Accuracy', value: '94.0%' },
+      { label: 'Tickets Handled', value: '600+' },
+    ],
+  },
+  {
+    id: 'AFR-2026-KE-1005',
+    studentName: 'Victor Koech',
+    trackTitle: 'AI Overdue Payment Follow-Up Agent',
+    liveUrl: 'https://afridemy.online/verified/victor-koech',
+    githubUrl: 'https://github.com/afridemy-verified/victor-koech-collections-agent',
+    issueDate: 'April 2026',
+    status: 'Verified Production Grade',
+    overallScore: 92,
+    rubric: [
+      { id: 'r1', criteria: 'Overdue Detection & Escalation Sequencing', score: 9.2, maxScore: 10, description: 'Polite first, firm later, with a clear escalation ladder.', status: 'Passed' },
+      { id: 'r2', criteria: 'Aging Reports & Human Escalation', score: 9.1, maxScore: 10, description: 'Flags the accounts that genuinely need a phone call instead of another message.', status: 'Passed' },
+    ],
+    smeReviewer: {
+      name: 'Caroline Chebet',
+      role: 'Finance Officer',
+      company: 'Rift Valley Suppliers',
+      location: 'Eldoret',
+      quote: 'Overdue accounts used to sit for weeks. The follow-up sequence gets most of them paid within days.',
+      avatarInitials: 'CC',
+    },
+    metrics: [
+      { label: 'Response Latency', value: '1.5s' },
+      { label: 'Payment Links Sent', value: '210+' },
+      { label: 'Recovery Rate (30 days)', value: '78.4%' },
+      { label: 'Escalation Precision', value: '93.1%' },
+    ],
+  },
+];

@@ -146,22 +146,12 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
 
           {/* Telemetry Metrics Row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl border border-[#12102A]/10 bg-white text-center">
-              <span className="text-[10px] font-mono text-[#12102A]/50 uppercase block">Response Latency</span>
-              <span className="text-base font-bold font-mono text-[#12102A]">{verification.metrics.latencyAvg}</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-[#12102A]/10 bg-white text-center">
-              <span className="text-[10px] font-mono text-[#12102A]/50 uppercase block">Hallucination Rate</span>
-              <span className="text-base font-bold font-mono text-[#10B981]">{verification.metrics.hallucinationRate}</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-[#12102A]/10 bg-white text-center">
-              <span className="text-[10px] font-mono text-[#12102A]/50 uppercase block">Catalog Accuracy</span>
-              <span className="text-base font-bold font-mono text-[#10B981]">{verification.metrics.stockAccuracy}</span>
-            </div>
-            <div className="p-3.5 rounded-xl border border-[#12102A]/10 bg-white text-center">
-              <span className="text-[10px] font-mono text-[#12102A]/50 uppercase block">M-Pesa Webhook</span>
-              <span className="text-base font-bold font-mono text-[#12102A]">{verification.metrics.mpesaWebhookUptime}</span>
-            </div>
+            {verification.metrics.map((metric) => (
+              <div key={metric.label} className="p-3.5 rounded-xl border border-[#12102A]/10 bg-white text-center">
+                <span className="text-[10px] font-mono text-[#12102A]/50 block">{metric.label}</span>
+                <span className="text-base font-bold font-mono text-[#12102A]">{metric.value}</span>
+              </div>
+            ))}
           </div>
 
           {/* Section Navigation Tabs */}
