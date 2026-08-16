@@ -417,8 +417,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 transition={{ duration: 0.5, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute -bottom-4 -right-3 sm:right-28 bg-[#F5A623] text-[#12102A] rounded-xl shadow-lg p-3 w-[160px] z-10"
               >
-                <p className="text-2xl font-black leading-none">15K+</p>
-                <p className="text-[10px] font-bold leading-tight mt-1">KES earned per system installed</p>
+                <p className="text-2xl font-black leading-none">KES 15K+</p>
+                <p className="text-[10px] font-bold leading-tight mt-1">Estimated per system sold</p>
               </motion.div>
             </motion.div>
           </div>
