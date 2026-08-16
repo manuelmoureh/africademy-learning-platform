@@ -704,10 +704,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold font-mono text-[#F5A623]">
+                    <span className="text-xs font-bold text-[#F5A623]">
                       {track.trackNumber}
                     </span>
-                    <span className="flex items-center gap-1 text-xs font-semibold font-mono text-[#12102A]/50">
+                    <span className="flex items-center gap-1 text-xs font-semibold text-[#12102A]/50">
                       <BookOpen className="w-3.5 h-3.5" />
                       {track.steps.length || track.totalSteps}
                     </span>
