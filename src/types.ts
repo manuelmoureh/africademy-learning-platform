@@ -57,6 +57,9 @@ export interface Track {
   tags: string[];
   whoBuysThis: string;
   impactStat: string;
+  // One-time price in KES for the full system (first 5 lessons are free regardless -
+  // that's a sales hook, not tied to this number). Tiered by business value, not step count.
+  price: number;
   steps: Step[];
   // Explicit opt-in for the homepage Curriculum Tracks section, so featuring a course there
   // is a data decision on the course itself, not a hardcoded slice in LandingPage.tsx.

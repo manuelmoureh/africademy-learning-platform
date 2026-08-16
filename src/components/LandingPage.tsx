@@ -566,10 +566,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     {track.impactStat}
                   </p>
                   <div className="mt-auto pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-xs font-bold text-[#10B981]">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Verified
-                    </span>
+                    <div>
+                      <span className="text-base font-black text-[#12102A]">KES {track.price.toLocaleString()}</span>
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-[#10B981]">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Verified &middot; first 5 free
+                      </span>
+                    </div>
                     <button
                       onClick={onEnterApp}
                       className="text-xs font-bold text-[#12102A] hover:text-[#F5A623] flex items-center gap-1 cursor-pointer transition-colors"
