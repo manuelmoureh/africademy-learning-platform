@@ -79,6 +79,97 @@ const Counter: React.FC<CounterProps> = ({ target, prefix = '', suffix = '' }) =
   return <span ref={ref}>{prefix}{Math.round(display)}{suffix}</span>;
 };
 
+// Shared behavior for the category and reviews strips: scroll-state tracking (for arrow disabled state),
+// pausable auto-scroll, and click-and-drag scrolling. Kept as one hook since both strips need identical behavior.
+function useHorizontalCarousel(itemCount: number, reduce: boolean | null, step: number, intervalMs: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const updateScrollState = () => {
+    const el = ref.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === 'left' ? -step : step, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    updateScrollState();
+    el.addEventListener('scroll', updateScrollState, { passive: true });
+    return () => el.removeEventListener('scroll', updateScrollState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemCount]);
+
+  useEffect(() => {
+    if (reduce) return;
+    const el = ref.current;
+    if (!el) return;
+    let paused = false;
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+    el.addEventListener('mouseenter', pause);
+    el.addEventListener('mouseleave', resume);
+    el.addEventListener('touchstart', pause, { passive: true });
+    const interval = setInterval(() => {
+      if (paused) return;
+      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 4;
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: step, behavior: 'smooth' });
+      }
+    }, intervalMs);
+    return () => {
+      clearInterval(interval);
+      el.removeEventListener('mouseenter', pause);
+      el.removeEventListener('mouseleave', resume);
+      el.removeEventListener('touchstart', pause);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce, itemCount]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let isDown = false;
+    let startX = 0;
+    let startScroll = 0;
+    const onDown = (e: MouseEvent) => {
+      isDown = true;
+      el.classList.add('cursor-grabbing');
+      startX = e.pageX;
+      startScroll = el.scrollLeft;
+    };
+    const onMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      e.preventDefault();
+      el.scrollLeft = startScroll - (e.pageX - startX);
+    };
+    const onUp = () => {
+      isDown = false;
+      el.classList.remove('cursor-grabbing');
+    };
+    el.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      el.removeEventListener('mousedown', onDown);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, []);
+
+  return { ref, canScrollLeft, canScrollRight, scroll };
+}
+
 interface LandingPageProps {
   onEnterApp: () => void;
   onOpenPricing: () => void;
@@ -109,86 +200,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const reduce = useReducedMotion();
   const [navSearch, setNavSearch] = useState('');
 
-  const categoryScrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  const updateCategoryScrollState = () => {
-    const el = categoryScrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 4);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
-  };
-
-  const scrollCategories = (direction: 'left' | 'right') => {
-    const el = categoryScrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: direction === 'left' ? -260 : 260, behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    const el = categoryScrollRef.current;
-    if (!el) return;
-    updateCategoryScrollState();
-    el.addEventListener('scroll', updateCategoryScrollState, { passive: true });
-    return () => el.removeEventListener('scroll', updateCategoryScrollState);
-  }, [tracks.length]);
-
-  useEffect(() => {
-    if (reduce) return;
-    const el = categoryScrollRef.current;
-    if (!el) return;
-    let paused = false;
-    const pause = () => { paused = true; };
-    const resume = () => { paused = false; };
-    el.addEventListener('mouseenter', pause);
-    el.addEventListener('mouseleave', resume);
-    el.addEventListener('touchstart', pause, { passive: true });
-    const interval = setInterval(() => {
-      if (paused) return;
-      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 4;
-      if (atEnd) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: 240, behavior: 'smooth' });
-      }
-    }, 3200);
-    return () => {
-      clearInterval(interval);
-      el.removeEventListener('mouseenter', pause);
-      el.removeEventListener('mouseleave', resume);
-      el.removeEventListener('touchstart', pause);
-    };
-  }, [reduce, tracks.length]);
-
-  const reviewsScrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (reduce) return;
-    const el = reviewsScrollRef.current;
-    if (!el) return;
-    let paused = false;
-    const pause = () => { paused = true; };
-    const resume = () => { paused = false; };
-    el.addEventListener('mouseenter', pause);
-    el.addEventListener('mouseleave', resume);
-    el.addEventListener('touchstart', pause, { passive: true });
-    const interval = setInterval(() => {
-      if (paused) return;
-      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 4;
-      if (atEnd) {
-        el.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        el.scrollBy({ left: 300, behavior: 'smooth' });
-      }
-    }, 3600);
-    return () => {
-      clearInterval(interval);
-      el.removeEventListener('mouseenter', pause);
-      el.removeEventListener('mouseleave', resume);
-      el.removeEventListener('touchstart', pause);
-    };
-  }, [reduce]);
+  const categoryCarousel = useHorizontalCarousel(tracks.length, reduce, 240, 3200);
+  const reviewsCarousel = useHorizontalCarousel(REVIEWS.length, reduce, 300, 3600);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -499,26 +512,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           <button
             type="button"
-            onClick={() => scrollCategories('left')}
+            onClick={() => categoryCarousel.scroll('left')}
             aria-label="Scroll categories left"
-            disabled={!canScrollLeft}
+            disabled={!categoryCarousel.canScrollLeft}
             className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
           >
             <ChevronLeft className="w-4 h-4 text-[#12102A]" />
           </button>
           <button
             type="button"
-            onClick={() => scrollCategories('right')}
+            onClick={() => categoryCarousel.scroll('right')}
             aria-label="Scroll categories right"
-            disabled={!canScrollRight}
+            disabled={!categoryCarousel.canScrollRight}
             className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
           >
             <ChevronRight className="w-4 h-4 text-[#12102A]" />
           </button>
 
           <div
-            ref={categoryScrollRef}
-            className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 scroll-px-6 lg:scroll-px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+            ref={categoryCarousel.ref}
+            className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 scroll-px-6 lg:scroll-px-12 snap-x snap-mandatory cursor-grab select-none [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
           >
           {tracks.map((track) => {
@@ -680,9 +693,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-xs sm:text-sm text-[#12102A]/60">Real people, building real systems.</p>
           </div>
 
+          <div className="relative">
+            <div className="hidden md:block absolute -left-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none" />
+            <div className="hidden md:block absolute -right-1 top-0 bottom-2 w-28 z-[5] bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none" />
+
+            <button
+              type="button"
+              onClick={() => reviewsCarousel.scroll('left')}
+              aria-label="Scroll reviews left"
+              disabled={!reviewsCarousel.canScrollLeft}
+              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
+            >
+              <ChevronLeft className="w-4 h-4 text-[#12102A]" />
+            </button>
+            <button
+              type="button"
+              onClick={() => reviewsCarousel.scroll('right')}
+              aria-label="Scroll reviews right"
+              disabled={!reviewsCarousel.canScrollRight}
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-[#12102A]/10 shadow-lg items-center justify-center cursor-pointer transition-all hover:border-[#F5A623] disabled:opacity-0 disabled:pointer-events-none"
+            >
+              <ChevronRight className="w-4 h-4 text-[#12102A]" />
+            </button>
+
           <div
-            ref={reviewsScrollRef}
-            className="flex gap-5 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 scroll-px-6 lg:scroll-px-12 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+            ref={reviewsCarousel.ref}
+            className="flex gap-5 overflow-x-auto pb-2 -mx-6 px-6 lg:-mx-12 lg:px-12 scroll-px-6 lg:scroll-px-12 snap-x snap-mandatory cursor-grab select-none [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
           >
             {REVIEWS.map((review) => (
@@ -709,6 +745,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
             ))}
+          </div>
           </div>
         </div>
       </section>
