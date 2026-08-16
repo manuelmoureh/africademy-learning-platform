@@ -599,7 +599,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 className="relative space-y-2"
               >
                 <div className="flex items-center gap-3">
-                  <span className="relative w-10 h-10 rounded-xl bg-[#F5A623]/15 flex items-center justify-center shrink-0">
+                  <span className="relative z-10 w-10 h-10 rounded-xl bg-[#F5A623]/15 ring-4 ring-white flex items-center justify-center shrink-0">
                     <step.icon className="w-5 h-5 text-[#F5A623]" />
                   </span>
                   <span className="text-[10px] font-mono font-bold text-[#12102A]/30">0{i + 1}</span>
@@ -682,7 +682,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto space-y-12">
 
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <h2 className="text-3xl sm:text-4xl font-black text-[#12102A]">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">
               Every System Solves a Real Business Problem
             </h2>
             <p className="text-xs sm:text-sm text-[#12102A]/60">
@@ -756,7 +756,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="p-8 md:p-12 rounded-3xl bg-[#12102A] text-white flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden">
           <div className="space-y-4 max-w-xl">
-            <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
               Not a Certificate. A Working System, Live, With Your Name on It.
             </h2>
             <p className="text-xs sm:text-sm text-white/75 leading-relaxed font-medium">
@@ -803,7 +803,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="px-6 lg:px-12 py-16 bg-white border-t border-[#12102A]/10">
         <div className="max-w-6xl mx-auto space-y-10">
           <div className="text-center max-w-xl mx-auto space-y-2">
-            <h2 className="text-3xl font-black text-[#12102A]">What Students Are Saying</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">What Students Are Saying</h2>
             <p className="text-xs sm:text-sm text-[#12102A]/60">Real people, building real systems.</p>
           </div>
 
