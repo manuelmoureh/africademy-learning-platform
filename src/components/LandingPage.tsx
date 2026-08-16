@@ -591,7 +591,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onEnterApp}
               className="px-6 py-3 rounded-xl border border-[#12102A]/10 bg-white hover:border-[#F5A623] text-sm font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97] inline-flex items-center gap-2"
             >
-              Browse All {tracks.length} Systems
+              Browse All Systems
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

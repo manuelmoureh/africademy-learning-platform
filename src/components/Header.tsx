@@ -85,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={onEnterApp}
                     className="cursor-pointer mt-1 flex items-center justify-between border-t border-[#12102A]/10 pt-2"
                   >
-                    <span className="text-sm font-bold text-[#F5A623]">See all {tracks.length} systems</span>
+                    <span className="text-sm font-bold text-[#F5A623]">See all systems</span>
                     <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
                   </MotionNavigationMenuLink>
                 </div>
