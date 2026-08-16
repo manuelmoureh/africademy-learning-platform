@@ -111,7 +111,13 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
             className="text-left rounded-2xl border border-[#12102A]/10 bg-white flex flex-col overflow-hidden hover:border-[#F5A623] hover:shadow-lg transition-colors cursor-pointer group"
           >
             {/* Thumbnail: a small honest mockup of the actual interface being built, not a stock photo or bare icon */}
-            <div className="relative h-36 bg-[#12102A] flex items-center justify-center overflow-hidden p-4">
+            <div
+              className="relative h-36 bg-[#12102A] flex items-center justify-center overflow-hidden p-4"
+              style={{
+                backgroundImage: 'radial-gradient(rgba(245,166,35,0.15) 1px, transparent 1px)',
+                backgroundSize: '14px 14px',
+              }}
+            >
               <SystemThumbnail trackId={track.id} />
               <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/90 text-[#12102A]">
                 {FIELD_BY_TRACK_ID[track.id]}
