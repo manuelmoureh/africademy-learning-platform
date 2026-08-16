@@ -363,6 +363,7 @@ export default function App() {
                 setSelectedTrackId(id);
                 setActiveNav('course-detail');
               }}
+              onGoHome={() => setViewMode('landing')}
             />
           )}
 
