@@ -39,10 +39,9 @@ const Counter: React.FC<CounterProps> = ({ target, prefix = '', suffix = '' }) =
       return;
     }
     const controls = animate(0, target, {
-      type: 'spring',
-      stiffness: 40,
-      damping: 12,
-      restDelta: 0.5,
+      duration: 1.6,
+      delay: 0.5,
+      ease: [0.16, 1, 0.3, 1],
       onUpdate: (v) => setDisplay(v),
     });
     return () => controls.stop();
