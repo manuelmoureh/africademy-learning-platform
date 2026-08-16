@@ -3,7 +3,7 @@ import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
   Check, Users, Star, Search, ChevronLeft, ChevronRight, Menu, X,
-  Wrench, Repeat, ChevronDown, Mail, Loader2
+  Wrench, Repeat, ChevronDown, Mail, Loader2, BookOpen
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -699,26 +699,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col overflow-hidden hover:border-[#F5A623] transition-all group"
               >
-                <div
-                  className="relative h-24 bg-[#12102A] flex items-center justify-center p-3"
-                  style={{
-                    backgroundImage: 'radial-gradient(rgba(245,166,35,0.15) 1px, transparent 1px)',
-                    backgroundSize: '14px 14px',
-                  }}
-                >
+                <div className="h-28 bg-[#12102A] flex items-center justify-center p-3">
                   <SystemThumbnail trackId={track.id} />
-                  <span className="absolute top-2 right-2 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/90 text-[#12102A]">
-                    {track.steps.length || track.totalSteps} lessons
-                  </span>
-                  <span className="absolute top-2 left-2 w-6 h-6 rounded-md bg-white/10 flex items-center justify-center">
-                    <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-white/70" />
-                  </span>
                 </div>
                 <div className="p-6 flex flex-col flex-1">
-                  <span className="text-[10px] font-mono font-bold text-[#F5A623] tracking-wider">
-                    {track.trackNumber}
-                  </span>
-                  <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold font-mono text-[#F5A623]">
+                      {track.trackNumber}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs font-semibold font-mono text-[#12102A]/50">
+                      <BookOpen className="w-3.5 h-3.5" />
+                      {track.steps.length || track.totalSteps}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-2">
                     {track.title}
                   </h3>
                   <p className="text-xs text-[#12102A]/70 font-bold mt-2">
