@@ -69,16 +69,25 @@ export const Header: React.FC<HeaderProps> = ({
                 Systems
               </MotionNavigationMenuTrigger>
               <MotionNavigationMenuContent>
-                <div className="grid w-[420px] grid-cols-2 gap-1 p-1">
-                  {tracks.slice(0, 4).map((track) => (
-                    <MotionNavigationMenuLink key={track.id} onClick={() => onSelectCourse(track.id)} className="cursor-pointer">
-                      <span className="flex items-center gap-2 text-sm font-bold text-[#12102A]">
-                        <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
-                        {track.category}
-                      </span>
-                      <span className="text-[#12102A]/60 text-xs">{track.title}</span>
-                    </MotionNavigationMenuLink>
-                  ))}
+                <div className="w-[420px] p-1">
+                  <div className="grid grid-cols-2 gap-1">
+                    {tracks.slice(0, 4).map((track) => (
+                      <MotionNavigationMenuLink key={track.id} onClick={() => onSelectCourse(track.id)} className="cursor-pointer">
+                        <span className="flex items-center gap-2 text-sm font-bold text-[#12102A]">
+                          <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
+                          {track.category}
+                        </span>
+                        <span className="text-[#12102A]/60 text-xs">{track.title}</span>
+                      </MotionNavigationMenuLink>
+                    ))}
+                  </div>
+                  <MotionNavigationMenuLink
+                    onClick={onEnterApp}
+                    className="cursor-pointer mt-1 flex items-center justify-between border-t border-[#12102A]/10 pt-2"
+                  >
+                    <span className="text-sm font-bold text-[#F5A623]">See all {tracks.length} systems</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
+                  </MotionNavigationMenuLink>
                 </div>
               </MotionNavigationMenuContent>
             </MotionNavigationMenuItem>
