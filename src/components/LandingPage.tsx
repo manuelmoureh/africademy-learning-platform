@@ -289,7 +289,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
               className="text-3xl sm:text-4xl md:text-5xl font-black text-[#12102A] tracking-[-0.02em] leading-[1.1]"
             >
-              We Help You Build <span className="text-[#F5A623]">AI Systems</span> That Businesses Pay For.
+              Build <span className="text-[#F5A623]">AI Systems</span> That Businesses Pay For.
             </motion.h1>
 
             <motion.p
@@ -298,7 +298,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="text-base sm:text-lg text-[#12102A]/75 font-medium leading-relaxed max-w-xl"
             >
-              Build for a real business first. Once they confirm it works, you're ready to get paid to do it again.
+              Learn the skills. Build the proof. Earn from it.
             </motion.p>
 
             {/* CTAs */}
