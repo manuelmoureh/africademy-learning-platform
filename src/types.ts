@@ -102,8 +102,6 @@ export interface UserAccount {
 export interface RubricCriterion {
   id: string;
   criteria: string;
-  score: number;
-  maxScore: number;
   description: string;
   status: 'Passed' | 'Pending' | 'Needs Improvement';
 }
@@ -116,7 +114,6 @@ export interface PortfolioVerification {
   githubUrl: string;
   issueDate: string;
   status: 'Verified Production Grade' | 'In Evaluation';
-  overallScore: number;
   // One plain-language sentence describing what the system actually does, for a
   // non-technical visitor (a business owner, not a developer).
   summary: string;

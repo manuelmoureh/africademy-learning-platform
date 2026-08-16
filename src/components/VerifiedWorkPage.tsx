@@ -57,10 +57,9 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({ onBack }) =>
                     <p className="text-[11px] text-[#12102A]/50 font-semibold leading-snug">{profile.trackTitle}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <ShieldCheck className="w-4 h-4 text-[#10B981]" />
-                  <span className="text-lg font-black text-[#10B981]">{profile.overallScore}</span>
-                  <span className="text-[10px] text-[#12102A]/40 font-bold">/100</span>
+                  <span className="text-sm font-black text-[#10B981]">Verified</span>
                 </div>
               </div>
 

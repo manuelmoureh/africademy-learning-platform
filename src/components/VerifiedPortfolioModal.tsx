@@ -88,17 +88,12 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
               </p>
             </div>
 
-            {/* Overall Score Badge */}
-            <div className="flex items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/10 shrink-0 self-stretch md:self-auto justify-between md:justify-center">
-              <div>
-                <span className="text-[9px] text-white/60 block">Score</span>
-                <span className="text-3xl font-black text-[#10B981] font-mono">
-                  {verification.overallScore}<span className="text-sm text-white/60">/100</span>
-                </span>
-              </div>
+            {/* Verified Badge */}
+            <div className="flex items-center gap-3 bg-white/10 p-4 rounded-xl border border-white/10 shrink-0 self-stretch md:self-auto justify-center md:justify-center">
               <div className="w-10 h-10 rounded-lg bg-[#10B981]/20 flex items-center justify-center text-[#10B981]">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
+              <span className="text-lg font-black text-[#10B981]">Verified</span>
             </div>
           </div>
 
@@ -191,11 +186,8 @@ export const VerifiedPortfolioModal: React.FC<VerifiedPortfolioModalProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#10B981]/10 text-[#10B981] rounded">
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-[#10B981]/10 text-[#10B981] rounded">
                       {item.status}
-                    </span>
-                    <span className="text-xs font-mono font-bold text-[#12102A] bg-[#F0EEF6] px-2.5 py-1 rounded border border-[#12102A]/5">
-                      {item.score}/{item.maxScore}
                     </span>
                   </div>
                 </div>

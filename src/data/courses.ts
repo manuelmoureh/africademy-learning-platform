@@ -920,46 +920,35 @@ export const INITIAL_PORTFOLIO_VERIFICATION: PortfolioVerification = {
   githubUrl: 'https://github.com/afridemy-verified/wanjiku-muthoni-retail-bot',
   issueDate: 'August 2026',
   status: 'Verified Production Grade',
-  overallScore: 98,
   summary: 'A WhatsApp assistant that answers customer questions, checks real stock, and takes M-Pesa payments automatically.',
   rubric: [
     {
       id: 'rubric-1',
       criteria: 'Inventory Consistency & Stock Decrement',
-      score: 10,
-      maxScore: 10,
       description: "Never makes up a product that doesn't exist, and always suggests something else when an item is out of stock.",
       status: 'Passed'
     },
     {
       id: 'rubric-2',
       criteria: 'M-Pesa STK Push Integration & Error Routing',
-      score: 9.8,
-      maxScore: 10,
       description: "Payments go through cleanly, and a cancelled payment doesn't break the conversation.",
       status: 'Passed'
     },
     {
       id: 'rubric-3',
       criteria: 'Kenyan Regional Nuance & Sheng Comprehension',
-      score: 9.5,
-      maxScore: 10,
       description: 'Understands English, Swahili, and everyday Nairobi slang without getting confused mid-order.',
       status: 'Passed'
     },
     {
       id: 'rubric-4',
       criteria: 'Response Speed Under Load',
-      score: 10,
-      maxScore: 10,
       description: 'Replies fast, even when a lot of customers are messaging at once.',
       status: 'Passed'
     },
     {
       id: 'rubric-5',
       criteria: 'Guardrails & Prompt Injection Defense',
-      score: 9.7,
-      maxScore: 10,
       description: "Can't be tricked into ignoring its instructions or going off-script.",
       status: 'Passed'
     }
@@ -992,12 +981,11 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     githubUrl: 'https://github.com/afridemy-verified/manuel-moureh-retail-agent',
     issueDate: 'June 2026',
     status: 'Verified Production Grade',
-    overallScore: 94,
     summary: 'A WhatsApp assistant that answers customer questions, checks stock, and takes M-Pesa payments for a Nairobi boutique.',
     rubric: [
-      { id: 'r1', criteria: 'Inventory Consistency & Stock Decrement', score: 9.5, maxScore: 10, description: "Never makes up a product that doesn't exist, and always suggests something else when an item is out of stock.", status: 'Passed' },
-      { id: 'r2', criteria: 'M-Pesa STK Push Integration', score: 9.4, maxScore: 10, description: "Payments go through cleanly, and a cancelled payment doesn't break the conversation.", status: 'Passed' },
-      { id: 'r3', criteria: 'Kenyan Regional Nuance & Sheng Comprehension', score: 9.2, maxScore: 10, description: 'Understands English, Swahili, and everyday Nairobi slang without getting confused mid-order.', status: 'Passed' },
+      { id: 'r1', criteria: 'Inventory Consistency & Stock Decrement', description: "Never makes up a product that doesn't exist, and always suggests something else when an item is out of stock.", status: 'Passed' },
+      { id: 'r2', criteria: 'M-Pesa STK Push Integration', description: "Payments go through cleanly, and a cancelled payment doesn't break the conversation.", status: 'Passed' },
+      { id: 'r3', criteria: 'Kenyan Regional Nuance & Sheng Comprehension', description: 'Understands English, Swahili, and everyday Nairobi slang without getting confused mid-order.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Grace Wanjiru',
@@ -1022,12 +1010,11 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     githubUrl: 'https://github.com/afridemy-verified/vivian-bii-lead-agent',
     issueDate: 'June 2026',
     status: 'Verified Production Grade',
-    overallScore: 91,
     summary: 'A chat assistant that qualifies real estate leads and books viewings automatically for a Nairobi agency.',
     rubric: [
-      { id: 'r1', criteria: 'Lead Qualification', score: 9.1, maxScore: 10, description: 'Asks for budget, bedroom count, and neighborhood, and never asks the same question twice.', status: 'Passed' },
-      { id: 'r2', criteria: 'Viewing Scheduling', score: 9.0, maxScore: 10, description: "Books property viewings straight into the agent's calendar, with no double-bookings.", status: 'Passed' },
-      { id: 'r3', criteria: 'CRM & Sheets Sync', score: 9.3, maxScore: 10, description: 'A qualified lead lands in the sales pipeline within seconds, no manual data entry.', status: 'Passed' },
+      { id: 'r1', criteria: 'Lead Qualification', description: 'Asks for budget, bedroom count, and neighborhood, and never asks the same question twice.', status: 'Passed' },
+      { id: 'r2', criteria: 'Viewing Scheduling', description: "Books property viewings straight into the agent's calendar, with no double-bookings.", status: 'Passed' },
+      { id: 'r3', criteria: 'CRM & Sheets Sync', description: 'A qualified lead lands in the sales pipeline within seconds, no manual data entry.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Peter Otieno',
@@ -1052,12 +1039,11 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     githubUrl: 'https://github.com/afridemy-verified/liza-malemba-invoicing-agent',
     issueDate: 'May 2026',
     status: 'Verified Production Grade',
-    overallScore: 89,
     summary: 'An assistant that turns handwritten receipts into proper invoices and matches M-Pesa payments automatically.',
     rubric: [
-      { id: 'r1', criteria: 'Receipt Reading', score: 8.8, maxScore: 10, description: 'Reads a photo of a handwritten receipt and turns it into a proper, itemized invoice.', status: 'Passed' },
-      { id: 'r2', criteria: 'Invoice Generation', score: 9.0, maxScore: 10, description: 'Creates a branded, downloadable invoice within seconds of a confirmed sale.', status: 'Passed' },
-      { id: 'r3', criteria: 'M-Pesa Payment Matching', score: 8.9, maxScore: 10, description: 'Matches M-Pesa payment messages to the right invoice automatically, with almost no manual fixing.', status: 'Passed' },
+      { id: 'r1', criteria: 'Receipt Reading', description: 'Reads a photo of a handwritten receipt and turns it into a proper, itemized invoice.', status: 'Passed' },
+      { id: 'r2', criteria: 'Invoice Generation', description: 'Creates a branded, downloadable invoice within seconds of a confirmed sale.', status: 'Passed' },
+      { id: 'r3', criteria: 'M-Pesa Payment Matching', description: 'Matches M-Pesa payment messages to the right invoice automatically, with almost no manual fixing.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Halima Juma',
@@ -1082,11 +1068,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     githubUrl: 'https://github.com/afridemy-verified/sammy-mwashighadi-support-agent',
     issueDate: 'May 2026',
     status: 'Verified Production Grade',
-    overallScore: 87,
     summary: 'A support assistant that answers customer questions on WhatsApp and knows when to bring in a real person.',
     rubric: [
-      { id: 'r1', criteria: 'Accurate Answers', score: 8.6, maxScore: 10, description: "Answers from the business's real policies, never a generic guess.", status: 'Passed' },
-      { id: 'r2', criteria: 'Handoff to a Human', score: 8.9, maxScore: 10, description: 'Knows when to stop and bring in a real person, instead of looping the customer.', status: 'Passed' },
+      { id: 'r1', criteria: 'Accurate Answers', description: "Answers from the business's real policies, never a generic guess.", status: 'Passed' },
+      { id: 'r2', criteria: 'Handoff to a Human', description: 'Knows when to stop and bring in a real person, instead of looping the customer.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Joseph Mwangangi',
@@ -1111,11 +1096,10 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     githubUrl: 'https://github.com/afridemy-verified/victor-koech-collections-agent',
     issueDate: 'April 2026',
     status: 'Verified Production Grade',
-    overallScore: 92,
     summary: 'An assistant that follows up on overdue invoices automatically, so a business gets paid without awkward phone calls.',
     rubric: [
-      { id: 'r1', criteria: 'Follow-Up Messages', score: 9.2, maxScore: 10, description: 'Starts polite, gets firmer over time, following a clear set of steps.', status: 'Passed' },
-      { id: 'r2', criteria: 'Knowing When to Call', score: 9.1, maxScore: 10, description: 'Flags the accounts that genuinely need a phone call instead of another message.', status: 'Passed' },
+      { id: 'r1', criteria: 'Follow-Up Messages', description: 'Starts polite, gets firmer over time, following a clear set of steps.', status: 'Passed' },
+      { id: 'r2', criteria: 'Knowing When to Call', description: 'Flags the accounts that genuinely need a phone call instead of another message.', status: 'Passed' },
     ],
     smeReviewer: {
       name: 'Caroline Chebet',
