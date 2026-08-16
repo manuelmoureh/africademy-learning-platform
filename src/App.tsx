@@ -48,7 +48,7 @@ function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' |
   const detailMatch = pathname.match(/^\/systems\/([^/]+)\/?$/);
   if (detailMatch) return { view: 'app', activeNav: 'course-detail', trackId: detailMatch[1] };
 
-  return { view: 'landing', activeNav: 'catalog', trackId: null };
+  return { view: 'landing', activeNav: '', trackId: null };
 }
 
 const GUEST_USER: UserAccount = {
@@ -87,11 +87,6 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { view: viewMode, activeNav, trackId: routeTrackId } = parseRoute(location.pathname);
-  // "Systems" nav clicks call this with the same string Header always passed to the old
-  // setActiveNav state setter, so Header.tsx didn't need to change.
-  const goToNav = (nav: string) => {
-    navigate(nav === 'community' ? '/community' : '/systems');
-  };
 
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [selectedTrackId, setSelectedTrackId] = useState<string>('whatsapp-retail-agent');
@@ -266,6 +261,24 @@ export default function App() {
   if (viewMode === 'landing') {
     return (
       <>
+        <Header
+          tracks={tracks}
+          activeNav={activeNav}
+          user={user}
+          isAuthenticated={!!authUserId}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={() => navigate('/systems')}
+          onGoHome={() => navigate('/')}
+          onEnterApp={() => navigate('/systems')}
+          onSelectCourse={(id) => navigate(`/systems/${id}`)}
+          onOpenSandbox={() => setIsSandboxOpen(true)}
+          onOpenPortfolio={() => setIsPortfolioOpen(true)}
+          onOpenPricing={() => setIsPricingOpen(true)}
+          onOpenAbout={() => navigate('/about')}
+          onOpenAuth={() => setIsAuthOpen(true)}
+        />
+
         <LandingPage
           onEnterApp={() => navigate('/systems')}
           onOpenPricing={() => setIsPricingOpen(true)}
@@ -354,18 +367,21 @@ export default function App() {
 
       {/* Top Header Navigation */}
       <Header
+        tracks={tracks}
         activeNav={activeNav}
-        setActiveNav={goToNav}
-        onOpenWorkspace={() => setIsSandboxOpen(true)}
-        onOpenPricing={() => setIsPricingOpen(true)}
-        onOpenPortfolio={() => setIsPortfolioOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onGoHome={() => navigate('/')}
-        onOpenAbout={() => navigate('/about')}
         user={user}
+        isAuthenticated={!!authUserId}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onSearchSubmit={() => navigate('/systems')}
+        onGoHome={() => navigate('/')}
+        onEnterApp={() => navigate('/systems')}
+        onSelectCourse={(id) => navigate(`/systems/${id}`)}
+        onOpenSandbox={() => setIsSandboxOpen(true)}
+        onOpenPortfolio={() => setIsPortfolioOpen(true)}
+        onOpenPricing={() => setIsPricingOpen(true)}
+        onOpenAbout={() => navigate('/about')}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
       {/* Main Learning Hub Layout */}

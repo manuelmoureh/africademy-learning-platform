@@ -2,21 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView, animate, useMotionValue, useSpring } from 'motion/react';
 import {
   ShieldCheck, ArrowRight, Play, CheckCircle2,
-  Check, Users, Star, Search, ChevronLeft, ChevronRight, Menu, X,
-  Wrench, Repeat, ChevronDown, Mail, Loader2, BookOpen
+  Check, Users, Star, Search, ChevronLeft, ChevronRight,
+  Wrench, Repeat, ChevronDown, Mail, Loader2, BookOpen, Rocket
 } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 import { subscribeToNewsletter } from '../lib/db';
 import { SystemThumbnail } from './SystemThumbnail';
-import {
-  MotionNavigationMenu,
-  MotionNavigationMenuContent,
-  MotionNavigationMenuItem,
-  MotionNavigationMenuLink,
-  MotionNavigationMenuList,
-  MotionNavigationMenuTrigger,
-} from './ui/motion-navigation-menu';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -201,8 +193,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   tracks,
 }) => {
   const reduce = useReducedMotion();
-  const [navSearch, setNavSearch] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
 
@@ -238,158 +228,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="min-h-screen bg-[#F0EEF6] text-[#12102A] flex flex-col">
-      {/* Top Navbar — translucent, stays legible over whatever scrolls beneath it */}
-      <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between gap-6">
-          <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={onEnterApp}>
-            <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
-          </div>
-
-          <MotionNavigationMenu className="hidden md:flex" viewportClassName="border-[#12102A]/10">
-            <MotionNavigationMenuList>
-              <MotionNavigationMenuItem value="courses">
-                <MotionNavigationMenuTrigger onClick={onEnterApp} className="text-[#12102A]/70 data-[state=open]:text-[#12102A]">
-                  Systems
-                </MotionNavigationMenuTrigger>
-                <MotionNavigationMenuContent>
-                  <div className="grid w-[420px] grid-cols-2 gap-1 p-1">
-                    {tracks.slice(0, 4).map((track) => (
-                      <MotionNavigationMenuLink key={track.id} onClick={onEnterApp} className="cursor-pointer">
-                        <span className="flex items-center gap-2 text-sm font-bold text-[#12102A]">
-                          <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
-                          {track.category}
-                        </span>
-                        <span className="text-[#12102A]/60 text-xs">{track.title}</span>
-                      </MotionNavigationMenuLink>
-                    ))}
-                  </div>
-                </MotionNavigationMenuContent>
-              </MotionNavigationMenuItem>
-
-              <MotionNavigationMenuItem>
-                <MotionNavigationMenuLink
-                  onClick={onOpenSandbox}
-                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
-                >
-                  See It Work
-                </MotionNavigationMenuLink>
-              </MotionNavigationMenuItem>
-
-              <MotionNavigationMenuItem>
-                <MotionNavigationMenuLink
-                  onClick={onOpenPortfolio}
-                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
-                >
-                  Verified Work
-                </MotionNavigationMenuLink>
-              </MotionNavigationMenuItem>
-
-              <MotionNavigationMenuItem>
-                <MotionNavigationMenuLink
-                  onClick={onOpenPricing}
-                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
-                >
-                  Pricing
-                </MotionNavigationMenuLink>
-              </MotionNavigationMenuItem>
-
-              <MotionNavigationMenuItem>
-                <MotionNavigationMenuLink
-                  onClick={onOpenAbout}
-                  className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
-                >
-                  About
-                </MotionNavigationMenuLink>
-              </MotionNavigationMenuItem>
-            </MotionNavigationMenuList>
-          </MotionNavigationMenu>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <form
-              onSubmit={(e) => { e.preventDefault(); onSearch(navSearch); }}
-              className="hidden lg:block relative"
-            >
-              <Search className="w-3.5 h-3.5 text-[#12102A]/35 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={navSearch}
-                onChange={(e) => setNavSearch(e.target.value)}
-                placeholder="Search systems"
-                className="w-40 focus:w-56 pl-9 pr-3 py-2 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-xs font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all duration-300"
-              />
-            </form>
-
-            <button
-              onClick={onOpenAuth}
-              className="hidden md:block px-4 py-2 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#F0EEF6] text-xs font-bold text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={onEnterApp}
-              className="px-4 py-2 rounded-full bg-[#12102A] hover:bg-[#1c1940] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all active:scale-[0.97] shadow-xs"
-            >
-              Start Learning
-              <ArrowRight className="w-3.5 h-3.5 text-[#F5A623]" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen((v) => !v)}
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileMenuOpen}
-              className="md:hidden p-2 rounded-lg text-[#12102A] hover:bg-[#F0EEF6] cursor-pointer transition-colors"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {mobileMenuOpen && (
-            <div className="md:hidden border-t border-[#12102A]/10 bg-white">
-              <div className="px-6 py-4 flex flex-col gap-1">
-                <form
-                  onSubmit={(e) => { e.preventDefault(); setMobileMenuOpen(false); onSearch(navSearch); }}
-                  className="relative mb-2"
-                >
-                  <Search className="w-3.5 h-3.5 text-[#12102A]/35 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={navSearch}
-                    onChange={(e) => setNavSearch(e.target.value)}
-                    placeholder="Search systems"
-                    className="w-full pl-9 pr-3 py-2.5 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-sm font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all"
-                  />
-                </form>
-
-                {[
-                  { label: 'Systems', onClick: onEnterApp },
-                  { label: 'See It Work', onClick: onOpenSandbox },
-                  { label: 'Verified Work', onClick: onOpenPortfolio },
-                  { label: 'Pricing', onClick: onOpenPricing },
-                  { label: 'About', onClick: onOpenAbout },
-                ].map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => { setMobileMenuOpen(false); item.onClick(); }}
-                    className="text-left py-2.5 text-sm font-semibold text-[#12102A]/80 hover:text-[#12102A] cursor-pointer transition-colors border-b border-[#12102A]/5 last:border-b-0"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}
-                  className="mt-3 w-full py-2.5 rounded-full border border-[#12102A]/10 bg-white hover:bg-[#F0EEF6] text-sm font-bold text-[#12102A] cursor-pointer transition-all"
-                >
-                  Sign In
-                </button>
-              </div>
-            </div>
-          )}
-      </nav>
+      {/* Top nav now lives in the shared <Header> component, rendered once by App.tsx
+          above every page, so it never visually shifts between the homepage and the
+          Systems/app pages. */}
 
       {/* Hero Section */}
       <section
@@ -584,7 +425,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {[
               { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
               { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing, not a mock exercise.' },
-              { icon: ShieldCheck, title: 'Get it verified', body: 'Install it for a business you bring on. They confirm it works, not you.' },
+              { icon: Rocket, title: 'Put it to work', body: 'Install it for a business you bring on, so it is running in the real world, not a demo.' },
               { icon: Repeat, title: 'Resell it', body: 'Use the verified link to pitch the same system to your next client.' },
             ].map((step, i) => (
               <motion.div
