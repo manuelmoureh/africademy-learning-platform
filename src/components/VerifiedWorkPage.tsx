@@ -27,7 +27,7 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({ onBack }) =>
           Back
         </button>
         <div className="w-px h-5 bg-[#12102A]/10" />
-        <img src="/logo-dark.png" alt="Afridemy" className="h-7 w-auto" />
+        <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
       </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-10">
@@ -53,8 +53,8 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({ onBack }) =>
                     {initialsOf(profile.studentName)}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-[#12102A] truncate">{profile.studentName}</p>
-                    <p className="text-[11px] text-[#12102A]/50 font-semibold truncate">{profile.trackTitle}</p>
+                    <p className="text-sm font-bold text-[#12102A]">{profile.studentName}</p>
+                    <p className="text-[11px] text-[#12102A]/50 font-semibold leading-snug">{profile.trackTitle}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
