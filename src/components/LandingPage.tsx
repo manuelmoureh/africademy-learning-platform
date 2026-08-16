@@ -254,7 +254,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Hero Section */}
       <section
-        className="relative px-6 lg:px-12 pt-4 pb-6 md:pt-6 md:pb-10 max-w-6xl mx-auto w-full overflow-hidden"
+        className="relative px-6 lg:px-12 pt-4 pb-6 md:pt-6 md:pb-10 max-w-6xl mx-auto w-full overflow-hidden min-h-[calc(100dvh-5rem)] flex flex-col justify-center"
         onMouseMove={handleHeroMouseMove}
         onMouseLeave={handleHeroMouseLeave}
       >
@@ -323,7 +323,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Stat row — placeholder figures per founder direction, swap for real numbers before launch */}
-            <div className="grid grid-cols-3 gap-3 pt-5 border-t border-[#12102A]/10 text-center">
+            <div className="flex items-start gap-10 pt-8 border-t border-[#12102A]/10 text-left">
               <div>
                 <p className="text-xl sm:text-2xl font-black text-[#12102A]"><Counter target={100} suffix="+" /></p>
                 <p className="text-[10px] sm:text-[11px] text-[#12102A]/60 font-semibold leading-tight mt-0.5">On-demand systems</p>
@@ -380,7 +380,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 initial={reduce ? false : { opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute -top-3 right-10 sm:right-12 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
+                className="absolute -top-3 -right-3 sm:-right-4 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
                 Build market ready AI systems
