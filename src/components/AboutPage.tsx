@@ -27,7 +27,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onBack, onEnterApp }) => (
           We train young Kenyans to build AI systems real businesses actually use.
         </h1>
         <p className="text-sm md:text-base text-[#12102A]/70 font-medium max-w-xl mx-auto">
-          The proof is a live system a business confirms works, not a piece of paper.
+          The proof is a live system with your name on it, not a piece of paper.
         </p>
       </div>
     </section>
@@ -89,8 +89,18 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onBack, onEnterApp }) => (
           <h2 className="font-bold text-lg text-[#12102A]">How verification works</h2>
         </div>
         <p className="text-sm text-[#12102A]/70 leading-relaxed">
-          Every system needs a live link, a short demo, and a real business contact who can confirm it's actually running in their operations. Each one is scored against a rubric specific to its track before it's marked verified. One link, not a claim.
+          A verified system isn't a claim, it's proof: a live link, a short demo, and a quote from the real business running it. Each one is scored against a rubric specific to its track before it carries the verified badge.
         </p>
+      </div>
+    </section>
+
+    {/* Founder note */}
+    <section className="px-6 lg:px-12 pb-16">
+      <div className="max-w-3xl mx-auto p-6 md:p-8 rounded-2xl border border-[#12102A]/10 bg-white space-y-2">
+        <p className="text-sm text-[#12102A]/80 leading-relaxed italic">
+          "I'm Manuel, born and raised in Nairobi. I've spent years scaling AI-driven systems for brands like Jumia and my own company, Trance AI, and I kept seeing the same gap: young Kenyans with real hustle, but nothing to prove what they can actually do. Afridemy is how I'm fixing that, because I want to see more of us kutoka block and build the life we actually chose for ourselves."
+        </p>
+        <p className="text-xs font-bold text-[#12102A]/50">Manuel, Founder</p>
       </div>
     </section>
 

@@ -20,7 +20,7 @@ const REVIEWS = [
   {
     name: 'Manuel Moureh',
     location: 'Nairobi',
-    quote: "Built the WhatsApp agent for a friend's boutique in under two weeks. That link is still the first thing I show new clients.",
+    quote: "Built the full Shopify store and AI automation layer for Africore Tech, WhatsApp ordering, M-Pesa checkout, the works. It's been running the business ever since.",
   },
   {
     name: 'Vivian Bii',
