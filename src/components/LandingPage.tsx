@@ -430,9 +430,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Category Strip */}
       <section className="px-6 lg:px-12 pt-6 pb-14 max-w-6xl mx-auto w-full">
         <div className="text-center max-w-xl mx-auto space-y-2 mb-8">
-          <p className="text-[11px] font-bold text-[#F5A623] uppercase tracking-wider">Categories</p>
           <h2 className="text-2xl sm:text-3xl font-black text-[#12102A]">Explore AI Systems by Category</h2>
-          <p className="text-xs sm:text-sm text-[#12102A]/60">Browse by what real African businesses are hiring for.</p>
+          <p className="text-xs sm:text-sm text-[#12102A]/60">See what real African businesses already pay for.</p>
         </div>
 
         <div className="relative">
