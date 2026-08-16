@@ -883,8 +883,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 a: 'A certificate says you finished a course. A verified portfolio is a live system you can showcase to clients.',
               },
               {
-                q: 'What happens if the business says it doesn\'t work?',
-                a: "Then it's not verified yet. You fix it and try again. The whole point is that it has to actually work before it counts.",
+                q: 'Can I do this alongside school or a job?',
+                a: "Yes. You move at your own pace, there's no fixed schedule to keep up with.",
               },
               {
                 q: 'How long does it take to finish a system?',
