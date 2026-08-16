@@ -242,7 +242,7 @@ export default function App() {
   };
 
   if (viewMode === 'about') {
-    return <AboutPage onBack={() => navigate('/')} />;
+    return <AboutPage onBack={() => navigate('/')} onEnterApp={() => navigate('/systems')} />;
   }
 
   if (viewMode === 'privacy') {

@@ -1,29 +1,111 @@
 import React from 'react';
-import { StaticPage } from './StaticPage';
+import { ArrowLeft, ArrowRight, AlertCircle, Lightbulb, CheckCircle2, ShieldCheck } from 'lucide-react';
 
-export const AboutPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <StaticPage title="About Afridemy" onBack={onBack}>
-    <p>
-      Afridemy trains young Kenyans to build real AI automation systems, WhatsApp agents, lead-capture tools,
-      invoicing assistants, for real small businesses. Not practice exercises, not a certificate at the end.
-    </p>
-    <p>
-      The problem we set out to fix: a resume lists skills you claim, not skills you've demonstrated. Afridemy
-      replaces that with a verified portfolio, a real, live system you built, checked against an objective rubric,
-      confirmed by the business actually using it. That's the credential. One link, not a claim.
-    </p>
-    <h2>Why Kenya first</h2>
-    <p>
-      Over a million young Kenyans enter the labor market every year against roughly 600,000 formal jobs added.
-      Meanwhile, most Kenyan SMEs have already bought into AI and can't get it to actually work for them. We train
-      people to close that gap directly, real capacity for real businesses, not more competition for scarce jobs
-      that already exist somewhere else.
-    </p>
-    <h2>How verification works</h2>
-    <p>
-      Every submission needs a live, working link, a demo recording, and a real business contact who can confirm
-      it's genuinely in use, not just a description of what it does. Each project is scored against a written
-      rubric specific to its track before it's published as verified.
-    </p>
-  </StaticPage>
+interface AboutPageProps {
+  onBack: () => void;
+  onEnterApp: () => void;
+}
+
+export const AboutPage: React.FC<AboutPageProps> = ({ onBack, onEnterApp }) => (
+  <div className="min-h-screen bg-[#F0EEF6] text-[#12102A]">
+    <nav className="flex items-center gap-4 px-6 lg:px-12 h-20 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10 sticky top-0 z-30">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </button>
+      <div className="w-px h-5 bg-[#12102A]/10" />
+      <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
+    </nav>
+
+    {/* Hero */}
+    <section className="px-6 lg:px-12 py-16 md:py-20">
+      <div className="max-w-3xl mx-auto text-center space-y-4">
+        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#12102A] leading-tight">
+          We train young Kenyans to build AI systems real businesses actually use.
+        </h1>
+        <p className="text-sm md:text-base text-[#12102A]/70 font-medium max-w-xl mx-auto">
+          The proof is a live system a business confirms works, not a piece of paper.
+        </p>
+      </div>
+    </section>
+
+    {/* Stat row */}
+    <section className="px-6 lg:px-12 pb-16">
+      <div className="max-w-3xl mx-auto grid grid-cols-2 gap-6 p-8 rounded-3xl bg-[#12102A] text-white">
+        <div className="text-center">
+          <p className="text-3xl md:text-4xl font-black text-[#F5A623]">1M+</p>
+          <p className="text-xs text-white/60 font-semibold mt-1">Young Kenyans entering the job market every year</p>
+        </div>
+        <div className="text-center border-l border-white/10">
+          <p className="text-3xl md:text-4xl font-black text-[#F5A623]">600K</p>
+          <p className="text-xs text-white/60 font-semibold mt-1">Formal jobs added in the same year</p>
+        </div>
+      </div>
+    </section>
+
+    {/* Problem, Insight, Solution */}
+    <section className="px-6 lg:px-12 py-16 bg-white border-y border-[#12102A]/10">
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="space-y-3">
+          <span className="w-10 h-10 rounded-xl bg-[#F5A623]/15 flex items-center justify-center">
+            <AlertCircle className="w-5 h-5 text-[#F5A623]" />
+          </span>
+          <h2 className="font-bold text-[#12102A]">The gap</h2>
+          <p className="text-sm text-[#12102A]/70 leading-relaxed">
+            That gap between new workers and new jobs doesn't close on its own, and most training doesn't touch it either.
+          </p>
+        </div>
+        <div className="space-y-3">
+          <span className="w-10 h-10 rounded-xl bg-[#F5A623]/15 flex items-center justify-center">
+            <Lightbulb className="w-5 h-5 text-[#F5A623]" />
+          </span>
+          <h2 className="font-bold text-[#12102A]">What we noticed</h2>
+          <p className="text-sm text-[#12102A]/70 leading-relaxed">
+            Most Kenyan SMEs already want AI. They just can't get it to actually work for them. That's a skills gap, not a hiring problem.
+          </p>
+        </div>
+        <div className="space-y-3">
+          <span className="w-10 h-10 rounded-xl bg-[#F5A623]/15 flex items-center justify-center">
+            <CheckCircle2 className="w-5 h-5 text-[#F5A623]" />
+          </span>
+          <h2 className="font-bold text-[#12102A]">What we do</h2>
+          <p className="text-sm text-[#12102A]/70 leading-relaxed">
+            We train people to close that gap directly: build the system a business needs, install it for them, and walk away with proof it works.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {/* Verification */}
+    <section className="px-6 lg:px-12 py-16">
+      <div className="max-w-3xl mx-auto space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="w-10 h-10 rounded-xl bg-[#10B981]/15 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5 text-[#10B981]" />
+          </span>
+          <h2 className="font-bold text-lg text-[#12102A]">How verification works</h2>
+        </div>
+        <p className="text-sm text-[#12102A]/70 leading-relaxed">
+          Every system needs a live link, a short demo, and a real business contact who can confirm it's actually running in their operations. Each one is scored against a rubric specific to its track before it's marked verified. One link, not a claim.
+        </p>
+      </div>
+    </section>
+
+    {/* CTA */}
+    <section className="px-6 lg:px-12 pb-20">
+      <div className="max-w-3xl mx-auto p-8 md:p-10 rounded-3xl bg-[#12102A] text-white text-center space-y-4">
+        <h2 className="text-xl md:text-2xl font-black">Ready to build something real?</h2>
+        <button
+          onClick={onEnterApp}
+          className="px-6 py-3 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] font-black text-sm rounded-xl inline-flex items-center gap-2 cursor-pointer shadow-xs transition-all active:scale-[0.97]"
+        >
+          Start Learning
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+    </section>
+  </div>
 );
