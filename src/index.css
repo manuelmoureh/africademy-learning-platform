@@ -4,6 +4,46 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Self-hosted Satoshi: was loaded from Fontshare's CDN via a <link>, which meant two
+   extra cross-origin round trips (the CSS, then the font files) before the real font
+   could swap in, so the fallback system font was visible on every load. Hosting the
+   files locally and preloading the critical weights (see index.html) removes that gap. */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi/satoshi-300.woff2') format('woff2');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi/satoshi-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi/satoshi-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi/satoshi-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi/satoshi-900.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+  font-style: normal;
+}
+
 @layer base {
   body {
     font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
