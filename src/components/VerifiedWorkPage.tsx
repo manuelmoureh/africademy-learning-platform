@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 import { PortfolioVerification } from '../types';
 import { PLACEHOLDER_VERIFIED_WORK } from '../data/courses';
-import { SystemThumbnail } from './SystemThumbnail';
 import { VerifiedPortfolioModal } from './VerifiedPortfolioModal';
 
-// Maps each placeholder profile to its real track/system for the SystemThumbnail preview,
-// keyed by student name since PortfolioVerification only stores the human-readable track title.
-const TRACK_ID_BY_STUDENT: Record<string, string> = {
-  'Manuel Moureh': 'whatsapp-retail-agent',
-  'Vivian Bii': 'lead-capture-bot',
-  'Liza Malemba': 'invoicing-assistant',
-  'Sammy Mwashighadi': 'support-ticketing-agent',
-  'Victor Koech': 'payment-collections-agent',
-};
+function initialsOf(name: string): string {
+  const parts = name.trim().split(' ');
+  return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}`.toUpperCase() : name.slice(0, 2).toUpperCase();
+}
 
 interface VerifiedWorkPageProps {
   onBack: () => void;
@@ -53,32 +47,37 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({ onBack }) =>
               onClick={() => setOpenProfile(profile)}
               className="text-left rounded-2xl border border-[#12102A]/10 bg-white overflow-hidden flex flex-col hover:border-[#F5A623] hover:shadow-lg transition-all cursor-pointer group"
             >
-              <div
-                className="h-36 bg-[#12102A] flex items-center justify-center p-4"
-                style={{
-                  backgroundImage: 'radial-gradient(rgba(245,166,35,0.15) 1px, transparent 1px)',
-                  backgroundSize: '14px 14px',
-                }}
-              >
-                <SystemThumbnail trackId={TRACK_ID_BY_STUDENT[profile.studentName]} />
+              <div className="p-5 flex items-center justify-between gap-3 border-b border-[#12102A]/10 bg-[#F0EEF6]">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-11 h-11 rounded-full bg-[#12102A] text-[#F5A623] font-black text-sm flex items-center justify-center shrink-0">
+                    {initialsOf(profile.studentName)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-[#12102A] truncate">{profile.studentName}</p>
+                    <p className="text-[11px] text-[#12102A]/50 font-semibold truncate">{profile.trackTitle}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <ShieldCheck className="w-4 h-4 text-[#10B981]" />
+                  <span className="text-lg font-black text-[#10B981]">{profile.overallScore}</span>
+                  <span className="text-[10px] text-[#12102A]/40 font-bold">/100</span>
+                </div>
               </div>
 
               <div className="p-5 flex flex-col flex-1">
-                <span className="text-xs font-bold text-[#F5A623]">
+                <p className="text-[10px] font-bold text-[#12102A]/40">Confirmed by</p>
+                <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-0.5 leading-snug">
                   {profile.smeReviewer.company}
-                </span>
-                <h3 className="font-bold text-base text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-1 leading-snug">
-                  {profile.trackTitle}
                 </h3>
-                <p className="text-xs text-[#12102A]/70 font-semibold mt-1.5">
-                  Built by {profile.studentName}
+                <p className="text-xs text-[#12102A]/60 mt-1">
+                  {profile.smeReviewer.role}, {profile.smeReviewer.location}
                 </p>
 
-                <div className="mt-4 pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
-                  <span className="flex items-center gap-1 text-xs font-bold text-[#10B981]">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Verified
-                  </span>
+                <div className="mt-4 pt-4 border-t border-dashed border-[#12102A]/10 flex-1">
+                  <p className="text-xs text-[#12102A]/70 italic leading-relaxed">"{profile.smeReviewer.quote}"</p>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-[#12102A]/10 flex items-center justify-end">
                   <span className="text-xs font-bold text-[#12102A] flex items-center gap-1">
                     View Verification <ArrowRight className="w-3.5 h-3.5" />
                   </span>
