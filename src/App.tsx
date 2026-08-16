@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { CurriculumRoadmap } from './components/CurriculumRoadmap';
@@ -29,6 +30,26 @@ import { Step, Track, UserAccount, PortfolioVerification } from './types';
 import { Play, Sparkles, CheckCheck, ShieldCheck, Check } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { fetchUserProgress, setStepProgress } from './lib/db';
+
+// Maps the URL to what used to be `viewMode`/`activeNav` state, so every page the app
+// can show has a real, bookmarkable, back-button-friendly URL instead of living entirely
+// in memory.
+function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'case-studies' | 'app'; activeNav: string; trackId: string | null } {
+  if (pathname === '/about') return { view: 'about', activeNav: '', trackId: null };
+  if (pathname === '/privacy') return { view: 'privacy', activeNav: '', trackId: null };
+  if (pathname === '/terms') return { view: 'terms', activeNav: '', trackId: null };
+  if (pathname === '/case-studies') return { view: 'case-studies', activeNav: '', trackId: null };
+  if (pathname === '/community') return { view: 'app', activeNav: 'community', trackId: null };
+  if (pathname === '/systems') return { view: 'app', activeNav: 'catalog', trackId: null };
+
+  const learnMatch = pathname.match(/^\/systems\/([^/]+)\/learn\/?$/);
+  if (learnMatch) return { view: 'app', activeNav: 'curriculum', trackId: learnMatch[1] };
+
+  const detailMatch = pathname.match(/^\/systems\/([^/]+)\/?$/);
+  if (detailMatch) return { view: 'app', activeNav: 'course-detail', trackId: detailMatch[1] };
+
+  return { view: 'landing', activeNav: 'catalog', trackId: null };
+}
 
 const GUEST_USER: UserAccount = {
   name: 'Guest',
@@ -63,11 +84,26 @@ function applyProgressToTracks(baseTracks: Track[], rows: { track_id: string; st
 }
 
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { view: viewMode, activeNav, trackId: routeTrackId } = parseRoute(location.pathname);
+  // "Systems" nav clicks call this with the same string Header always passed to the old
+  // setActiveNav state setter, so Header.tsx didn't need to change.
+  const goToNav = (nav: string) => {
+    navigate(nav === 'community' ? '/community' : '/systems');
+  };
+
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [selectedTrackId, setSelectedTrackId] = useState<string>('whatsapp-retail-agent');
-  const [activeNav, setActiveNav] = useState<string>('catalog');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'landing' | 'app' | 'about' | 'privacy' | 'terms' | 'case-studies'>('landing');
+
+  // The URL is the source of truth for which track is open; keep local state in sync so
+  // existing lookups (activeTrack, progress, handleToggleCompleteStep) keep working as-is.
+  useEffect(() => {
+    if (routeTrackId && routeTrackId !== selectedTrackId) {
+      setSelectedTrackId(routeTrackId);
+    }
+  }, [routeTrackId]);
 
   // User Account State — starts as guest, replaced by the real Supabase session on mount
   const [user, setUser] = useState<UserAccount>(GUEST_USER);
@@ -211,19 +247,19 @@ export default function App() {
   };
 
   if (viewMode === 'about') {
-    return <AboutPage onBack={() => setViewMode('landing')} />;
+    return <AboutPage onBack={() => navigate('/')} />;
   }
 
   if (viewMode === 'privacy') {
-    return <PrivacyPolicyPage onBack={() => setViewMode('landing')} />;
+    return <PrivacyPolicyPage onBack={() => navigate('/')} />;
   }
 
   if (viewMode === 'terms') {
-    return <TermsOfServicePage onBack={() => setViewMode('landing')} />;
+    return <TermsOfServicePage onBack={() => navigate('/')} />;
   }
 
   if (viewMode === 'case-studies') {
-    return <CaseStudiesPage onBack={() => setViewMode('landing')} />;
+    return <CaseStudiesPage onBack={() => navigate('/')} />;
   }
 
   // If on Landing Page view
@@ -231,19 +267,18 @@ export default function App() {
     return (
       <>
         <LandingPage
-          onEnterApp={() => setViewMode('app')}
+          onEnterApp={() => navigate('/systems')}
           onOpenPricing={() => setIsPricingOpen(true)}
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenSandbox={() => setIsSandboxOpen(true)}
           onOpenPortfolio={() => setIsPortfolioOpen(true)}
-          onOpenCaseStudies={() => setViewMode('case-studies')}
-          onOpenAbout={() => setViewMode('about')}
-          onOpenPrivacy={() => setViewMode('privacy')}
-          onOpenTerms={() => setViewMode('terms')}
+          onOpenCaseStudies={() => navigate('/case-studies')}
+          onOpenAbout={() => navigate('/about')}
+          onOpenPrivacy={() => navigate('/privacy')}
+          onOpenTerms={() => navigate('/terms')}
           onSearch={(query) => {
             setSearchQuery(query);
-            setActiveNav('catalog');
-            setViewMode('app');
+            navigate('/systems');
           }}
           tracks={tracks}
         />
@@ -320,17 +355,17 @@ export default function App() {
       {/* Top Header Navigation */}
       <Header
         activeNav={activeNav}
-        setActiveNav={setActiveNav}
+        setActiveNav={goToNav}
         onOpenWorkspace={() => setIsSandboxOpen(true)}
         onOpenPricing={() => setIsPricingOpen(true)}
         onOpenPortfolio={() => setIsPortfolioOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
-        onGoHome={() => setViewMode('landing')}
-        onOpenAbout={() => setViewMode('about')}
+        onGoHome={() => navigate('/')}
+        onOpenAbout={() => navigate('/about')}
         user={user}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onSearchSubmit={() => setActiveNav('catalog')}
+        onSearchSubmit={() => navigate('/systems')}
       />
 
       {/* Main Learning Hub Layout */}
@@ -342,10 +377,7 @@ export default function App() {
           <Sidebar
             tracks={tracks}
             selectedTrackId={selectedTrackId}
-            onSelectTrack={(id) => {
-              setSelectedTrackId(id);
-              setActiveNav('course-detail');
-            }}
+            onSelectTrack={(id) => navigate(`/systems/${id}`)}
             onOpenPricing={() => setIsPricingOpen(true)}
             onOpenPortfolio={() => setIsPortfolioOpen(true)}
             isProUser={isProUser}
@@ -363,11 +395,8 @@ export default function App() {
             <CourseCatalog
               tracks={tracks}
               searchQuery={searchQuery}
-              onSelectCourse={(id) => {
-                setSelectedTrackId(id);
-                setActiveNav('course-detail');
-              }}
-              onGoHome={() => setViewMode('landing')}
+              onSelectCourse={(id) => navigate(`/systems/${id}`)}
+              onGoHome={() => navigate('/')}
             />
           )}
 
@@ -375,8 +404,8 @@ export default function App() {
             <CourseDetailPage
               track={activeTrack}
               isProUser={isProUser}
-              onBack={() => setActiveNav('catalog')}
-              onStart={() => setActiveNav('curriculum')}
+              onBack={() => navigate('/systems')}
+              onStart={() => navigate(`/systems/${activeTrack.id}/learn`)}
               onOpenPricing={() => setIsPricingOpen(true)}
             />
           )}

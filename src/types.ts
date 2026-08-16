@@ -58,6 +58,9 @@ export interface Track {
   whoBuysThis: string;
   impactStat: string;
   steps: Step[];
+  // Explicit opt-in for the homepage Curriculum Tracks section, so featuring a course there
+  // is a data decision on the course itself, not a hardcoded slice in LandingPage.tsx.
+  featuredOnHomepage?: boolean;
 }
 
 export interface ChatMessage {

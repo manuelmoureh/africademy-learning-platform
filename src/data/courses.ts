@@ -74,6 +74,7 @@ export const INITIAL_TRACKS: Track[] = [
     tags: ['WhatsApp Cloud API', 'Gemini 3.7 Flash', 'M-Pesa STK Push', 'Live Inventory Hooks'],
     whoBuysThis: 'Retail shops, boutiques, and online sellers',
     impactStat: 'WhatsApp AI agents already resolve up to 70% of customer questions instantly',
+    featuredOnHomepage: true,
     steps: [
       {
         id: 'step-1',
@@ -344,6 +345,7 @@ Check the LIVE INVENTORY table before answering.
     tags: ['CRM Webhooks', 'Google Sheets API', 'Calendar Scheduling', 'Property Filters'],
     whoBuysThis: 'Real estate agencies and property managers',
     impactStat: 'Slow lead response loses real estate agents the sale before they even reply',
+    featuredOnHomepage: true,
     steps: [
       {
         id: 'lc-step-1',
@@ -438,6 +440,7 @@ Check the LIVE INVENTORY table before answering.
     tags: ['Gemini Flash Vision', 'PDF Generation', 'M-Pesa Till Reconciliation', 'Overdue Follow-ups'],
     whoBuysThis: 'Small shops, service providers, and contractors',
     impactStat: 'Automated reminders mean invoices actually get paid on time, not chased by hand',
+    featuredOnHomepage: true,
     steps: [
       {
         id: 'inv-step-1',
@@ -513,6 +516,7 @@ Check the LIVE INVENTORY table before answering.
     tags: ['Knowledge Base RAG', 'Ticket Escalation', 'Sentiment Detection'],
     whoBuysThis: 'Any business fielding WhatsApp or email support',
     impactStat: 'AI-driven support automation cuts ticket backlog by up to 40%',
+    featuredOnHomepage: true,
     steps: [
       {
         id: 'sup-step-1',
@@ -571,6 +575,7 @@ Check the LIVE INVENTORY table before answering.
     tags: ['Calendar API', 'Reminder Automation', 'No-Show Reduction'],
     whoBuysThis: 'Salons, clinics, and repair shops',
     impactStat: 'Bots handle bookings 24/7, so a business never misses one after hours',
+    featuredOnHomepage: true,
     steps: [
       {
         id: 'book-step-1',
@@ -629,6 +634,7 @@ Check the LIVE INVENTORY table before answering.
     tags: ['Content Generation', 'Post Scheduling', 'Voice-to-Caption'],
     whoBuysThis: 'Small brands, boutiques, and local businesses',
     impactStat: 'Kenyan SMEs are shifting from rented social platforms to owned, automated systems',
+    featuredOnHomepage: true,
     steps: [
       {
         id: 'soc-step-1',

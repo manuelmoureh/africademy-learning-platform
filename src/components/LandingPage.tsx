@@ -689,7 +689,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tracks.slice(0, 6).map((track, i) => (
+            {tracks.filter((t) => t.featuredOnHomepage).slice(0, 6).map((track, i) => (
               <motion.div
                 key={track.id}
                 initial={reduce ? false : 'hidden'}
@@ -715,18 +715,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <h3 className="font-bold text-lg text-[#12102A] group-hover:text-[#F5A623] transition-colors mt-2">
                     {track.title}
                   </h3>
-                  <p className="text-xs text-[#12102A]/70 font-bold mt-2">
+                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                    {track.tags.slice(0, 3).map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#12102A]/10 text-[#12102A]/60"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#12102A]/70 font-bold mt-3">
                     {track.impactStat}
                   </p>
                   <div className="mt-auto pt-4 border-t border-[#12102A]/10 flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#10B981]">
-                      {track.badgeTitle}
+                    <span className="flex items-center gap-1 text-xs font-bold text-[#10B981]">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Verified
                     </span>
                     <button
                       onClick={onEnterApp}
                       className="text-xs font-bold text-[#12102A] hover:text-[#F5A623] flex items-center gap-1 cursor-pointer transition-colors"
                     >
-                      See the Steps <ArrowRight className="w-3.5 h-3.5" />
+                      View System <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
