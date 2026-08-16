@@ -62,7 +62,7 @@ export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuer
           Pick What You Want to Build
         </h1>
         <p className="text-sm text-[#12102A]/70 mt-2 max-w-xl font-medium">
-          Every system ends up installed for a business you bring on, checked and confirmed by the person using it.
+          Build it once, then install it for any business that needs it.
         </p>
       </div>
 
