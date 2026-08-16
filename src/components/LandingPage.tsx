@@ -425,8 +425,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {[
               { icon: Search, title: 'Pick a system', body: 'Browse the categories and choose one that matches a real business need.' },
               { icon: Wrench, title: 'Build it for real', body: 'Work through the lessons and build the actual thing.' },
-              { icon: ShieldCheck, title: 'Get a verified portfolio', body: 'Install it for a business you bring on, and the working system becomes your portfolio.' },
-              { icon: Repeat, title: 'Sell it', body: 'Use the verified link to pitch the same system to your next client.' },
+              { icon: ShieldCheck, title: 'Get a verified portfolio', body: 'Walk away with a verified portfolio you can showcase to clients.' },
+              { icon: Repeat, title: 'Sell it', body: 'Take the same system to your next customer and sell it again.' },
             ].map((step, i) => (
               <motion.div
                 key={step.title}
