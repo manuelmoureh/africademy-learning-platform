@@ -13,6 +13,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Google tag (gtag.js). send_page_view is off because this is a client-routed SPA -
+         page views are fired manually on route change, see src/lib/analytics.ts. -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z2K3EQV85X"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-Z2K3EQV85X', { send_page_view: false });
+    </script>
   </head>
   <body class="h-full bg-[#F0EEF6] text-[#12102A] antialiased selection:bg-[#F5A623]/20 selection:text-[#12102A]" style="font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <div id="root" class="h-full"></div>

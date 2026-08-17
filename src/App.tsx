@@ -30,6 +30,7 @@ import { Step, Track, UserAccount, PortfolioVerification } from './types';
 import { Play, Sparkles, CheckCheck, ShieldCheck, Check } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { fetchUserProgress, setStepProgress } from './lib/db';
+import { trackPageView } from './lib/analytics';
 
 // Maps the URL to what used to be `viewMode`/`activeNav` state, so every page the app
 // can show has a real, bookmarkable, back-button-friendly URL instead of living entirely
@@ -87,6 +88,12 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { view: viewMode, activeNav, trackId: routeTrackId } = parseRoute(location.pathname);
+
+  // GA4 needs a manual page_view on every route change - see index.html for why the
+  // automatic one is disabled.
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
 
   const [tracks, setTracks] = useState<Track[]>(INITIAL_TRACKS);
   const [selectedTrackId, setSelectedTrackId] = useState<string>('whatsapp-retail-agent');
