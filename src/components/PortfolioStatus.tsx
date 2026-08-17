@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShieldCheck, ArrowUpRight, CheckCircle2, Award, Send } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ShieldCheck, ArrowUpRight, Send } from 'lucide-react';
 
 interface PortfolioStatusProps {
   onOpenPortfolio: () => void;
@@ -17,14 +18,20 @@ export const PortfolioStatus: React.FC<PortfolioStatusProps> = ({
   const isComplete = completedSteps >= totalSteps;
 
   return (
-    <div className="bg-white border border-[#12102A]/10 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="bg-white border border-[#12102A]/10 rounded-2xl p-6 shadow-xs flex flex-col justify-between"
+    >
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#12102A]/40 font-mono">
             Portfolio Verification
           </h3>
-          <span className="text-[10px] font-bold font-mono text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded">
-            98/100 AUDIT
+          <span className="text-[10px] font-bold font-mono text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded flex items-center gap-1">
+            <ShieldCheck className="w-3 h-3" />
+            Verified
           </span>
         </div>
 
@@ -34,10 +41,10 @@ export const PortfolioStatus: React.FC<PortfolioStatusProps> = ({
           </div>
 
           <h4 className="font-bold text-sm text-[#12102A]">
-            Verified Developer Portfolio
+            Verified Portfolio
           </h4>
           <p className="text-xs text-[#12102A]/70 mt-1.5 px-2 leading-relaxed font-medium">
-            Includes your live interactive demo link, 5-point SME engineering rubric audit, and Safaricom webhook telemetry.
+            A live link, a short demo, and a quote from the real business running it, once you finish and submit this system.
           </p>
         </div>
       </div>
@@ -61,6 +68,6 @@ export const PortfolioStatus: React.FC<PortfolioStatusProps> = ({
           <ArrowUpRight className="w-3.5 h-3.5 text-[#12102A]/40" />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };

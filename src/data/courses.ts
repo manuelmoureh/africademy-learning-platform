@@ -547,8 +547,7 @@ Check the LIVE INVENTORY table before answering.
             'Retrieval-augmented prompting to avoid hallucinated policy answers',
             'Confidence thresholds for when to answer versus escalate'
           ]
-        },
-        reviews: []
+        }
       },
       {
         id: 'sup-step-2',
@@ -567,8 +566,7 @@ Check the LIVE INVENTORY table before answering.
             'Structuring a clean handoff summary for a human agent',
             'Never leaving the customer without an acknowledgment'
           ]
-        },
-        reviews: []
+        }
       }
     ]
   },
@@ -609,8 +607,7 @@ Check the LIVE INVENTORY table before answering.
             'Offering slots conversationally instead of a rigid form',
             'Handling timezone edge cases for remote clients'
           ]
-        },
-        reviews: []
+        }
       },
       {
         id: 'book-step-2',
@@ -629,8 +626,7 @@ Check the LIVE INVENTORY table before answering.
             'One-tap reschedule flows inside WhatsApp',
             'Measuring no-show rate before and after automation'
           ]
-        },
-        reviews: []
+        }
       }
     ]
   },
@@ -671,8 +667,7 @@ Check the LIVE INVENTORY table before answering.
             'Extracting the actual announcement from a rambling voice note',
             'Keeping generated captions in the business\'s real voice, not generic marketing-speak'
           ]
-        },
-        reviews: []
+        }
       },
       {
         id: 'soc-step-2',
@@ -691,8 +686,7 @@ Check the LIVE INVENTORY table before answering.
             'A lightweight human-approval gate before anything publishes',
             'Basic engagement tracking on published posts'
           ]
-        },
-        reviews: []
+        }
       }
     ]
   },
@@ -732,8 +726,7 @@ Check the LIVE INVENTORY table before answering.
             'Setting realistic reorder points per product',
             'Avoiding false alerts from one-off bulk orders'
           ]
-        },
-        reviews: []
+        }
       },
       {
         id: 'inv2-step-2',
@@ -752,8 +745,7 @@ Check the LIVE INVENTORY table before answering.
             'Confirming supplier receipt and expected delivery date',
             'Logging reorder history for future forecasting'
           ]
-        },
-        reviews: []
+        }
       }
     ]
   },
@@ -793,8 +785,7 @@ Check the LIVE INVENTORY table before answering.
             'Handling inconsistent formats without breaking',
             'Flagging fields the parser genuinely couldn\'t extract, instead of guessing'
           ]
-        },
-        reviews: []
+        }
       },
       {
         id: 'hr-step-2',
@@ -813,8 +804,7 @@ Check the LIVE INVENTORY table before answering.
             'Keeping a human reviewer in the loop before any rejection is sent',
             'Automated interview slot booking for shortlisted candidates'
           ]
-        },
-        reviews: []
+        }
       }
     ]
   },
@@ -854,8 +844,7 @@ Check the LIVE INVENTORY table before answering.
             'Tone calibration so reminders stay professional, never harassing',
             'Attaching a working payment link to every reminder'
           ]
-        },
-        reviews: []
+        }
       },
       {
         id: 'col-step-2',
@@ -874,8 +863,7 @@ Check the LIVE INVENTORY table before answering.
             'Setting a sane automation-to-human handoff threshold',
             'Avoiding endless automated messaging on accounts that won\'t respond'
           ]
-        },
-        reviews: []
+        }
       }
     ]
   },
@@ -915,8 +903,7 @@ Check the LIVE INVENTORY table before answering.
             'Handling free-text modifications without breaking the order schema',
             'Confirming the full order back to the customer before payment'
           ]
-        },
-        reviews: []
+        }
       },
       {
         id: 'food-step-2',
@@ -935,8 +922,7 @@ Check the LIVE INVENTORY table before answering.
             'Direct kitchen order handoff without manual re-entry',
             'Rider dispatch notification with delivery address'
           ]
-        },
-        reviews: []
+        }
       }
     ]
   }

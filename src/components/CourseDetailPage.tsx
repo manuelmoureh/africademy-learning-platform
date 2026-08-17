@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 import { StarRating } from './StarRating';
@@ -56,66 +56,21 @@ const RateSystem: React.FC<{ trackId: string; userId: string | null; onOpenAuth:
   );
 };
 
-const ModuleRow: React.FC<{ step: Track['steps'][number]; isProUser: boolean }> = ({ step, isProUser }) => {
-  const [showReviews, setShowReviews] = useState(false);
-  const reviews = step.reviews ?? [];
-  const avgRating = reviews.length
-    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-    : 0;
+const ModuleRow: React.FC<{ step: Track['steps'][number]; isUnlocked: boolean }> = ({ step, isUnlocked }) => {
+  const isLocked = step.isGated && !isUnlocked;
 
   return (
-    <div className="rounded-xl border border-[#12102A]/10 bg-white overflow-hidden">
-      <div className="flex items-center gap-3 p-3">
-        <span className="text-xs font-mono font-bold text-[#12102A]/40 w-6 shrink-0">{step.number}</span>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#12102A] truncate">{step.title}</p>
-          <p className="text-[11px] text-[#12102A]/50 truncate">{step.subtitle}</p>
-        </div>
-        <span className="text-[10px] font-mono text-[#12102A]/40 shrink-0">{step.duration}</span>
-        {step.isGated && !isProUser ? (
-          <Lock className="w-3.5 h-3.5 text-[#12102A]/30 shrink-0" />
-        ) : (
-          <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]/60 shrink-0" />
-        )}
+    <div className="rounded-xl border border-[#12102A]/10 bg-white overflow-hidden flex items-center gap-3 p-3">
+      <span className="text-xs font-mono font-bold text-[#12102A]/40 w-6 shrink-0">{step.number}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-bold text-[#12102A] truncate">{step.title}</p>
+        <p className="text-[11px] text-[#12102A]/50 truncate">{step.subtitle}</p>
       </div>
-
-      <button
-        onClick={() => setShowReviews((v) => !v)}
-        className="w-full flex items-center justify-between px-3 py-2 border-t border-[#12102A]/5 bg-[#F0EEF6] text-[11px] font-semibold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-colors"
-      >
-        <span className="flex items-center gap-1.5">
-          {reviews.length > 0 ? (
-            <>
-              <Star className="w-3.5 h-3.5 fill-[#F5A623] text-[#F5A623]" />
-              {avgRating.toFixed(1)} ({reviews.length} review{reviews.length === 1 ? '' : 's'})
-            </>
-          ) : (
-            'No reviews yet, be the first learner to complete this lesson'
-          )}
-        </span>
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showReviews ? 'rotate-180' : ''}`} />
-      </button>
-
-      {showReviews && (
-        <div className="px-3 pb-3 pt-1 space-y-2 border-t border-[#12102A]/5">
-          {reviews.length === 0 ? (
-            <p className="text-[11px] text-[#12102A]/50 font-medium pt-2">
-              This lesson doesn't have reviews yet. Once learners complete it, their feedback shows up here.
-            </p>
-          ) : (
-            reviews.map((r) => (
-              <div key={r.id} className="pt-2">
-                <div className="flex items-center gap-1 mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`w-3 h-3 ${i < r.rating ? 'fill-[#F5A623] text-[#F5A623]' : 'text-[#12102A]/15'}`} />
-                  ))}
-                </div>
-                <p className="text-xs text-[#12102A]/80 font-medium leading-relaxed">"{r.quote}"</p>
-                <p className="text-[10px] text-[#12102A]/40 mt-1">{r.learnerName}, {r.cohort}</p>
-              </div>
-            ))
-          )}
-        </div>
+      <span className="text-[10px] font-mono text-[#12102A]/40 shrink-0">{step.duration}</span>
+      {isLocked ? (
+        <Lock className="w-3.5 h-3.5 text-[#12102A]/30 shrink-0" />
+      ) : (
+        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]/60 shrink-0" />
       )}
     </div>
   );
@@ -123,14 +78,14 @@ const ModuleRow: React.FC<{ step: Track['steps'][number]; isProUser: boolean }> 
 
 interface CourseDetailPageProps {
   track: Track;
-  isProUser: boolean;
+  isUnlocked: boolean;
   userId: string | null;
   onBack: () => void;
   onStart: () => void;
   onOpenAuth: () => void;
 }
 
-export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isProUser, userId, onBack, onStart, onOpenAuth }) => {
+export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnlocked, userId, onBack, onStart, onOpenAuth }) => {
   const learnings = Array.from(
     new Set(track.steps.flatMap((s) => s.content.keyLearnings).slice(0, 6))
   );
@@ -209,7 +164,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
                     variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                   >
-                    <ModuleRow step={step} isProUser={isProUser} />
+                    <ModuleRow step={step} isUnlocked={isUnlocked} />
                   </motion.div>
                 ))}
               </motion.div>

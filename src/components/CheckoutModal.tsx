@@ -9,13 +9,20 @@ interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  // When set, this is a one-time per-system unlock rather than the Pro subscription
+  // checkout, so the copy and price reflect the specific track being bought.
+  product?: { name: string; price: number };
 }
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
+  product,
 }) => {
+  const label = product ? product.name : 'Afridemy Pro';
+  const price = product ? product.price : 3800;
+  const priceDisplay = `KES ${price.toLocaleString()}`;
   const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'card'>('mpesa');
   const [phoneNumber, setPhoneNumber] = useState('0712 345 678');
   const [cardNumber, setCardNumber] = useState('4242 •••• •••• 4242');
@@ -67,14 +74,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-bold text-[#F5A623] uppercase tracking-widest font-mono">
-                Afridemy Pro Checkout
+                {product ? 'System Checkout' : 'Afridemy Pro Checkout'}
               </span>
               <span className="text-[9px] font-bold font-mono px-2 py-0.5 bg-[#10B981]/15 text-[#10B981] rounded">
                 SECURE 256-BIT
               </span>
             </div>
             <h3 className="font-black text-xl text-[#12102A]">
-              {stage === 'confirmed' ? 'Payment Confirmed' : 'Upgrade to Afridemy Pro'}
+              {stage === 'confirmed' ? 'Payment Confirmed' : `Unlock ${label}`}
             </h3>
           </div>
 
@@ -92,8 +99,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             {/* Price Banner */}
             <div className="p-4 rounded-xl bg-[#12102A] text-white flex items-center justify-between">
               <div>
-                <p className="text-xs text-white/70 font-mono">Monthly Pro Membership</p>
-                <p className="text-2xl font-black text-white">KES 3,800 <span className="text-xs text-white/50 font-normal">($29 USD)</span></p>
+                <p className="text-xs text-white/70 font-mono">{product ? 'One-time payment' : 'Monthly Pro Membership'}</p>
+                <p className="text-2xl font-black text-white">{priceDisplay}</p>
               </div>
               <div className="text-right">
                 <span className="text-[10px] font-bold font-mono px-2 py-1 bg-[#F5A623] text-[#12102A] rounded">
@@ -187,25 +194,44 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
             {/* Included feature list */}
             <div className="p-3.5 rounded-xl bg-[#F0EEF6] border border-[#12102A]/5 space-y-2">
-              <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
-                <Check className="w-3.5 h-3.5 text-[#10B981]" />
-                Unlocks all 12 production steps across all tracks
-              </div>
-              <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
-                <Check className="w-3.5 h-3.5 text-[#10B981]" />
-                Full live Gemini 3.7 Flash AI sandbox runtime
-              </div>
-              <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
-                <Check className="w-3.5 h-3.5 text-[#10B981]" />
-                Verified developer portfolio with live shareable link & rubric
-              </div>
+              {product ? (
+                <>
+                  <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
+                    <Check className="w-3.5 h-3.5 text-[#10B981]" />
+                    Unlocks every remaining lesson in {product.name}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
+                    <Check className="w-3.5 h-3.5 text-[#10B981]" />
+                    Full live sandbox for this system
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
+                    <Check className="w-3.5 h-3.5 text-[#10B981]" />
+                    One-time payment, yours to keep
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
+                    <Check className="w-3.5 h-3.5 text-[#10B981]" />
+                    Unlocks all 12 production steps across all tracks
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
+                    <Check className="w-3.5 h-3.5 text-[#10B981]" />
+                    Full live Gemini 3.7 Flash AI sandbox runtime
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-[#12102A]/80 font-medium">
+                    <Check className="w-3.5 h-3.5 text-[#10B981]" />
+                    Verified developer portfolio with live shareable link & rubric
+                  </div>
+                </>
+              )}
             </div>
 
             <button
               type="submit"
               className="w-full py-3.5 bg-[#00A859] hover:bg-[#008f4c] text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors"
             >
-              {paymentMethod === 'mpesa' ? 'Send M-Pesa STK Push (KES 3,800)' : 'Pay KES 3,800 with Card'}
+              {paymentMethod === 'mpesa' ? `Send M-Pesa STK Push (${priceDisplay})` : `Pay ${priceDisplay} with Card`}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -223,7 +249,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 Check Your Phone (+254 {phoneNumber})
               </h4>
               <p className="text-xs text-[#12102A]/70 mt-1 max-w-sm mx-auto leading-relaxed">
-                Safaricom STK Push has been dispatched. Enter your M-Pesa PIN to complete payment of <b>KES 3,800</b> to Till Number <b>542109</b> (Afridemy Kenya).
+                Safaricom STK Push has been dispatched. Enter your M-Pesa PIN to complete payment of <b>{priceDisplay}</b> to Till Number <b>542109</b> (Afridemy Kenya).
               </p>
             </div>
 
@@ -242,31 +268,43 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
         {/* Stage 3: Confirmed */}
         {stage === 'confirmed' && (
-          <div className="p-8 text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-[#10B981] text-white flex items-center justify-center mx-auto shadow-md">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="p-8 text-center space-y-6"
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.1 }}
+              className="w-16 h-16 rounded-full bg-[#10B981] text-white flex items-center justify-center mx-auto shadow-md"
+            >
               <CheckCircle2 className="w-9 h-9" />
-            </div>
+            </motion.div>
 
             <div>
               <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#10B981] block mb-1">
                 Transaction Verified • Daraja Ref: QK918237
               </span>
               <h4 className="text-2xl font-black text-[#12102A]">
-                Welcome to Afridemy Pro
+                {product ? `${product.name} Unlocked` : 'Welcome to Afridemy Pro'}
               </h4>
               <p className="text-xs text-[#12102A]/70 mt-2 max-w-sm mx-auto leading-relaxed font-medium">
-                Your account has been upgraded. All 12 production steps, the live Gemini AI sandbox, and verified developer portfolio are now fully unlocked.
+                {product
+                  ? 'Every remaining lesson and the live sandbox for this system are now fully unlocked.'
+                  : 'Your account has been upgraded. All 12 production steps, the live Gemini AI sandbox, and verified developer portfolio are now fully unlocked.'}
               </p>
             </div>
 
             <button
               onClick={handleFinish}
-              className="w-full py-3.5 bg-[#12102A] hover:bg-[#1c1940] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors"
+              className="w-full py-3.5 bg-[#12102A] hover:bg-[#1c1940] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors active:scale-[0.98]"
             >
-              Access Pro Dashboard
+              {product ? 'Continue Learning' : 'Access Pro Dashboard'}
               <ArrowRight className="w-4 h-4 text-[#F5A623]" />
             </button>
-          </div>
+          </motion.div>
         )}
 
       </motion.div>

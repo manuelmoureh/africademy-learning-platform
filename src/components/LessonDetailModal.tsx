@@ -7,20 +7,24 @@ interface LessonDetailModalProps {
   step: Step | null;
   onClose: () => void;
   onOpenSandbox: () => void;
-  onOpenPricing: () => void;
+  onUnlock: () => void;
   onToggleComplete: (stepId: string) => void;
-  isProUser: boolean;
+  isUnlocked: boolean;
+  trackTitle: string;
+  trackPrice: number;
 }
 
 export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
   step,
   onClose,
   onOpenSandbox,
-  onOpenPricing,
+  onUnlock,
   onToggleComplete,
-  isProUser,
+  isUnlocked,
+  trackTitle,
+  trackPrice,
 }) => {
-  const isLocked = step ? step.isGated && !isProUser : false;
+  const isLocked = step ? step.isGated && !isUnlocked : false;
   const isCompleted = step?.status === 'completed';
 
   return (
@@ -61,7 +65,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
                     ? 'bg-[#F5A623]/20 text-[#F5A623]' 
                     : 'bg-gray-100 text-gray-500'
                 }`}>
-                  {isLocked ? 'PRO GATED' : step.status.toUpperCase()}
+                  {isLocked ? 'LOCKED' : step.status.toUpperCase()}
                 </span>
               </div>
               <h3 className="text-lg font-black text-[#12102A] leading-snug">
@@ -80,15 +84,20 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
         {/* Content */}
         {isLocked ? (
-          /* Gated Locked State */
-          <div className="flex-1 p-8 overflow-y-auto flex flex-col items-center justify-center text-center space-y-6">
+          /* Locked State */
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="flex-1 p-8 overflow-y-auto flex flex-col items-center justify-center text-center space-y-6"
+          >
             <div className="w-16 h-16 rounded-2xl bg-[#F5A623]/10 border border-[#F5A623]/30 text-[#F5A623] flex items-center justify-center">
               <Lock className="w-8 h-8" />
             </div>
 
             <div className="max-w-md space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-widest font-mono text-[#F5A623]">
-                Afridemy Pro Content
+                Locked Lesson
               </span>
               <h4 className="text-2xl font-black text-[#12102A]">
                 Step {step.number} is Locked
@@ -116,17 +125,22 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
             <button
               onClick={() => {
                 onClose();
-                onOpenPricing();
+                onUnlock();
               }}
-              className="px-6 py-3 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-black rounded-xl flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+              className="px-6 py-3 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-black rounded-xl flex items-center gap-2 cursor-pointer shadow-xs transition-colors active:scale-[0.98]"
             >
-              Upgrade to Pro to Unlock (KES 3,800/mo)
+              Unlock {trackTitle} (KES {trackPrice.toLocaleString()})
               <ArrowRight className="w-4 h-4" />
             </button>
-          </div>
+          </motion.div>
         ) : (
           /* Full Unlocked Content */
-          <div className="flex-1 p-6 overflow-y-auto space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="flex-1 p-6 overflow-y-auto space-y-6"
+          >
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#12102A]/40 font-mono mb-2">
                 Lesson Overview
@@ -202,7 +216,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
                 </p>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Footer Actions */}

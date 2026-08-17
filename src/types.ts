@@ -1,12 +1,3 @@
-export interface Review {
-  id: string;
-  learnerName: string;
-  cohort: string;
-  rating: 1 | 2 | 3 | 4 | 5;
-  quote: string;
-  date: string;
-}
-
 export interface Step {
   id: string;
   number: string;
@@ -27,7 +18,6 @@ export interface Step {
       expectedOutput: string;
     };
   };
-  reviews?: Review[];
 }
 
 export type TrackIconName =

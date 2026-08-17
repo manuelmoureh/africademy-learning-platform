@@ -1,27 +1,33 @@
 import React from 'react';
-import { Terminal, Play, Lock, Sparkles, ExternalLink } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Terminal, Play, Lock } from 'lucide-react';
 
 interface BuildWorkspaceCardProps {
   onOpenSandbox: () => void;
-  onOpenPricing?: () => void;
+  onUnlock?: () => void;
   isUnlocked?: boolean;
 }
 
 export const BuildWorkspaceCard: React.FC<BuildWorkspaceCardProps> = ({
   onOpenSandbox,
-  onOpenPricing,
+  onUnlock,
   isUnlocked = true,
 }) => {
   const handleClick = () => {
     if (isUnlocked) {
       onOpenSandbox();
-    } else if (onOpenPricing) {
-      onOpenPricing();
+    } else if (onUnlock) {
+      onUnlock();
     }
   };
 
   return (
-    <div 
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
       onClick={handleClick}
       className={`rounded-2xl p-6 text-[#12102A] flex flex-col justify-between cursor-pointer transition-all duration-200 group shadow-xs relative overflow-hidden ${
         isUnlocked 
@@ -45,7 +51,7 @@ export const BuildWorkspaceCard: React.FC<BuildWorkspaceCardProps> = ({
           <span className={`flex items-center gap-1 text-[10px] font-black uppercase font-mono px-2 py-0.5 rounded-full ${
             isUnlocked ? 'bg-[#12102A] text-[#F5A623]' : 'bg-gray-200 text-gray-700'
           }`}>
-            {isUnlocked ? 'Live' : 'Pro Only'}
+            {isUnlocked ? 'Live' : 'Locked'}
           </span>
         </div>
 
@@ -53,22 +59,22 @@ export const BuildWorkspaceCard: React.FC<BuildWorkspaceCardProps> = ({
           Build Workspace
         </h3>
         <p className="text-xs font-semibold text-[#12102A]/85 mb-6 leading-relaxed">
-          {isUnlocked 
-            ? 'Access the live WhatsApp retail sandbox, test prompt memory against product SKUs, and simulate orders.'
-            : 'Unlock the full live Gemini 3.7 Flash AI runtime, inventory hooks, and Daraja M-Pesa simulator.'}
+          {isUnlocked
+            ? 'Access the live sandbox, test your build against real inputs, and simulate the finished system.'
+            : 'Unlock this system to access the live sandbox and dev tools.'}
         </p>
       </div>
 
       <div className={`mt-auto p-3.5 rounded-xl flex items-center justify-between transition-colors ${
-        isUnlocked 
-          ? 'bg-[#12102A] group-hover:bg-[#1c1940]' 
+        isUnlocked
+          ? 'bg-[#12102A] group-hover:bg-[#1c1940]'
           : 'bg-gray-200 group-hover:bg-gray-300'
       }`}>
         <div className="flex items-center gap-2">
           <span className={`text-[10px] font-black tracking-widest font-mono ${
             isUnlocked ? 'text-[#F5A623]' : 'text-[#12102A]'
           }`}>
-            {isUnlocked ? 'LAUNCH SANDBOX' : 'UPGRADE TO UNLOCK'}
+            {isUnlocked ? 'LAUNCH SANDBOX' : 'UNLOCK TO ACCESS'}
           </span>
         </div>
         <div className={`w-6 h-6 rounded-full flex items-center justify-center group-hover:translate-x-0.5 transition-transform ${
@@ -81,6 +87,6 @@ export const BuildWorkspaceCard: React.FC<BuildWorkspaceCardProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

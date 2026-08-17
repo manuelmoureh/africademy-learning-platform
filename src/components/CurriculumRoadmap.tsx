@@ -14,7 +14,7 @@ interface CurriculumRoadmapProps {
   onSelectStep: (step: Step) => void;
   onToggleCompleteStep: (stepId: string) => void;
   onOpenSandbox: () => void;
-  isProUser: boolean;
+  isUnlocked: boolean;
 }
 
 export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
@@ -23,7 +23,7 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
   onSelectStep,
   onToggleCompleteStep,
   onOpenSandbox,
-  isProUser,
+  isUnlocked,
 }) => {
   const completedCount = steps.filter(s => s.status === 'completed').length;
   const totalCount = steps.length;
@@ -54,7 +54,7 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
       >
         {steps.map((step) => {
           const isSelected = selectedStepId === step.id;
-          const isLocked = step.isGated && !isProUser;
+          const isLocked = step.isGated && !isUnlocked;
 
           if (step.status === 'completed') {
             return (
@@ -179,14 +179,7 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
               </div>
 
               <div className="shrink-0 flex items-center gap-2">
-                {isLocked ? (
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-gray-200 text-gray-700 flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-gray-500" />
-                    PRO
-                  </span>
-                ) : (
-                  <Lock className="w-3.5 h-3.5 text-[#12102A]/40" />
-                )}
+                <Lock className={`w-3.5 h-3.5 ${isLocked ? 'text-gray-500' : 'text-[#12102A]/40'}`} />
               </div>
             </motion.div>
           );

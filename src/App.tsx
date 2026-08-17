@@ -179,6 +179,16 @@ export default function App() {
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [showUpgradeToast, setShowUpgradeToast] = useState(false);
+  const [isTrackCheckoutOpen, setIsTrackCheckoutOpen] = useState(false);
+
+  // Per-system one-time purchase, stubbed client-side for now: this array should
+  // eventually be a real Supabase record tied to a completed payment, not just local
+  // state, but that backend wiring is an explicitly separate follow-up.
+  const [purchasedTrackIds, setPurchasedTrackIds] = useState<string[]>([]);
+  const isTrackUnlocked = (trackId: string) => purchasedTrackIds.includes(trackId);
+  const handlePurchaseTrack = (trackId: string) => {
+    setPurchasedTrackIds(prev => (prev.includes(trackId) ? prev : [...prev, trackId]));
+  };
 
   const activeTrack = tracks.find(t => t.id === selectedTrackId) || tracks[0];
   const isProUser = user.plan === 'pro';
@@ -422,12 +432,10 @@ export default function App() {
             apply while someone is still browsing */}
         {activeNav !== 'catalog' && (
           <Sidebar
-            tracks={tracks}
-            selectedTrackId={selectedTrackId}
-            onSelectTrack={(id) => navigate(`/systems/${id}`)}
-            onOpenPricing={() => setIsPricingOpen(true)}
-            onOpenPortfolio={() => setIsPortfolioOpen(true)}
-            isProUser={isProUser}
+            track={activeTrack}
+            onBrowseAll={() => navigate('/systems')}
+            onUnlockTrack={() => setIsTrackCheckoutOpen(true)}
+            isUnlocked={isTrackUnlocked(activeTrack.id)}
             activeTrackProgress={progressPercent}
           />
         )}
@@ -450,7 +458,7 @@ export default function App() {
           {activeNav === 'course-detail' && (
             <CourseDetailPage
               track={activeTrack}
-              isProUser={isProUser}
+              isUnlocked={isTrackUnlocked(activeTrack.id)}
               userId={authUserId}
               onBack={() => navigate('/systems')}
               onStart={() => navigate(`/systems/${activeTrack.id}/learn`)}
@@ -467,8 +475,8 @@ export default function App() {
                     <span className="text-[10px] font-bold text-[#F5A623] uppercase tracking-widest font-mono">
                       {activeTrack.trackNumber}
                     </span>
-                    <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-[#12102A] text-white rounded">
-                      NAIROBI RETAIL COMMERCE
+                    <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-[#12102A] text-white rounded uppercase">
+                      {activeTrack.category}
                     </span>
                   </div>
                   <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#12102A]">
@@ -499,7 +507,7 @@ export default function App() {
                     onSelectStep={(step) => setSelectedStep(step)}
                     onToggleCompleteStep={handleToggleCompleteStep}
                     onOpenSandbox={() => setIsSandboxOpen(true)}
-                    isProUser={isProUser}
+                    isUnlocked={isTrackUnlocked(activeTrack.id)}
                   />
                 </div>
 
@@ -514,8 +522,8 @@ export default function App() {
 
                   <BuildWorkspaceCard
                     onOpenSandbox={() => setIsSandboxOpen(true)}
-                    onOpenPricing={() => setIsPricingOpen(true)}
-                    isUnlocked={isProUser}
+                    onUnlock={() => setIsTrackCheckoutOpen(true)}
+                    isUnlocked={isTrackUnlocked(activeTrack.id)}
                   />
                 </div>
 
@@ -538,12 +546,14 @@ export default function App() {
           setSelectedStep(null);
           setIsSandboxOpen(true);
         }}
-        onOpenPricing={() => {
+        onUnlock={() => {
           setSelectedStep(null);
-          setIsPricingOpen(true);
+          setIsTrackCheckoutOpen(true);
         }}
         onToggleComplete={handleToggleCompleteStep}
-        isProUser={isProUser}
+        isUnlocked={isTrackUnlocked(activeTrack.id)}
+        trackTitle={activeTrack.title}
+        trackPrice={activeTrack.price}
       />
 
       <PricingModal
@@ -560,6 +570,13 @@ export default function App() {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         onSuccess={handleUpgradeSuccess}
+      />
+
+      <CheckoutModal
+        isOpen={isTrackCheckoutOpen}
+        onClose={() => setIsTrackCheckoutOpen(false)}
+        onSuccess={() => handlePurchaseTrack(activeTrack.id)}
+        product={{ name: activeTrack.title, price: activeTrack.price }}
       />
 
       <AuthModal
