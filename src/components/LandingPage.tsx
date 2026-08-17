@@ -767,7 +767,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pb-10 border-b border-white/10">
             <div className="space-y-3 max-w-sm">
-              <img src="/logo-light.png" alt="Afridemy" className="h-6 w-auto" />
+              <img src="/logo-light.png" alt="Afridemy" className="h-10 w-auto" />
               <p className="text-white/50 leading-relaxed">Get notified when new systems and categories launch.</p>
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
                 <div className="relative flex-1">
@@ -796,7 +796,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-6">
               <div className="space-y-2.5">
                 <p className="text-white/80 font-bold text-[11px] tracking-wider">Systems</p>
                 <button onClick={onEnterApp} className="block text-left hover:text-white transition-colors cursor-pointer">All Systems</button>
@@ -805,15 +805,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="space-y-2.5">
                 <p className="text-white/80 font-bold text-[11px] tracking-wider">Company</p>
                 <button onClick={onOpenAbout} className="block text-left hover:text-white transition-colors cursor-pointer">About</button>
+              </div>
+              <div className="space-y-2.5">
+                <p className="text-white/80 font-bold text-[11px] tracking-wider">Legal</p>
                 <button onClick={onOpenPrivacy} className="block text-left hover:text-white transition-colors cursor-pointer">Privacy Policy</button>
                 <button onClick={onOpenTerms} className="block text-left hover:text-white transition-colors cursor-pointer">Terms of Service</button>
               </div>
             </div>
           </div>
 
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="pt-6 text-center sm:text-left">
             <span className="text-white/40">&copy; {new Date().getFullYear()} Afridemy. All rights reserved.</span>
-            <span className="text-white/30 text-[11px]">WhatsApp and M-Pesa are trademarks of their respective owners. Afridemy is not affiliated with Meta or Safaricom.</span>
           </div>
         </div>
       </footer>
