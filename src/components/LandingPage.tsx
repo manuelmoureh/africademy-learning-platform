@@ -811,9 +811,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span className="font-semibold text-white/50">Based in Nairobi, Kenya</span>
-            <span className="text-white/30 font-mono text-[10px]">Built for real WhatsApp and M-Pesa agents, made for Africa, by Africans.</span>
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <span className="text-white/40">&copy; {new Date().getFullYear()} Afridemy. All rights reserved.</span>
+            <span className="text-white/30 text-[11px]">WhatsApp and M-Pesa are trademarks of their respective owners. Afridemy is not affiliated with Meta or Safaricom.</span>
           </div>
         </div>
       </footer>
