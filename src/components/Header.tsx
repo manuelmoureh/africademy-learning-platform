@@ -49,6 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const systemsActive = activeNav === 'catalog' || activeNav === 'course-detail' || activeNav === 'curriculum';
+  const homeActive = !activeNav;
 
   return (
     <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10">
@@ -59,6 +60,15 @@ export const Header: React.FC<HeaderProps> = ({
 
         <MotionNavigationMenu className="hidden md:flex" viewportClassName="border-[#12102A]/10">
           <MotionNavigationMenuList>
+            <MotionNavigationMenuItem>
+              <MotionNavigationMenuLink
+                onClick={onGoHome}
+                className={`flex h-9 items-center px-4 py-2 text-sm font-semibold cursor-pointer ${homeActive ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
+              >
+                Home
+              </MotionNavigationMenuLink>
+            </MotionNavigationMenuItem>
+
             <MotionNavigationMenuItem value="courses">
               <MotionNavigationMenuTrigger
                 onClick={onEnterApp}
@@ -208,6 +218,7 @@ export const Header: React.FC<HeaderProps> = ({
             </form>
 
             {[
+              { label: 'Home', onClick: onGoHome },
               { label: 'Systems', onClick: onEnterApp },
               { label: 'Verified Work', onClick: onOpenVerifiedWork },
               { label: 'About', onClick: onOpenAbout },

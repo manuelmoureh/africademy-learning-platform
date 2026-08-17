@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 interface StaticPageProps {
   title: string;
@@ -15,11 +15,11 @@ export const StaticPage: React.FC<StaticPageProps> = ({ title, onBack, children 
           onClick={onBack}
           className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back
+          <Home className="w-4 h-4" />
+          Home
         </button>
         <div className="w-px h-5 bg-[#12102A]/10" />
-        <img src="/logo-dark.png" alt="Afridemy" className="h-7 w-auto" />
+        <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
       </nav>
 
       <div className="max-w-3xl mx-auto px-6 py-16">

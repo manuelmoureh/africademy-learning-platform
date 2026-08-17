@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, AlertCircle, Lightbulb, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Home, ArrowRight, AlertCircle, Lightbulb, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface AboutPageProps {
   onBack: () => void;
@@ -13,8 +13,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onBack, onEnterApp }) => (
         onClick={onBack}
         className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Back
+        <Home className="w-4 h-4" />
+        Home
       </button>
       <div className="w-px h-5 bg-[#12102A]/10" />
       <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
