@@ -19,6 +19,7 @@ interface HeaderProps {
   activeNav?: string;
   user: UserAccount;
   isAuthenticated: boolean;
+  authLoading?: boolean;
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onSearchSubmit: () => void;
@@ -36,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeNav,
   user,
   isAuthenticated,
+  authLoading = false,
   searchQuery,
   onSearchChange,
   onSearchSubmit,
@@ -51,6 +53,13 @@ export const Header: React.FC<HeaderProps> = ({
   const systemsActive = activeNav === 'catalog' || activeNav === 'course-detail' || activeNav === 'curriculum';
   const homeActive = !activeNav;
 
+  // A query left over from a previous search shouldn't silently keep filtering
+  // the catalog once someone clicks away to browse something else.
+  const goTo = (action: () => void) => () => {
+    onSearchChange('');
+    action();
+  };
+
   return (
     <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between gap-6">
@@ -62,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
           <MotionNavigationMenuList>
             <MotionNavigationMenuItem>
               <MotionNavigationMenuLink
-                onClick={onGoHome}
+                onClick={goTo(onGoHome)}
                 className={`flex h-9 items-center px-4 py-2 text-sm font-semibold cursor-pointer ${homeActive ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
               >
                 Home
@@ -71,8 +80,8 @@ export const Header: React.FC<HeaderProps> = ({
 
             <MotionNavigationMenuItem value="courses">
               <MotionNavigationMenuTrigger
-                onClick={onEnterApp}
-                className={`data-[state=open]:text-[#12102A] ${systemsActive ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
+                onClick={goTo(onEnterApp)}
+                className={`data-[state=open]:text-[#12102A] font-semibold ${systemsActive ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
               >
                 Systems
               </MotionNavigationMenuTrigger>
@@ -80,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="w-[420px] p-1">
                   <div className="grid grid-cols-2 gap-1">
                     {tracks.slice(0, 4).map((track) => (
-                      <MotionNavigationMenuLink key={track.id} onClick={() => onSelectCourse(track.id)} className="cursor-pointer">
+                      <MotionNavigationMenuLink key={track.id} onClick={goTo(() => onSelectCourse(track.id))} className="cursor-pointer">
                         <span className="flex items-center gap-2 text-sm font-bold text-[#12102A]">
                           <TrackIcon name={track.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
                           {track.category}
@@ -90,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
                     ))}
                   </div>
                   <MotionNavigationMenuLink
-                    onClick={onEnterApp}
+                    onClick={goTo(onEnterApp)}
                     className="cursor-pointer mt-1 flex items-center justify-between border-t border-[#12102A]/10 pt-2"
                   >
                     <span className="text-sm font-bold text-[#F5A623]">See all systems</span>
@@ -102,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <MotionNavigationMenuItem>
               <MotionNavigationMenuLink
-                onClick={onOpenVerifiedWork}
+                onClick={goTo(onOpenVerifiedWork)}
                 className={`flex h-9 items-center px-4 py-2 text-sm font-semibold cursor-pointer ${activeNav === 'verified-work' ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
               >
                 Verified Work
@@ -111,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <MotionNavigationMenuItem>
               <MotionNavigationMenuLink
-                onClick={onOpenAbout}
+                onClick={goTo(onOpenAbout)}
                 className={`flex h-9 items-center px-4 py-2 text-sm font-semibold cursor-pointer ${activeNav === 'about' ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
               >
                 About
@@ -131,11 +140,27 @@ export const Header: React.FC<HeaderProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search systems"
-              className="w-40 focus:w-56 pl-9 pr-3 py-2 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-xs font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all duration-300"
+              aria-label="Search AI systems"
+              className="w-40 focus:w-56 pl-9 pr-7 py-2 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-xs font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all duration-300"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => onSearchChange('')}
+                aria-label="Clear search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-[#12102A]/35 hover:text-[#12102A] hover:bg-[#12102A]/5 cursor-pointer transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </form>
 
-          {isAuthenticated ? (
+          {authLoading ? (
+            <div className="hidden md:flex items-center gap-2.5 p-1 pr-1.5">
+              <div className="w-16 h-7 rounded-full bg-[#12102A]/8 animate-pulse" />
+              <div className="w-9 h-9 rounded-full bg-[#12102A]/8 animate-pulse" />
+            </div>
+          ) : isAuthenticated ? (
             <>
               <button
                 onClick={onOpenPricing}
@@ -213,15 +238,26 @@ export const Header: React.FC<HeaderProps> = ({
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search systems"
-                className="w-full pl-9 pr-3 py-2.5 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-sm font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all"
+                aria-label="Search AI systems"
+                className="w-full pl-9 pr-9 py-2.5 rounded-full border border-[#12102A]/10 bg-[#F0EEF6] text-sm font-medium text-[#12102A] placeholder:text-[#12102A]/40 focus:outline-none focus:border-[#F5A623] focus:bg-white transition-all"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => onSearchChange('')}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-[#12102A]/35 hover:text-[#12102A] cursor-pointer transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </form>
 
             {[
-              { label: 'Home', onClick: onGoHome },
-              { label: 'Systems', onClick: onEnterApp },
-              { label: 'Verified Work', onClick: onOpenVerifiedWork },
-              { label: 'About', onClick: onOpenAbout },
+              { label: 'Home', onClick: goTo(onGoHome) },
+              { label: 'Systems', onClick: goTo(onEnterApp) },
+              { label: 'Verified Work', onClick: goTo(onOpenVerifiedWork) },
+              { label: 'About', onClick: goTo(onOpenAbout) },
             ].map((item) => (
               <button
                 key={item.label}

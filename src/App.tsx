@@ -103,6 +103,7 @@ export default function App() {
   // User Account State — starts as guest, replaced by the real Supabase session on mount
   const [user, setUser] = useState<UserAccount>(GUEST_USER);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // Bootstrap the real auth session and any saved progress
   useEffect(() => {
@@ -143,7 +144,8 @@ export default function App() {
           loadProfileAndProgress(data.session.user.id);
         }
       })
-      .catch((err) => console.warn('Supabase session check failed', err));
+      .catch((err) => console.warn('Supabase session check failed', err))
+      .finally(() => { if (active) setAuthLoading(false); });
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -247,6 +249,7 @@ export default function App() {
         tracks={tracks}
         user={user}
         isAuthenticated={!!authUserId}
+        authLoading={authLoading}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onSearchSubmit={() => navigate('/systems')}
@@ -274,6 +277,7 @@ export default function App() {
         tracks={tracks}
         user={user}
         isAuthenticated={!!authUserId}
+        authLoading={authLoading}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onSearchSubmit={() => navigate('/systems')}
@@ -296,6 +300,7 @@ export default function App() {
           activeNav={activeNav}
           user={user}
           isAuthenticated={!!authUserId}
+          authLoading={authLoading}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onSearchSubmit={() => navigate('/systems')}
@@ -397,6 +402,7 @@ export default function App() {
         activeNav={activeNav}
         user={user}
         isAuthenticated={!!authUserId}
+        authLoading={authLoading}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onSearchSubmit={() => navigate('/systems')}

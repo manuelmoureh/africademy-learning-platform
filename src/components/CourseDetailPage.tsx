@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star, ChevronDown } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
@@ -135,7 +136,12 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
   );
 
   return (
-    <section className="p-6 md:p-10 max-w-5xl mx-auto w-full space-y-8">
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="p-6 md:p-10 max-w-5xl mx-auto w-full space-y-8"
+    >
       <button
         onClick={onBack}
         className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/60 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
@@ -190,11 +196,23 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
                 Full lesson-by-lesson content for this system is still being written. Join the waitlist by starting free on another track, we'll let you know the moment this one opens.
               </p>
             ) : (
-              <div className="space-y-2">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ staggerChildren: 0.06 }}
+                className="space-y-2"
+              >
                 {track.steps.map((step) => (
-                  <ModuleRow key={step.id} step={step} isProUser={isProUser} />
+                  <motion.div
+                    key={step.id}
+                    variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                  >
+                    <ModuleRow step={step} isProUser={isProUser} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
@@ -222,6 +240,6 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isPro
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

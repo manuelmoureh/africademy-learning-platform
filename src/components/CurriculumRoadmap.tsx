@@ -1,5 +1,11 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { Step } from '../types';
+
+const rowFade = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
 import { PlayCircle, CheckCircle, Lock, ExternalLink, Code2, ArrowRight } from 'lucide-react';
 
 interface CurriculumRoadmapProps {
@@ -40,15 +46,23 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
       </div>
 
       {/* Roadmap List */}
-      <div className="space-y-3">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        transition={{ staggerChildren: 0.05 }}
+        className="space-y-3"
+      >
         {steps.map((step) => {
           const isSelected = selectedStepId === step.id;
           const isLocked = step.isGated && !isProUser;
 
           if (step.status === 'completed') {
             return (
-              <div
+              <motion.div
                 key={step.id}
+                variants={rowFade}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                whileHover={{ x: 2 }}
                 onClick={() => onSelectStep(step)}
                 className={`group flex items-center gap-4 p-4 rounded-xl bg-[#10B981]/5 border border-[#10B981]/20 transition-all cursor-pointer hover:border-[#10B981]/40 ${
                   isSelected ? 'ring-2 ring-[#10B981]/40' : ''
@@ -83,14 +97,17 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
                     Review <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             );
           }
 
           if (step.status === 'current' && !isLocked) {
             return (
-              <div
+              <motion.div
                 key={step.id}
+                variants={rowFade}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                whileHover={{ x: 2 }}
                 onClick={() => onSelectStep(step)}
                 className={`group flex items-center gap-4 p-4 rounded-xl bg-white border border-[#12102A]/10 shadow-xs transition-all cursor-pointer hover:border-[#F5A623] ${
                   isSelected ? 'ring-2 ring-[#F5A623]' : ''
@@ -129,14 +146,17 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
                     Open Lab
                   </button>
                 </div>
-              </div>
+              </motion.div>
             );
           }
 
           // Locked or Pro Gated state
           return (
-            <div
+            <motion.div
               key={step.id}
+              variants={rowFade}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              whileHover={{ x: 2 }}
               onClick={() => onSelectStep(step)}
               className="flex items-center gap-4 p-4 rounded-xl bg-[#F0EEF6] border border-[#12102A]/10 hover:border-[#F5A623] transition-all cursor-pointer group"
             >
@@ -168,10 +188,10 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
                   <Lock className="w-3.5 h-3.5 text-[#12102A]/40" />
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 };

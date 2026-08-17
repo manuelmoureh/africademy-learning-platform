@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { PortfolioVerification, Track, UserAccount } from '../types';
 import { PLACEHOLDER_VERIFIED_WORK } from '../data/courses';
 import { VerifiedPortfolioModal } from './VerifiedPortfolioModal';
 import { Header } from './Header';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(' ');
@@ -14,6 +20,7 @@ interface VerifiedWorkPageProps {
   tracks: Track[];
   user: UserAccount;
   isAuthenticated: boolean;
+  authLoading?: boolean;
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onSearchSubmit: () => void;
@@ -29,6 +36,7 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({
   tracks,
   user,
   isAuthenticated,
+  authLoading,
   searchQuery,
   onSearchChange,
   onSearchSubmit,
@@ -48,6 +56,7 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({
         activeNav="verified-work"
         user={user}
         isAuthenticated={isAuthenticated}
+        authLoading={authLoading}
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
         onSearchSubmit={onSearchSubmit}
@@ -61,19 +70,33 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({
       />
 
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-10">
-        <div className="max-w-2xl space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="max-w-2xl space-y-3"
+        >
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#12102A]">
             Verified Work
           </h1>
           <p className="text-sm text-[#12102A]/70 font-medium leading-relaxed">
             Every profile here is a system built by a student and confirmed working by the business it was installed for. Open any profile to see the full verification.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ staggerChildren: 0.08 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {PLACEHOLDER_VERIFIED_WORK.map((profile) => (
-            <button
+            <motion.button
               key={profile.id}
+              variants={fadeUp}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+              whileHover={{ y: -3 }}
               onClick={() => setOpenProfile(profile)}
               className="text-left rounded-2xl border border-[#12102A]/10 bg-white overflow-hidden flex flex-col hover:border-[#F5A623] hover:shadow-lg transition-all cursor-pointer group"
             >
@@ -112,9 +135,9 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({
                   </span>
                 </div>
               </div>
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       <VerifiedPortfolioModal
