@@ -242,7 +242,22 @@ export default function App() {
   };
 
   if (viewMode === 'about') {
-    return <AboutPage onBack={() => navigate('/')} onEnterApp={() => navigate('/systems')} />;
+    return (
+      <AboutPage
+        tracks={tracks}
+        user={user}
+        isAuthenticated={!!authUserId}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={() => navigate('/systems')}
+        onGoHome={() => navigate('/')}
+        onEnterApp={() => navigate('/systems')}
+        onSelectCourse={(id) => navigate(`/systems/${id}`)}
+        onOpenVerifiedWork={() => navigate('/verified')}
+        onOpenPricing={() => setIsPricingOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
+    );
   }
 
   if (viewMode === 'privacy') {
@@ -254,7 +269,22 @@ export default function App() {
   }
 
   if (viewMode === 'verified-work') {
-    return <VerifiedWorkPage onBack={() => navigate('/')} />;
+    return (
+      <VerifiedWorkPage
+        tracks={tracks}
+        user={user}
+        isAuthenticated={!!authUserId}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={() => navigate('/systems')}
+        onGoHome={() => navigate('/')}
+        onEnterApp={() => navigate('/systems')}
+        onSelectCourse={(id) => navigate(`/systems/${id}`)}
+        onOpenPricing={() => setIsPricingOpen(true)}
+        onOpenAbout={() => navigate('/about')}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
+    );
   }
 
   // If on Landing Page view

@@ -1020,8 +1020,8 @@ export const PLACEHOLDER_VERIFIED_WORK: PortfolioVerification[] = [
     smeReviewer: {
       name: 'Africore Tech',
       role: 'Client Business',
-      company: 'Nairobi, Kenya',
-      location: 'Nairobi',
+      company: 'Africore Tech',
+      location: 'Nairobi, Kenya',
       quote: "This system runs our store today, product discovery, WhatsApp ordering, M-Pesa and card checkout, delivery, all of it. It's reduced buying friction and cut the manual work out of running the shop.",
       avatarInitials: 'AT',
     },

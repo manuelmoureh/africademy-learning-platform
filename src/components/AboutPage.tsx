@@ -1,24 +1,54 @@
 import React from 'react';
-import { Home, ArrowRight, AlertCircle, Lightbulb, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ArrowRight, AlertCircle, Lightbulb, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Track, UserAccount } from '../types';
+import { Header } from './Header';
 
 interface AboutPageProps {
-  onBack: () => void;
+  tracks: Track[];
+  user: UserAccount;
+  isAuthenticated: boolean;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  onSearchSubmit: () => void;
+  onGoHome: () => void;
   onEnterApp: () => void;
+  onSelectCourse: (trackId: string) => void;
+  onOpenVerifiedWork: () => void;
+  onOpenPricing: () => void;
+  onOpenAuth: () => void;
 }
 
-export const AboutPage: React.FC<AboutPageProps> = ({ onBack, onEnterApp }) => (
+export const AboutPage: React.FC<AboutPageProps> = ({
+  tracks,
+  user,
+  isAuthenticated,
+  searchQuery,
+  onSearchChange,
+  onSearchSubmit,
+  onGoHome,
+  onEnterApp,
+  onSelectCourse,
+  onOpenVerifiedWork,
+  onOpenPricing,
+  onOpenAuth,
+}) => (
   <div className="min-h-screen bg-[#F0EEF6] text-[#12102A]">
-    <nav className="flex items-center gap-4 px-6 lg:px-12 h-20 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10 sticky top-0 z-30">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/70 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
-      >
-        <Home className="w-4 h-4" />
-        Home
-      </button>
-      <div className="w-px h-5 bg-[#12102A]/10" />
-      <img src="/logo-dark.png" alt="Afridemy" className="h-14 w-auto" />
-    </nav>
+    <Header
+      tracks={tracks}
+      activeNav="about"
+      user={user}
+      isAuthenticated={isAuthenticated}
+      searchQuery={searchQuery}
+      onSearchChange={onSearchChange}
+      onSearchSubmit={onSearchSubmit}
+      onGoHome={onGoHome}
+      onEnterApp={onEnterApp}
+      onSelectCourse={onSelectCourse}
+      onOpenVerifiedWork={onOpenVerifiedWork}
+      onOpenPricing={onOpenPricing}
+      onOpenAbout={() => {}}
+      onOpenAuth={onOpenAuth}
+    />
 
     {/* Hero */}
     <section className="px-6 lg:px-12 py-16 md:py-20">

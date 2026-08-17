@@ -103,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
             <MotionNavigationMenuItem>
               <MotionNavigationMenuLink
                 onClick={onOpenVerifiedWork}
-                className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
+                className={`flex h-9 items-center px-4 py-2 text-sm font-semibold cursor-pointer ${activeNav === 'verified-work' ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
               >
                 Verified Work
               </MotionNavigationMenuLink>
@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
             <MotionNavigationMenuItem>
               <MotionNavigationMenuLink
                 onClick={onOpenAbout}
-                className="flex h-9 items-center px-4 py-2 text-sm font-semibold text-[#12102A]/70 cursor-pointer"
+                className={`flex h-9 items-center px-4 py-2 text-sm font-semibold cursor-pointer ${activeNav === 'about' ? 'text-[#12102A]' : 'text-[#12102A]/70'}`}
               >
                 About
               </MotionNavigationMenuLink>
