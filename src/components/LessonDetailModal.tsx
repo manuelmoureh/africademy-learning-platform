@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Step } from '../types';
 import { X, CheckCircle2, Code2, BookOpen, Sparkles, ArrowRight, Lock } from 'lucide-react';
@@ -30,6 +30,34 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
   // separate from isGated (paywall). Never surface the raw "locked" progress value
   // here - it reads as "paywalled" even on a free lesson nobody's started yet.
   const badgeLabel = isLocked ? 'LOCKED' : isCompleted ? 'COMPLETED' : 'AVAILABLE';
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [hasReachedEnd, setHasReachedEnd] = useState(false);
+
+  // Every time we land on a (possibly new) lesson: jump the content back to the top -
+  // without this, "Next Lesson" swaps the content underneath while keeping whatever
+  // scroll position you were at, which reads as "nothing happened". Also reset the
+  // read-to-the-end gate, unless the content is short enough that there's nothing to
+  // scroll through in the first place.
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    el.scrollTop = 0;
+    setHasReachedEnd(el.scrollHeight <= el.clientHeight + 4);
+  }, [step?.id]);
+
+  const handleContentScroll = () => {
+    if (hasReachedEnd) return;
+    const el = contentRef.current;
+    if (el && el.scrollHeight - el.scrollTop - el.clientHeight < 24) {
+      setHasReachedEnd(true);
+    }
+  };
+
+  // You can always undo a completion, but you can't mark a lesson done until you've
+  // actually scrolled through it - "Mark as Completed" shouldn't be a button that
+  // works before anyone's read anything.
+  const canMarkComplete = isCompleted || hasReachedEnd;
 
   return (
     <AnimatePresence>
@@ -138,6 +166,8 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
         ) : (
           /* Full Unlocked Content */
           <motion.div
+            ref={contentRef}
+            onScroll={handleContentScroll}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -226,14 +256,18 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
           <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
             <button
               onClick={() => onToggleComplete(step.id)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                isCompleted
-                  ? 'bg-[#10B981]/15 text-[#10B981] hover:bg-[#10B981]/25'
-                  : 'bg-white border border-[#12102A]/10 text-[#12102A] hover:border-[#10B981] hover:text-[#10B981]'
+              disabled={!canMarkComplete}
+              title={!canMarkComplete ? 'Scroll to the end of the lesson to mark it complete' : undefined}
+              className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                !canMarkComplete
+                  ? 'bg-white border border-[#12102A]/10 text-[#12102A]/35 cursor-not-allowed'
+                  : isCompleted
+                  ? 'bg-[#10B981]/15 text-[#10B981] hover:bg-[#10B981]/25 cursor-pointer'
+                  : 'bg-white border border-[#12102A]/10 text-[#12102A] hover:border-[#10B981] hover:text-[#10B981] cursor-pointer'
               }`}
             >
               <CheckCircle2 className="w-4 h-4" />
-              {isCompleted ? 'Completed (Click to Reset)' : 'Mark as Completed'}
+              {isCompleted ? 'Completed (Click to Reset)' : canMarkComplete ? 'Mark as Completed' : 'Scroll to Finish'}
             </button>
 
             {onNext && (
