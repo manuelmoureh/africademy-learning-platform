@@ -11,6 +11,7 @@ import { CurriculumRoadmap } from './components/CurriculumRoadmap';
 import { PortfolioStatus } from './components/PortfolioStatus';
 import { BuildWorkspaceCard } from './components/BuildWorkspaceCard';
 import { LessonDetailModal } from './components/LessonDetailModal';
+import { LessonPage } from './components/LessonPage';
 import { PricingModal } from './components/PricingModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { AuthModal } from './components/AuthModal';
@@ -34,21 +35,24 @@ import { trackPageView } from './lib/analytics';
 // Maps the URL to what used to be `viewMode`/`activeNav` state, so every page the app
 // can show has a real, bookmarkable, back-button-friendly URL instead of living entirely
 // in memory.
-function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'app'; activeNav: string; trackId: string | null } {
-  if (pathname === '/about') return { view: 'about', activeNav: '', trackId: null };
-  if (pathname === '/privacy') return { view: 'privacy', activeNav: '', trackId: null };
-  if (pathname === '/terms') return { view: 'terms', activeNav: '', trackId: null };
-  if (pathname === '/verified') return { view: 'verified-work', activeNav: '', trackId: null };
-  if (pathname === '/community') return { view: 'app', activeNav: 'community', trackId: null };
-  if (pathname === '/systems') return { view: 'app', activeNav: 'catalog', trackId: null };
+function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'lesson' | 'app'; activeNav: string; trackId: string | null; stepId: string | null } {
+  if (pathname === '/about') return { view: 'about', activeNav: '', trackId: null, stepId: null };
+  if (pathname === '/privacy') return { view: 'privacy', activeNav: '', trackId: null, stepId: null };
+  if (pathname === '/terms') return { view: 'terms', activeNav: '', trackId: null, stepId: null };
+  if (pathname === '/verified') return { view: 'verified-work', activeNav: '', trackId: null, stepId: null };
+  if (pathname === '/community') return { view: 'app', activeNav: 'community', trackId: null, stepId: null };
+  if (pathname === '/systems') return { view: 'app', activeNav: 'catalog', trackId: null, stepId: null };
+
+  const lessonMatch = pathname.match(/^\/systems\/([^/]+)\/learn\/([^/]+)\/?$/);
+  if (lessonMatch) return { view: 'lesson', activeNav: 'curriculum', trackId: lessonMatch[1], stepId: lessonMatch[2] };
 
   const learnMatch = pathname.match(/^\/systems\/([^/]+)\/learn\/?$/);
-  if (learnMatch) return { view: 'app', activeNav: 'curriculum', trackId: learnMatch[1] };
+  if (learnMatch) return { view: 'app', activeNav: 'curriculum', trackId: learnMatch[1], stepId: null };
 
   const detailMatch = pathname.match(/^\/systems\/([^/]+)\/?$/);
-  if (detailMatch) return { view: 'app', activeNav: 'course-detail', trackId: detailMatch[1] };
+  if (detailMatch) return { view: 'app', activeNav: 'course-detail', trackId: detailMatch[1], stepId: null };
 
-  return { view: 'landing', activeNav: '', trackId: null };
+  return { view: 'landing', activeNav: '', trackId: null, stepId: null };
 }
 
 const GUEST_USER: UserAccount = {
@@ -86,7 +90,7 @@ function applyProgressToTracks(baseTracks: Track[], rows: { track_id: string; st
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { view: viewMode, activeNav, trackId: routeTrackId } = parseRoute(location.pathname);
+  const { view: viewMode, activeNav, trackId: routeTrackId, stepId: routeStepId } = parseRoute(location.pathname);
 
   // GA4 needs a manual page_view on every route change - see index.html for why the
   // automatic one is disabled.
@@ -203,6 +207,17 @@ export default function App() {
   const nextStepFor = (track: Track): Step =>
     track.steps.find(s => s.status !== 'completed') || track.steps[0];
 
+  // Pilot: the new full-page lesson experience is live on the WhatsApp course only,
+  // approved and ready to roll out further once reviewed. Every other course still
+  // opens the lesson modal until that happens.
+  const openLesson = (step: Step) => {
+    if (activeTrack.id === 'whatsapp-retail-agent') {
+      navigate(`/systems/${activeTrack.id}/learn/${step.id}`);
+    } else {
+      setSelectedStep(step);
+    }
+  };
+
   // Whatever comes immediately after the lesson currently open in the detail modal,
   // so it can offer a "Next Lesson" action instead of dead-ending after "Mark as Completed".
   const nextStepAfterSelected = selectedStep
@@ -268,6 +283,40 @@ export default function App() {
     setShowUpgradeToast(true);
     setTimeout(() => setShowUpgradeToast(false), 5000);
   };
+
+  if (viewMode === 'lesson') {
+    const lessonTrack = tracks.find(t => t.id === routeTrackId) || activeTrack;
+    const lessonStep = lessonTrack.steps.find(s => s.id === routeStepId);
+    if (!lessonStep) {
+      navigate(`/systems/${lessonTrack.id}/learn`);
+      return null;
+    }
+    return (
+      <LessonPage
+        tracks={tracks}
+        track={lessonTrack}
+        step={lessonStep}
+        isUnlocked={isTrackUnlocked(lessonTrack.id)}
+        user={user}
+        isAuthenticated={!!authUserId}
+        authLoading={authLoading}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={() => navigate('/systems')}
+        onGoHome={() => navigate('/')}
+        onEnterApp={() => navigate('/systems')}
+        onSelectCourse={(id) => navigate(`/systems/${id}`)}
+        onOpenVerifiedWork={() => navigate('/verified')}
+        onOpenPricing={() => setIsPricingOpen(true)}
+        onOpenAbout={() => navigate('/about')}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onBack={() => navigate(`/systems/${lessonTrack.id}/learn`)}
+        onToggleComplete={handleToggleCompleteStep}
+        onUnlock={() => setIsTrackCheckoutOpen(true)}
+        onNavigateToStep={(stepId) => navigate(`/systems/${lessonTrack.id}/learn/${stepId}`)}
+      />
+    );
+  }
 
   if (viewMode === 'about') {
     return (
@@ -515,7 +564,7 @@ export default function App() {
                   <CurriculumRoadmap
                     steps={activeTrack.steps}
                     selectedStepId={selectedStep?.id || null}
-                    onSelectStep={(step) => setSelectedStep(step)}
+                    onSelectStep={openLesson}
                     onToggleCompleteStep={handleToggleCompleteStep}
                     isUnlocked={isTrackUnlocked(activeTrack.id)}
                   />
@@ -531,7 +580,7 @@ export default function App() {
                   />
 
                   <BuildWorkspaceCard
-                    onStartBuilding={() => setSelectedStep(nextStepFor(activeTrack))}
+                    onStartBuilding={() => openLesson(nextStepFor(activeTrack))}
                     nextLessonTitle={nextStepFor(activeTrack).title}
                   />
                 </div>
