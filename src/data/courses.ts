@@ -687,11 +687,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Build a state machine that tracks which critical pieces of information (budget, neighborhood, property size) have been captured and what is still missing. This ensures the agent only asks relevant follow-ups.",
             "lessonBody": "In real estate, the difference between a lead and a waste of time is qualification. A property qualification state engine is a system that systematically captures mandatory details—budget, preferred neighborhood (like Kilimani or Karen), and property type—before escalating the conversation. Without a state engine, a WhatsApp bot will endlessly answer questions without ever forcing the user to commit to a budget, leaving the human agent with incomplete data.\n\nA state machine works by tracking the \"current state\" of the conversation in a temporary session store, such as Redis or even an in-memory map for lightweight setups. When a lead says, \"I am looking for a 3-bedroom,\" the bot recognizes that the `property_size` state is fulfilled, but `budget` and `location` are still `null`. The engine's next prompt is explicitly generated to fill one of those null values.\n\nHandling transitions between states is critical. If the bot asks for a budget and the user replies with \"I want to live near Westlands,\" the system must not blindly save \"Westlands\" into the budget field. The state engine parses the response using an LLM to extract the entities, correctly updating the `location` state while keeping the `budget` state open and gently re-asking the budget question.\n\nIn the Kenyan market, users frequently mix currencies (KES vs USD) and use slang or shorthand (\"150k\", \"150g\"). Your state engine's extraction layer must normalize these inputs into a standard integer value. If a user says \"150k,\" the system should save `150000` internally to allow for proper database filtering later.\n\nBy the end of this lesson, you will build a foundational state machine that ensures every lead handed over to a human agent is fully profiled, saving hours of manual back-and-forth on WhatsApp and ensuring the agency only focuses on qualified buyers.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The engine only ever asks for whichever field is still missing.",
+                "flow": ["Lead sends a message", "State engine checks which fields are still null", "Bot asks only for the missing field", "All fields filled - ready for handoff"]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "Slang and shorthand get normalized before they ever hit your database.",
+                "compare": [
+                  { "label": "What the lead types", "text": "Budget is like 150k", "good": false },
+                  { "label": "Normalized in state", "text": "budget: 150000", "good": true }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Designing conversational states for budget, location, and property type",
               "Storing temporary user data reliably during the chat session",
               "Using graceful fallbacks when a user provides vague or non-standard answers"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A lead says 'I want to live near Westlands' right after the bot asked for their budget. What should the state engine do?",
+              "options": [
+                { "text": "Save 'Westlands' into the budget field since that's the current question", "feedback": "That would corrupt the budget field with location data - the engine has to recognize this doesn't answer the question it asked.", "correct": false },
+                { "text": "Extract 'Westlands' into the location field, leave budget open, and gently re-ask for budget", "feedback": "Right. The state engine parses what was actually said, updates the field it matches, and keeps asking for whatever's still missing.", "correct": true },
+                { "text": "Ignore the message since it doesn't match the expected field", "feedback": "Ignoring real information the lead volunteered wastes it - the engine should capture it under the right field instead.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -707,12 +731,38 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Enable the bot to check an agent's real-time availability and present open slots to the prospect. You will integrate the Google Calendar API to automatically create calendar events for site viewings.",
             "lessonBody": "Once a lead is qualified, the immediate next step is securing a site viewing. Relying on human agents to manually schedule viewings creates friction and delays, often resulting in cold leads. By integrating the Google Calendar API directly into your WhatsApp flow, you can present real-time availability and confirm bookings instantly.\n\nTo make this work, you must authenticate a Google Cloud project and enable the Calendar API using a Service Account. This allows your backend server to securely read the free/busy schedules of the human real estate agents without requiring them to log in repeatedly. When the bot prompts the lead for a viewing time, it queries the API to pull only the available slots for the upcoming week.\n\nDisplaying time slots on WhatsApp requires careful formatting. A list of raw ISO timestamps is unreadable. Instead, your code must parse the Calendar API response and format it into a clean, numbered list or utilize WhatsApp interactive list messages, showing friendly slots like \"Tuesday, 2:00 PM - 3:00 PM.\"\n\nHandling double-booking and timezone offsets is a classic trap. Kenyan time is EAT (UTC+3), but Google Calendar often returns times in UTC by default. You must explicitly handle timezone conversions in your code so that a 2:00 PM booking in WhatsApp accurately reflects as 2:00 PM EAT in the agent's calendar. Furthermore, if two leads try to book the exact same slot simultaneously, your code must re-verify availability right before executing the API call.\n\nSuccessfully implementing this integration means your real estate bot doesn't just collect data—it actively pushes deals forward by locking in physical viewings, turning WhatsApp into an autonomous booking engine.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 2,
+                "caption": "Raw ISO timestamps become a simple choice, not a puzzle.",
+                "chat": [
+                  { "sender": "customer", "text": "When can I view the Kilimani unit?" },
+                  { "sender": "agent", "text": "We have Tuesday 2:00 PM - 3:00 PM or Wednesday 10:00 AM - 11:00 AM open. Which works?" }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "EAT is UTC+3 - convert before it ever reaches the chat.",
+                "compare": [
+                  { "label": "Google Calendar API returns", "text": "2024-08-20T11:00:00Z (UTC)", "good": false },
+                  { "label": "What you must show", "text": "Tuesday, 2:00 PM EAT", "good": true }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Authenticating and securely calling the Google Calendar API",
               "Formatting available time slots for easy readability on mobile devices",
               "Handling double-booking conflicts and timezone offsets correctly"
             ],
-            "codeSnippet": "export async function bookViewing(date: string, userPhone: string) {\n  const event = {\n    summary: 'Property Viewing - Lead',\n    description: `Contact: ${userPhone}`,\n    start: { dateTime: date },\n    end: { dateTime: addHour(date) },\n  };\n  return await calendar.events.insert({ calendarId: 'primary', resource: event });\n}"
+            "codeSnippet": "export async function bookViewing(date: string, userPhone: string) {\n  const event = {\n    summary: 'Property Viewing - Lead',\n    description: `Contact: ${userPhone}`,\n    start: { dateTime: date },\n    end: { dateTime: addHour(date) },\n  };\n  return await calendar.events.insert({ calendarId: 'primary', resource: event });\n}",
+            "fadedPractice": {
+              "setup": "Two leads can request the same slot within seconds of each other. Checking availability once, when the bot first listed open slots, isn't enough - you have to check again right before you actually create the booking.",
+              "workedExample": "const isReachable = await calendar.calendarList\n  .get({ calendarId: 'primary' })\n  .then(() => true)\n  .catch(() => false);\n\nif (!isReachable) return fallbackToHumanScheduling();",
+              "challenge": "async function confirmBooking(date: string, userPhone: string) {\n  const stillFree = /* Your turn: how do you make sure this slot wasn't just taken by someone else? */;\n  if (!stillFree) return \"Sorry, that slot was just booked - want to see other times?\";\n  return await bookViewing(date, userPhone);\n}",
+              "placeholder": "Type the re-check...",
+              "solution": "await calendar.freebusy\n  .query({ items: [{ id: 'primary' }], timeMin: date, timeMax: addHour(date) })\n  .then(res => res.data.calendars.primary.busy.length === 0)",
+              "explanation": "The slot list a lead saw might be seconds or minutes old. Re-querying free/busy status right before you actually create the event is the only way to stop two leads from double-booking the same viewing."
+            }
           }
         },
         {
@@ -728,11 +778,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Ensure agents never miss a hot lead by syncing chat data into a structured Google Sheet. You will set up webhook handlers that parse the conversation state and append rows containing budget, location, and contact details.",
             "lessonBody": "Capturing lead data in a WhatsApp chat is useless if the human agents cannot access it in a structured format. While enterprise CRMs exist, a vast majority of Kenyan small and medium real estate agencies run their operations out of Google Sheets. Syncing WhatsApp data directly to a Sheet creates a real-time, lightweight CRM that the entire team can monitor.\n\nThe architecture relies on Google Sheets API via a Service Account. When the state engine from Lesson 1 completes a qualification flow, it triggers a webhook handler on your backend. This handler compiles the captured variables—phone number, budget, preferred area (e.g., Kileleshwa), and property type—into a flat array that matches the columns of the target Google Sheet.\n\nCalling the `spreadsheets.values.append` method pushes this array as a new row instantly. However, network calls can fail. If the Google API rate-limits your request or experiences downtime, your webhook must catch the error and implement a retry mechanism. Without retry logic, high-value leads could vanish into the void if the save operation fails silently.\n\nBeyond just appending rows, you can use Sheets to track the lead's status. Adding a \"Status\" column with data validation (e.g., New, Contacted, Viewing Scheduled) allows the agency to manage their pipeline directly in the spreadsheet. Your bot can even be configured to read from this sheet to know if a lead has already been contacted before sending automated follow-ups.\n\nBy building this bridge between the conversational agent and a structured database, you deliver immense organizational value to the real estate agency, ensuring that no prospect ever falls through the cracks due to disorganized chat histories.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "One completed qualification becomes one live row.",
+                "flow": ["Qualification flow completes", "Webhook compiles lead data into a row", "spreadsheets.values.append pushes the row", "Agent sees it live in Sheets"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "A high-value lead should never disappear because of one failed network call.",
+                "compare": [
+                  { "label": "No retry logic", "text": "API rate-limited - lead silently vanishes", "good": false },
+                  { "label": "With retry logic", "text": "API rate-limited - retries, lead saved", "good": true }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Setting up a Google Service Account for automated Sheets API access",
               "Structuring incoming webhook data into clean, tabular rows",
               "Handling network failures and building reliable retry logic"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "Your Sheets API call gets rate-limited mid-request. What happens to the lead's data if you have no retry logic?",
+              "options": [
+                { "text": "It's automatically queued and sent later", "feedback": "That behavior doesn't exist without retry logic you write yourself - a failed call just fails.", "correct": false },
+                { "text": "It's lost silently, with no record the lead ever qualified", "feedback": "Right. Without a catch-and-retry mechanism, a rate-limited or failed API call just fails, and a fully qualified lead vanishes.", "correct": true },
+                { "text": "The bot asks the lead to resend their info", "feedback": "No such flow exists - the lead has no idea the save even failed, so there's nothing prompting them to repeat themselves.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -748,11 +822,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Enhance the prospect's experience by instantly delivering property floor plans and brochures. You will map user preferences to a media database and trigger WhatsApp document messages.",
             "lessonBody": "Providing rich media at the exact moment of high intent drastically increases engagement. When a lead explicitly qualifies themselves for a specific tier of housing, sending an automated property brochure (PDF) or high-quality floor plan keeps them invested. The WhatsApp Cloud API natively supports media messages, making this a seamless experience.\n\nThe challenge lies in dynamic selection. You cannot blast the same brochure to everyone. Your system needs a media mapping table—a database or structured object that links property profiles (e.g., \"2-bedroom Westlands\") to a specific WhatsApp Media ID. When the state engine finishes qualification, it queries this table to find the perfect matching document.\n\nUploading media directly from your server on every request is slow and inefficient. Instead, the best practice is to upload your PDFs to the Meta servers once using the Media API, which returns a persistent Media ID. Your bot then sends messages using this ID, allowing WhatsApp to instantly deliver the file without re-uploading the heavy payload every time.\n\nA raw file attachment is easily ignored. The caption accompanying the PDF is where you drive action. Your code should dynamically generate a caption summarizing the key selling points—such as proximity to a major road or included amenities like a borehole—and include a clear call-to-action urging them to review the brochure and book a viewing.\n\nMastering automated media dispatch turns your bot into a highly capable digital broker, capable of delivering personalized marketing materials instantly, 24/7, without requiring a human agent to manually dig through their files and forward documents.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The right document, matched to what the lead actually qualified for.",
+                "flow": ["Lead qualifies for '2BR Westlands'", "System looks up matching Media ID", "WhatsApp document message sent", "Lead reviews the PDF instantly"]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "A file with no caption gets ignored on a phone screen.",
+                "compare": [
+                  { "label": "Bare attachment", "text": "[PDF attached]", "good": false },
+                  { "label": "With a real caption", "text": "2BR in Westlands, borehole + backup generator included. Tap to view the floor plan - book a viewing?", "good": true }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Uploading and managing media assets via the WhatsApp Cloud API",
               "Dynamically selecting the right brochure based on captured state data",
               "Crafting compelling caption copy to accompany file attachments"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "Why upload each brochure to Meta's Media API once and reuse the Media ID, instead of re-uploading the PDF fresh on every request?",
+              "options": [
+                { "text": "Meta requires a fresh upload every time for security", "feedback": "Not the actual rule - Meta's Media API is specifically designed to let you upload once and reuse the ID.", "correct": false },
+                { "text": "Reusing a Media ID skips re-uploading the heavy file every send, so delivery is instant", "feedback": "Right. Upload once, get a persistent Media ID, and every future send just references it - no repeated heavy uploads.", "correct": true },
+                { "text": "It's purely a style preference with no real effect", "feedback": "It's a real performance and reliability difference, not a style choice - repeated uploads would be slow and wasteful.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -768,11 +866,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Not all inquiries are ready to buy. Design a gentle funnel that identifies low-budget or 'just browsing' users, redirecting them to an automated email list rather than booking an in-person viewing.",
             "lessonBody": "Human real estate agents spend up to 40% of their time talking to prospects who have zero intention or ability to buy. An automated agent's true value isn't just in finding good leads—it's in ruthlessly filtering out the bad ones. Disqualifying \"tire-kickers\" protects the agency's time and resources.\n\nDisqualification relies on setting hard thresholds. If a user states a budget of KES 20,000 per month but insists on living in Karen or Runda, the system must recognize the mismatch. Instead of pushing this impossible lead to a human agent, the bot triggers a disqualification state.\n\nHandling disqualification requires tact. An abrupt \"you cannot afford this\" damages the brand. Instead, the prompt should instruct the LLM to politely explain the market reality, such as: \"While we don't currently have properties in Karen at that budget, we do have great options in Rongai or Ruaka.\" If they refuse to adjust their criteria, the bot cleanly closes the active qualification loop.\n\nDisqualified leads shouldn't be discarded entirely; they are funneled into a long-term nurture sequence. By tagging them in the CRM (Google Sheets) as \"Low Intent / Future,\" the agency can add them to automated email or WhatsApp newsletter lists for future projects that fit their budget, preserving the relationship without burning immediate manpower.\n\nImplementing this soft-filtering logic ensures the human agents only wake up to notifications for highly qualified, budget-ready prospects, proving the ROI of your automation system immediately.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 2,
+                "caption": "Same disqualification, completely different brand impression.",
+                "compare": [
+                  { "label": "Abrupt", "text": "You cannot afford this.", "good": false },
+                  { "label": "Tactful redirect", "text": "We don't have Karen listings at that budget, but Rongai and Ruaka have great options nearby.", "good": true }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "Disqualified doesn't mean discarded.",
+                "flow": ["Lead disqualifies on budget/location", "Tagged 'Low Intent / Future' in the CRM", "Added to the nurture list", "Re-engaged when a matching listing opens"]
+              }
+            ],
             "keyLearnings": [
               "Defining disqualification triggers (e.g., extremely low budget for a premium area)",
               "Writing polite, brand-appropriate disqualification and redirection messages",
               "Funneling low-intent leads into automated, long-term nurture sequences"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "scenario",
+              "question": "A lead insists on Karen at KES 20,000/month - well below market. How should the agent balance honesty with keeping the relationship?",
+              "options": [
+                { "text": "Politely explain the mismatch and offer nearby alternatives", "feedback": "This is usually the right move from this lesson - honest but still helpful, and it keeps the door open for later." },
+                { "text": "Immediately end the conversation", "feedback": "Protects agent time, but burns a relationship that might convert later at a different budget or area." },
+                { "text": "Promise to 'find something' anyway", "feedback": "This is exactly what disqualification logic exists to prevent - it wastes the human agent's time chasing a mismatch that was never going to close." }
+              ]
+            }
           }
         },
         {
@@ -788,6 +910,21 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Leverage an LLM to read the subtext of a conversation. You will construct a prompt that evaluates urgency, specific requests, and financial readiness, outputting a JSON score that triggers a webhook to a human broker.",
             "lessonBody": "Not all qualified leads are equal. A prospect looking to move in three months is a standard lead, but someone whose lease expires next week is a high-priority, high-intent buyer. Intent scoring uses LLMs to read the subtext of the conversation and assign a numerical value to the lead's urgency, triggering immediate action for the best prospects.\n\nInstead of simple keyword matching, you construct a system prompt that passes the entire chat transcript to the LLM. The prompt explicitly commands the model to evaluate the lead based on urgency, budget readiness, and specific requests. It must output a strict JSON payload containing the calculated score (1-10) and the reasoning behind it.\n\nFor leads that score above a predefined threshold (e.g., 8 or higher), the system initiates an automatic human handoff. This is done via a webhook that pings the real estate broker directly—often sending a summary of the chat and the intent reasoning to the agent's personal WhatsApp or a Slack channel, ensuring they can take over the conversation while the lead is still hot.\n\nWhen a human takes over, the bot must seamlessly pause its automated responses. If the bot continues to reply while the human is typing, it creates a chaotic and unprofessional experience for the user. Managing this state—flagging a conversation as \"Human Mode\"—is critical for a smooth transition.\n\nBy implementing intelligent scoring and routing, your system behaves like an elite receptionist, prioritizing the VIPs and ensuring the agency’s top closers are always dealing with the warmest possible leads.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The whole transcript, reduced to one number and a reason.",
+                "flow": ["Full chat transcript sent to the LLM", "Model scores urgency, budget, specificity", "JSON {score, reasoning, escalate} returned", "Score > 7 triggers handoff"]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "Once a human takes over, the bot has to actually stop replying - not just add a disclaimer.",
+                "chat": [
+                  { "sender": "customer", "text": "Still there? I really need to move by Friday." },
+                  { "sender": "agent", "text": "A team member is reviewing your request now and will message you shortly!" }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Prompting an LLM to evaluate text for urgency and budget readiness",
               "Outputting structured JSON with a numerical intent score",
@@ -797,6 +934,15 @@ export const INITIAL_TRACKS: Track[] = [
             "testCase": {
               "input": "I need a 3-bedroom in Kileleshwa, budget 150k KES/month, moving next week.",
               "expectedOutput": "{\"score\": 9, \"reasoning\": \"High urgency (moving next week) and clear budget for target area.\", \"escalate\": true}"
+            },
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A lead's intent score comes back as 9 and a human broker has been notified. The lead sends another message 30 seconds later. What should the bot do?",
+              "options": [
+                { "text": "Reply normally with the usual LLM-generated response", "feedback": "That creates confusing double-replies once a human is already engaged - the lead won't know who they're actually talking to.", "correct": false },
+                { "text": "Stay silent - the conversation is now flagged 'Human Mode'", "feedback": "Right. Once escalated, the bot pauses its generative replies entirely so the human agent owns the conversation cleanly.", "correct": true },
+                { "text": "Ask the lead to repeat their intent score", "feedback": "Intent scores aren't something a lead would know or state themselves - this doesn't match how the scoring actually works.", "correct": false }
+              ]
             }
           }
         },
@@ -813,11 +959,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "When a buyer's criteria match several listings, the bot must present options clearly. You will query a property database and use an LLM to generate a scannable, side-by-side comparison of amenities and pricing.",
             "lessonBody": "When a lead's criteria match multiple properties, overwhelming them with a dozen links causes decision paralysis. The automated agent must behave like a consultative broker, presenting a curated selection of 2-3 properties and clearly highlighting the tradeoffs between them.\n\nThis process begins with querying the property database based on intersecting constraints (e.g., budget < 100k, 2 bedrooms, Kilimani). The database query returns raw JSON data for the matching listings. Passing this raw data directly to the user is unreadable; it must be transformed into a scannable narrative.\n\nYou will write a specialized prompt that feeds the raw listing data to an LLM, instructing it to generate a side-by-side text comparison. The prompt must strictly constrain the output format, enforcing short sentences and bullet points that highlight differences—for example, noting that Property A has a larger balcony, while Property B has a backup generator and a borehole.\n\nFormatting is crucial on mobile screens. WhatsApp doesn't support complex tables, so the comparison must rely on clear spacing, bold text for property names, and emojis for quick visual scanning (e.g., 📍 for location, 💰 for price). The output must end with a definitive call to action, asking the user which specific property they would like to view.\n\nEnabling the bot to perform multi-property comparisons elevates it from a simple data-entry tool to an intelligent advisor, increasing user trust and pushing them closer to a final decision.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 0,
+                "caption": "A curated shortlist beats an overwhelming list every time.",
+                "flow": ["Multiple listings match budget + area", "Curated down to 2-3 best fits", "Presented with clear tradeoffs", "Lead picks one to view"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "Same data, but only one version is actually readable on a phone.",
+                "compare": [
+                  { "label": "Raw JSON dump", "text": "{\"price\":95000,\"balcony\":true,\"generator\":false}", "good": false },
+                  { "label": "AfrikBot's comparison", "text": "📍 Property A: bigger balcony. 📍 Property B: generator + borehole. Which one first?", "good": true }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Querying the property database based on multiple, intersecting user constraints",
               "Formatting a text comparison that reads well on small mobile screens",
               "Prompting the LLM to highlight distinct features of each property (e.g., balcony vs. closer to road)"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A lead's search matches 8 different properties. What should the bot do?",
+              "options": [
+                { "text": "Send all 8 links so the lead has full information", "feedback": "Eight options at once causes decision paralysis - more information isn't more helpful past a certain point.", "correct": false },
+                { "text": "Curate down to 2-3 and highlight the real tradeoffs between them", "feedback": "Right. A consultative broker narrows the field and explains the differences, rather than dumping every match.", "correct": true },
+                { "text": "Ask the lead to narrow their own search first", "feedback": "Curating the shortlist is the agent's job here, not something to push back onto the lead.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -833,11 +1003,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Outbound messaging in real estate is highly regulated by WhatsApp. Learn how to securely collect user opt-ins during the chat and manage the 24-hour customer service window constraint for follow-ups.",
             "lessonBody": "Building a WhatsApp bot is useless if Meta bans your number in the first week. Outbound messaging, especially in real estate where agents often want to broadcast new listings, is highly regulated. Understanding and strictly adhering to WhatsApp Business API compliance rules is non-negotiable for a production-ready system.\n\nThe core rule is the 24-hour customer service window. Whenever a user sends a message, a 24-hour timer begins. Within this window, your bot can send free-form text. Once the window closes, you are strictly prohibited from sending normal messages; you can only send pre-approved template messages. Your system must track this timer diligently.\n\nCollecting explicit opt-ins is another critical requirement. If a lead disqualifies themselves but you want to send them properties in the future, you cannot just spam them. The chat flow must include a distinct opt-in question (e.g., \"Would you like us to notify you when cheaper units open up? Reply YES\"). This consent must be logged in your database.\n\nWhen the 24-hour window is closed, reaching out to an opted-in lead requires a Template Message. These templates must be drafted in the Meta Business Manager and reviewed by WhatsApp for promotional or utility compliance. Your backend must know how to trigger these specific templates, passing variables (like the new property price) dynamically.\n\nMastering compliance ensures the agency's communication channel remains stable and operational. A banned number means lost leads and angry clients; building safeguards directly into your architecture prevents this entirely.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Free-form messaging only exists inside this window.",
+                "flow": ["Lead sends a message", "24-hour free-form window opens", "Window closes after 24h", "Only pre-approved templates allowed"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "Consent has to be asked for and logged, not assumed.",
+                "compare": [
+                  { "label": "Spamming without consent", "text": "Sending future listings with no opt-in", "good": false },
+                  { "label": "Explicit opt-in", "text": "\"Want us to notify you when cheaper units open up? Reply YES\"", "good": true }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Tracking and managing the 24-hour customer service messaging window",
               "Implementing explicit opt-in flows for future property alerts",
               "Creating and approving message templates for outbound follow-ups"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A lead messaged 26 hours ago and hasn't replied since. You want to tell them about a new listing. What can you send?",
+              "options": [
+                { "text": "A normal free-form text message", "feedback": "The 24-hour customer service window has already closed - free-form messages aren't allowed anymore.", "correct": false },
+                { "text": "Only a pre-approved Template Message reviewed by Meta", "feedback": "Right. Outside the 24-hour window, Template Messages are the only compliant way to reach out.", "correct": true },
+                { "text": "Nothing at all, ever", "feedback": "Template Messages exist for exactly this situation - the window closing doesn't mean the conversation is permanently over.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -853,11 +1047,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Prospective tenants or buyers often push back on price. Build a knowledge base of typical objections and approved responses, instructing the bot to offer alternative listings or payment plans before they disengage.",
             "lessonBody": "Real estate deals rarely close without pushback. Prospective tenants or buyers will almost always challenge the price, the location, or the terms. If your bot simply says \"No\" or crashes when faced with a complaint about rent being too high, the lead is lost. The AI must be trained to handle objections gracefully and keep the conversation alive.\n\nYou will build a localized knowledge base containing the agency's specific playbook for objections. If a user complains about the high service charge in Kileleshwa, the bot shouldn't hallucinate a discount; it should pull from the approved playbook to explain the value (e.g., \"The service charge includes 24/7 security and backup water, which are essential in this area\").\n\nUsing an LLM, you can dynamically map user complaints to the correct playbook response. The system prompt must instruct the model to pivot smoothly. If the user's budget is genuinely too low for the requested unit, the bot should immediately offer alternative payment plans or down-sell them to a smaller unit, rather than terminating the chat.\n\nRecognizing when an objection is too complex for AI is vital. If a user is aggressively negotiating a 20% discount for an annual upfront payment, the bot must recognize this as a high-value, high-complexity negotiation and trigger the human escalation protocol, rather than making unauthorized promises.\n\nEquipping the bot with objection-handling logic turns it into a resilient sales tool. It absorbs the initial friction, filters out impossible demands, and sets up the human agent for a much easier final negotiation.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The bot explains value from the real playbook - it never invents a discount.",
+                "compare": [
+                  { "label": "Hallucinated discount", "text": "Sure, I can knock off 20%!", "good": false },
+                  { "label": "From the playbook", "text": "The service charge covers 24/7 security and backup water - essential in this area.", "good": true }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "High-complexity negotiation goes to a human, not to an unauthorized promise.",
+                "flow": ["Lead pushes for 20% off annual payment", "Bot recognizes high-complexity negotiation", "Flags for human escalation", "Human closer takes over"]
+              }
+            ],
             "keyLearnings": [
               "Creating a structured knowledge base of typical real estate objections",
               "Instructing the LLM to pivot smoothly to alternative listings",
               "Recognizing when to escalate to human negotiation safely"
             ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A lead aggressively negotiates a 20% discount for paying a year upfront. What should the bot do?",
+              "options": [
+                { "text": "Calculate and offer the discount to keep momentum", "feedback": "That's an unauthorized discount the bot has no business making - a human closer has to own pricing decisions like this.", "correct": false },
+                { "text": "Recognize this as high-value, high-complexity and escalate to a human", "feedback": "Right. This is exactly the kind of negotiation the escalation protocol exists for.", "correct": true },
+                { "text": "Repeat the listed price with no further engagement", "feedback": "That risks losing a genuinely high-value lead over a conversation a human agent could probably close.", "correct": false }
+              ]
+            },
             "codeSnippet": "function handleObjection(userMessage: string) {\n  const prompt = `User says: \"${userMessage}\". Using our Nairobi real estate playbook, provide a polite response offering alternative payment plans or a different property. Keep it under 2 sentences.`;\n  return callLLM(prompt);\n}"
           }
         },
@@ -874,11 +1092,38 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Increase conversion rates prior to physical viewings by providing interactive virtual tours. You will use WhatsApp interactive buttons to let users trigger rich media experiences on demand.",
             "lessonBody": "Physical viewings are time-consuming for both the client and the agent. To increase the quality of in-person viewings, you can deploy interactive media and virtual tours directly within WhatsApp, allowing leads to heavily preview a property before committing to a physical visit.\n\nWhatsApp's interactive messages feature allows you to send buttons alongside text. When presenting a matched property, your bot can include a button labeled \"Take Virtual Tour.\" When the user taps this, it triggers a backend event that dispatches a high-resolution 360-degree image link or a targeted video walkthrough of the unit.\n\nDelivery timing is critical. High-bandwidth media shouldn't interrupt the core qualification flow. If you bombard the user with a 50MB video before they've even confirmed their budget, they will likely abandon the chat. Rich media should be gated behind these interactive buttons, ensuring they only load when the user explicitly requests them.\n\nTracking click-through rates on these media links provides valuable intent data. If a lead requests virtual tours for three different properties but doesn't book a physical viewing, your system can flag them for a follow-up, identifying exactly which properties caught their eye.\n\nIntegrating interactive viewings bridges the gap between digital discovery and physical commitment, significantly boosting the conversion rate of your appointment scheduling engine.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The tour only loads when the lead actually asks for it.",
+                "chat": [
+                  { "sender": "agent", "text": "2BR in Kilimani, KES 95,000/mo. Tap 'Take Virtual Tour' to see inside." },
+                  { "sender": "customer", "text": "(taps Take Virtual Tour)" }
+                ]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "Heavy media before qualification is the fastest way to lose a lead to a slow chat.",
+                "compare": [
+                  { "label": "Bombarding upfront", "text": "50MB video sent before budget is even confirmed", "good": false },
+                  { "label": "Gated behind a button", "text": "Video loads only when the lead taps 'Take Virtual Tour'", "good": true }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Configuring WhatsApp interactive buttons for 'Take Virtual Tour' prompts",
               "Embedding and tracking click-through rates on rich media links",
               "Timing the delivery of high-bandwidth media so it doesn't interrupt the core chat flow"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "Why gate the virtual tour video behind an interactive button instead of sending it automatically once a property matches?",
+              "options": [
+                { "text": "WhatsApp doesn't allow automatic video sends", "feedback": "That's not the actual constraint - WhatsApp allows it, the problem is what it does to the chat experience.", "correct": false },
+                { "text": "Unsolicited heavy media before the lead is ready can cause them to abandon the chat", "feedback": "Right. A 50MB video before budget is even confirmed is exactly the kind of friction that makes a lead drop off.", "correct": true },
+                { "text": "It's purely a cost-saving measure", "feedback": "Cost isn't the main driver here - it's about not derailing the qualification flow with unrequested heavy media.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -894,11 +1139,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Agency owners need visibility into bot performance. You will aggregate webhook data into Google Sheets or a basic dashboard to generate daily and weekly summaries of lead metrics.",
             "lessonBody": "A bot that operates in the dark provides no strategic value to the business owner. Real estate agency owners need to know how many leads came in, where they dropped off, and what neighborhoods are currently in high demand. Building a lead analytics dashboard surfaces this intelligence automatically.\n\nYou don't need to build a complex web app to deliver value. By extending the Google Sheets integration from Lesson 3, you can use built-in functions (like pivot tables) or simple script aggregations to track daily and weekly lead volumes. Your backend webhook can increment counters for specific metrics, such as \"Total Qualifications Started\" versus \"Total Viewings Booked.\"\n\nTracking the drop-off points in the conversational funnel is crucial for optimizing the bot. If 80% of users abandon the chat when asked for their budget, the prompt might be too aggressive, and the owner needs to know this. The analytics engine calculates these conversion rates and highlights bottlenecks.\n\nTo make this data actionable, set up a recurring automated report. Your system can compile a brief text summary of the day's metrics and send it via WhatsApp to the agency admin every evening at 6:00 PM. Delivering insights directly to their phone ensures they actually see and use the data.\n\nAdding an analytics layer transforms your project from a simple chat script into a comprehensive business operating system, providing the transparency that business owners demand before they pay for automation software.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 2,
+                "caption": "Knowing WHERE leads disappear is what actually lets you fix the funnel.",
+                "compare": [
+                  { "label": "No visibility", "text": "\"I have no idea why leads go quiet.\"", "good": false },
+                  { "label": "With drop-off tracking", "text": "\"80% drop off at the budget question - let's soften that prompt.\"", "good": true }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "The report reaches the owner where they already are.",
+                "flow": ["Webhook events logged all day", "Aggregated into daily/weekly counts", "Summary compiled at 6:00 PM", "Sent to the agency admin on WhatsApp"]
+              }
+            ],
             "keyLearnings": [
               "Aggregating webhook event data into daily and weekly summaries",
               "Calculating drop-off rates at different stages of the qualification flow",
               "Delivering automated summary reports via WhatsApp to the agency admin"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "80% of leads abandon the chat right after being asked for their budget. What does this data actually tell you?",
+              "options": [
+                { "text": "Nothing useful - drop-off is normal", "feedback": "An 80% drop-off at one specific question is a real, actionable signal, not background noise.", "correct": false },
+                { "text": "The budget question is likely too aggressive or too early, and worth revisiting", "feedback": "Right. This is exactly the kind of bottleneck the analytics engine exists to surface, so the prompt can be fixed.", "correct": true },
+                { "text": "The bot should stop asking about budget entirely", "feedback": "That overcorrects - the question is necessary for qualification, it's the framing or timing that likely needs fixing.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -914,11 +1183,35 @@ export const INITIAL_TRACKS: Track[] = [
           "content": {
             "overview": "Bring all components together into a production-ready system. You will connect a live WhatsApp number, conduct end-to-end testing, and deploy the bot for a real property manager to earn your Verified portfolio asset.",
             "lessonBody": "You have built a complex, state-aware, media-rich lead qualification system. The final step is moving it out of the testing environment and deploying it into production for a real business. A local script is not a portfolio piece; a live, verifiable endpoint connected to a real WhatsApp number is.\n\nDeployment requires securing your architecture. You must move all API keys, webhook secrets, and Google Service Account credentials into secure environment variables on a production server like Render, Heroku, or a VPS. Exposing credentials in your code is a critical failure that can lead to compromised business data.\n\nEnd-to-end testing must be rigorous before handoff. You will conduct live tests to ensure the Google Calendar API correctly blocks double bookings, the Meta Webhooks process incoming messages in under 2 seconds to avoid timeout loops, and the LLM intent scoring remains within the strict JSON format even when given confusing user input.\n\nThe true verification of your skill is real-world usage. You will onboard a test business—a real property manager or agency—connecting their WhatsApp Business number to your deployed webhook. You will configure their specific property database and calendar constraints, proving the system adapts to actual client requirements.\n\nTo secure your Verified Portfolio status, you must record a clean, 60-second video demonstrating the full pipeline: a user chatting on WhatsApp, the budget being negotiated, the viewing being booked, and the final row appearing instantly in the CRM Google Sheet. This demo, alongside a quote from the business owner, serves as your undeniable proof of competence.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Secrets never touch your repository - only the running app ever sees them.",
+                "flow": ["API keys and Google credentials", "Moved to environment variables", "Never committed to your repository"]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "This is the real conversation a real property manager's leads will have with your deployed system.",
+                "chat": [
+                  { "sender": "customer", "text": "Looking for a 2BR in Lavington, budget 120k" },
+                  { "sender": "agent", "text": "We have 2 options - want a quick comparison, or should I book you a viewing?" }
+                ]
+              }
+            ],
             "keyLearnings": [
               "Conducting end-to-end testing of the WhatsApp-to-Sheets pipeline",
               "Securing production API keys, webhooks, and Google credentials",
               "Recording a 60-second video demo of a successful property qualification flow"
-            ]
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "What ultimately proves you've mastered this course, in the Afridemy model?",
+              "options": [
+                { "text": "A passing score on a final quiz", "feedback": "Afridemy deliberately doesn't grade this way - there are no scores here, on purpose.", "correct": false },
+                { "text": "A real, deployed system onboarded to an actual agency, with a business owner's quote", "feedback": "Right. A live system, a real qualified lead flowing through it, and a business owner's quote - that's the Verified Portfolio.", "correct": true },
+                { "text": "Completing all 12 lessons regardless of whether the system works", "feedback": "Working through the lessons isn't the finish line - a working, verified system is.", "correct": false }
+              ]
+            }
           }
         }
       ]
