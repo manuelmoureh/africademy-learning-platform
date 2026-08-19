@@ -33,17 +33,22 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
+  const [hasWaitedEnough, setHasWaitedEnough] = useState(false);
 
   // Every time we land on a (possibly new) lesson: jump the content back to the top -
   // without this, "Next Lesson" swaps the content underneath while keeping whatever
-  // scroll position you were at, which reads as "nothing happened". Also reset the
-  // read-to-the-end gate, unless the content is short enough that there's nothing to
-  // scroll through in the first place.
+  // scroll position you were at, which reads as "nothing happened". Also reset both
+  // read-gates. Scrolling to the bottom only proves you SAW everything - a short
+  // lesson that fits on screen would satisfy that instantly with zero reading time,
+  // so a short minimum dwell is required too, on every lesson regardless of length.
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
     el.scrollTop = 0;
     setHasReachedEnd(el.scrollHeight <= el.clientHeight + 4);
+    setHasWaitedEnough(false);
+    const timer = setTimeout(() => setHasWaitedEnough(true), 4000);
+    return () => clearTimeout(timer);
   }, [step?.id]);
 
   const handleContentScroll = () => {
@@ -57,7 +62,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
   // You can always undo a completion, but you can't mark a lesson done until you've
   // actually scrolled through it - "Mark as Completed" shouldn't be a button that
   // works before anyone's read anything.
-  const canMarkComplete = isCompleted || hasReachedEnd;
+  const canMarkComplete = isCompleted || (hasReachedEnd && hasWaitedEnough);
 
   return (
     <AnimatePresence>
@@ -257,7 +262,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
             <button
               onClick={() => onToggleComplete(step.id)}
               disabled={!canMarkComplete}
-              title={!canMarkComplete ? 'Scroll to the end of the lesson to mark it complete' : undefined}
+              title={!canMarkComplete ? 'Finish reading this lesson to mark it complete' : undefined}
               className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                 !canMarkComplete
                   ? 'bg-white border border-[#12102A]/10 text-[#12102A]/35 cursor-not-allowed'
@@ -267,13 +272,19 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
               }`}
             >
               <CheckCircle2 className="w-4 h-4" />
-              {isCompleted ? 'Completed (Click to Reset)' : canMarkComplete ? 'Mark as Completed' : 'Scroll to Finish'}
+              {isCompleted ? 'Completed (Click to Reset)' : canMarkComplete ? 'Mark as Completed' : 'Reading...'}
             </button>
 
             {onNext && (
               <button
                 onClick={onNext}
-                className="px-4 py-2 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-black rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-[0.97]"
+                disabled={!canMarkComplete}
+                title={!canMarkComplete ? 'Finish reading this lesson to continue' : undefined}
+                className={`px-4 py-2 text-xs font-black rounded-lg flex items-center gap-1.5 shadow-xs transition-all ${
+                  canMarkComplete
+                    ? 'bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] cursor-pointer active:scale-[0.97]'
+                    : 'bg-[#12102A]/10 text-[#12102A]/35 cursor-not-allowed shadow-none'
+                }`}
               >
                 Next Lesson
                 <ArrowRight className="w-3.5 h-3.5" />
