@@ -187,6 +187,22 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
               </p>
             </div>
 
+            {/* The actual lesson - real instructional content, not a restatement of the overview */}
+            {step.content.lessonBody && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#12102A]/40 font-mono mb-3">
+                  The Lesson
+                </h4>
+                <div className="space-y-3">
+                  {step.content.lessonBody.split(/\n\s*\n/).map((paragraph, idx) => (
+                    <p key={idx} className="text-sm text-[#12102A]/80 leading-relaxed font-medium">
+                      {paragraph.trim()}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Key Learnings */}
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#12102A]/40 font-mono mb-3">

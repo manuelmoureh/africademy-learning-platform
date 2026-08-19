@@ -10,6 +10,11 @@ export interface Step {
   isGated?: boolean;
   content: {
     overview: string;
+    // The actual lesson: real instructional writing that teaches the concept - not a
+    // restatement of `overview`. Paragraphs separated by blank lines. Optional only
+    // because most existing lessons predate this field and still need a real content
+    // pass; every newly authored lesson must have it.
+    lessonBody?: string;
     keyLearnings: string[];
     samplePrompt?: string;
     codeSnippet?: string;
