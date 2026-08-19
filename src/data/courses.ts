@@ -1253,7 +1253,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Handling image resizing and basic pre-processing to save bandwidth",
               "Extracting raw text from crinkled or poorly lit photos"
             ],
-            "lessonBody": "Before a business can automate its invoicing, it needs a way to digitize the physical, handwritten receipts that are ubiquitous in Kenyan retail. Traditional Optical Character Recognition (OCR) systems are notoriously brittle; they rely on clear, printed text and perfectly aligned photos. When faced with a crumpled Ndovu receipt book filled with cursive handwriting, traditional OCR fails completely. This is where Vision Language Models change the paradigm.\n\nBy using Gemini 1.5 Flash Vision, you are not just extracting text character by character; you are asking an AI to understand the context of the image. The model can infer that a squiggly line next to 'Total' is a number, even if it's poorly written. This capability is critical for bringing low-tech, offline businesses into a digital database without forcing them to change their existing behavior or buy new point-of-sale hardware.\n\nTo implement this, you will construct an API request that sends the receipt image to Gemini. Because bandwidth can be an issue over standard Safaricom 4G connections in busy shops, you will learn how to compress and convert the image into a base64 string before transmission. This ensures the request is fast and reliable without sacrificing the resolution the model needs to read the text.\n\nFinally, the prompt you pair with the image is just as important as the picture itself. You cannot simply ask the model to \"read this.\" You must explicitly guide it to look for specific bookkeeping fields: the merchant name, the date, the line items, and the total amount. This focused instruction ensures the output contains the exact data points required for the next stage of the pipeline."
+            "lessonBody": "Before a business can automate its invoicing, it needs a way to digitize the physical, handwritten receipts that are ubiquitous in Kenyan retail. Traditional Optical Character Recognition (OCR) systems are notoriously brittle; they rely on clear, printed text and perfectly aligned photos. When faced with a crumpled Ndovu receipt book filled with cursive handwriting, traditional OCR fails completely. This is where Vision Language Models change the paradigm.\n\nBy using Gemini 1.5 Flash Vision, you are not just extracting text character by character; you are asking an AI to understand the context of the image. The model can infer that a squiggly line next to 'Total' is a number, even if it's poorly written. This capability is critical for bringing low-tech, offline businesses into a digital database without forcing them to change their existing behavior or buy new point-of-sale hardware.\n\nTo implement this, you will construct an API request that sends the receipt image to Gemini. Because bandwidth can be an issue over standard Safaricom 4G connections in busy shops, you will learn how to compress and convert the image into a base64 string before transmission. This ensures the request is fast and reliable without sacrificing the resolution the model needs to read the text.\n\nFinally, the prompt you pair with the image is just as important as the picture itself. You cannot simply ask the model to \"read this.\" You must explicitly guide it to look for specific bookkeeping fields: the merchant name, the date, the line items, and the total amount. This focused instruction ensures the output contains the exact data points required for the next stage of the pipeline.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Traditional OCR needs clean print. Vision models understand context.",
+                "compare": [
+                  { "label": "Traditional OCR", "text": "Fails completely on crumpled, handwritten Ndovu receipts", "good": false },
+                  { "label": "Gemini Vision", "text": "Infers a squiggly 'Total' figure from context", "good": true }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "From a phone photo to structured fields, in one request.",
+                "flow": ["Photo taken of a receipt", "Compressed to base64", "Sent with a field-specific prompt", "Merchant, date, items, total extracted"]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "Why can't you just tell Gemini Vision to 'read this receipt' with no further instruction?",
+              "options": [
+                { "text": "It only understands English commands", "feedback": "That's not the limitation here - the issue is specificity, not language.", "correct": false },
+                { "text": "A vague prompt won't reliably surface the exact fields (merchant, date, items, total) your pipeline needs", "feedback": "Right. Explicitly naming the bookkeeping fields is what makes the extraction usable downstream, not just readable.", "correct": true },
+                { "text": "Gemini Vision can't process receipt images at all", "feedback": "It can process them fine - the problem this lesson solves is getting focused, structured output from it.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1278,7 +1302,30 @@ export const INITIAL_TRACKS: Track[] = [
               "input": "Handwritten receipt for KES 1,160 inclusive of VAT.",
               "expectedOutput": "{\"merchant\": \"Local Hardware\", \"totalGross\": 1160, \"vat16\": 160, \"totalNet\": 1000}"
             },
-            "lessonBody": "Extracting raw text from a receipt is impressive, but raw text is entirely useless for automated bookkeeping. A database cannot query a paragraph of text to find out how much money was made on a Tuesday. The data must be converted into a structured, predictable format. In this step, you transition from unstructured vision processing to strict data modeling.\n\nYou will utilize Gemini's Structured Outputs capabilities to force the model to return a predefined JSON schema. By defining exact keys like 'merchantName', 'totalAmount', and 'lineItems', you eliminate the need for complex, error-prone regular expressions. The model is constrained to output only valid JSON, ensuring your downstream code never crashes due to unexpected text formatting.\n\nIn the Kenyan context, accurate data modeling also means handling taxation correctly. You will implement the mathematical logic to extract or calculate the standard 16% Value Added Tax (VAT). If a shop owner simply writes a gross total of KES 1,160 on a receipt, your code must calculate backwards—dividing by 1.16 to find the net amount, and calculating the 160 KES VAT portion automatically.\n\nThis deterministic calculation is a crucial architectural decision. While you could ask the LLM to do the math, LLMs are prone to arithmetic hallucinations. By having the AI extract the raw numbers and writing deterministic JavaScript or Python to perform the tax calculations, you guarantee absolute financial accuracy for the business owner's records."
+            "lessonBody": "Extracting raw text from a receipt is impressive, but raw text is entirely useless for automated bookkeeping. A database cannot query a paragraph of text to find out how much money was made on a Tuesday. The data must be converted into a structured, predictable format. In this step, you transition from unstructured vision processing to strict data modeling.\n\nYou will utilize Gemini's Structured Outputs capabilities to force the model to return a predefined JSON schema. By defining exact keys like 'merchantName', 'totalAmount', and 'lineItems', you eliminate the need for complex, error-prone regular expressions. The model is constrained to output only valid JSON, ensuring your downstream code never crashes due to unexpected text formatting.\n\nIn the Kenyan context, accurate data modeling also means handling taxation correctly. You will implement the mathematical logic to extract or calculate the standard 16% Value Added Tax (VAT). If a shop owner simply writes a gross total of KES 1,160 on a receipt, your code must calculate backwards—dividing by 1.16 to find the net amount, and calculating the 160 KES VAT portion automatically.\n\nThis deterministic calculation is a crucial architectural decision. While you could ask the LLM to do the math, LLMs are prone to arithmetic hallucinations. By having the AI extract the raw numbers and writing deterministic JavaScript or Python to perform the tax calculations, you guarantee absolute financial accuracy for the business owner's records.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Exact keys, not a regex guessing game.",
+                "flow": ["Raw receipt text extracted", "Gemini forced into a strict JSON schema", "merchantName, totalAmount, lineItems fields", "No more regex guesswork downstream"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "Extraction is the AI's job. Arithmetic is your code's job.",
+                "compare": [
+                  { "label": "Ask the LLM to compute VAT", "text": "Risk of arithmetic hallucination", "good": false },
+                  { "label": "Deterministic code computes VAT", "text": "gross / 1.16 = net, exact every time", "good": true }
+                ]
+              }
+            ],
+            "fadedPractice": {
+              "setup": "Never let the LLM do the tax arithmetic itself - it extracts the raw gross number, and your own code does the deterministic math to split out the 16% VAT.",
+              "workedExample": "const gross = 2320;\nconst net = gross / 1.16;\nconst vat = gross - net;\n// net = 2000, vat = 320",
+              "challenge": "function splitVAT(grossAmount: number) {\n  const net = /* Your turn: how do you back out the 16% VAT-exclusive net amount? */;\n  const vat = grossAmount - net;\n  return { net, vat };\n}",
+              "placeholder": "Type the net calculation...",
+              "solution": "grossAmount / 1.16",
+              "explanation": "Dividing the VAT-inclusive gross by 1.16 gives you the net amount - the difference between gross and net is the 16% VAT portion. Doing this in code instead of asking the LLM keeps the number exact, since LLMs are prone to arithmetic mistakes."
+            }
           }
         },
         {
@@ -1299,7 +1346,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Applying CSS print media queries to ensure clean page breaks"
             ],
             "codeSnippet": "const html = template({ customerName: 'Wanjiku', total: 2500, currency: 'KES' });\nawait page.setContent(html, { waitUntil: 'networkidle0' });\nawait page.pdf({ path: 'invoice.pdf', format: 'A4' });",
-            "lessonBody": "Once the receipt data is neatly structured in a JSON object, the next objective is presenting it professionally to the client. Many Kenyan SMEs lose out on corporate contracts because they issue informal, handwritten invoices. By generating clean, branded PDF documents automatically, you instantly elevate the perceived professionalism of the business.\n\nTo achieve this, you will build a microservice using Puppeteer, a headless version of the Google Chrome browser. While there are dedicated PDF generation libraries, they often require learning proprietary layout languages. Puppeteer allows you to design the invoice using standard HTML and CSS, which is infinitely more flexible and easier to maintain.\n\nYou will pair Puppeteer with Handlebars, a dynamic templating engine. Handlebars allows you to take your static HTML invoice design and inject the JSON variables directly into the markup. You will write loops to render rows in an invoice table for each line item and use CSS print media queries to ensure the document scales perfectly to an A4 page without awkward page breaks cutting text in half.\n\nFinally, you will handle the storage and delivery of this generated document. Creating the PDF buffer is only half the battle; you must then save it to a cloud storage bucket like AWS S3 or Firebase Storage. This generates a secure, public URL that your agent can instantly send back to the customer via WhatsApp, completing the loop from handwritten note to professional digital invoice."
+            "lessonBody": "Once the receipt data is neatly structured in a JSON object, the next objective is presenting it professionally to the client. Many Kenyan SMEs lose out on corporate contracts because they issue informal, handwritten invoices. By generating clean, branded PDF documents automatically, you instantly elevate the perceived professionalism of the business.\n\nTo achieve this, you will build a microservice using Puppeteer, a headless version of the Google Chrome browser. While there are dedicated PDF generation libraries, they often require learning proprietary layout languages. Puppeteer allows you to design the invoice using standard HTML and CSS, which is infinitely more flexible and easier to maintain.\n\nYou will pair Puppeteer with Handlebars, a dynamic templating engine. Handlebars allows you to take your static HTML invoice design and inject the JSON variables directly into the markup. You will write loops to render rows in an invoice table for each line item and use CSS print media queries to ensure the document scales perfectly to an A4 page without awkward page breaks cutting text in half.\n\nFinally, you will handle the storage and delivery of this generated document. Creating the PDF buffer is only half the battle; you must then save it to a cloud storage bucket like AWS S3 or Firebase Storage. This generates a secure, public URL that your agent can instantly send back to the customer via WhatsApp, completing the loop from handwritten note to professional digital invoice.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Same transaction, completely different first impression.",
+                "compare": [
+                  { "label": "Handwritten note", "text": "Informal, loses corporate trust", "good": false },
+                  { "label": "Branded PDF invoice", "text": "Professional, wins bigger contracts", "good": true }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "From a rendered buffer to a link in the customer's chat.",
+                "flow": ["PDF buffer generated", "Uploaded to cloud storage (S3/Firebase)", "Public URL created", "Sent back to customer on WhatsApp"]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "Why use Puppeteer with standard HTML/CSS instead of a dedicated PDF library with its own layout language?",
+              "options": [
+                { "text": "Puppeteer is the only tool that can create PDFs", "feedback": "Not true - dedicated PDF libraries exist too. The reason to prefer Puppeteer here is different.", "correct": false },
+                { "text": "Standard HTML/CSS is far more flexible and easier to maintain than a proprietary layout language", "feedback": "Right. You already know HTML/CSS, and it scales better as the invoice design evolves than learning a new templating system.", "correct": true },
+                { "text": "Dedicated PDF libraries don't support Kenyan currency formatting", "feedback": "Currency formatting isn't the actual constraint - any templating approach can format KES correctly.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1319,7 +1390,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Parsing M-Pesa payload data (TransAmount, MSISDN, BillRefNumber)",
               "Updating the invoice status in your database automatically upon payment"
             ],
-            "lessonBody": "One of the most persistent administrative headaches for a small business is manually checking whether an invoice has been paid. Owners typically spend hours cross-referencing M-Pesa SMS alerts with their written ledger. In this lesson, you eliminate that friction by building an automated reconciliation engine using the Safaricom Daraja API.\n\nYou will connect your system to Daraja's C2B (Customer to Business) API, which pushes real-time webhooks to your server the moment a payment hits the business's Till or Paybill number. You will register validation and confirmation URLs, learning how the Safaricom network securely authenticates your server before delivering the payload.\n\nWhen a payment notification arrives, your code must parse the incoming JSON payload. You will extract critical fields: the TransAmount (how much was paid), the MSISDN (the customer's phone number), and the BillRefNumber (the account or invoice number provided during payment). This data is the key to automating the ledger.\n\nThe final step is the database matching logic. Your system will query the database for an open invoice that matches the incoming payment details. Once a match is confirmed, the code updates the invoice status from 'Pending' to 'Paid' and can immediately trigger a WhatsApp receipt to the customer, completely automating the cash-collection workflow without human intervention."
+            "lessonBody": "One of the most persistent administrative headaches for a small business is manually checking whether an invoice has been paid. Owners typically spend hours cross-referencing M-Pesa SMS alerts with their written ledger. In this lesson, you eliminate that friction by building an automated reconciliation engine using the Safaricom Daraja API.\n\nYou will connect your system to Daraja's C2B (Customer to Business) API, which pushes real-time webhooks to your server the moment a payment hits the business's Till or Paybill number. You will register validation and confirmation URLs, learning how the Safaricom network securely authenticates your server before delivering the payload.\n\nWhen a payment notification arrives, your code must parse the incoming JSON payload. You will extract critical fields: the TransAmount (how much was paid), the MSISDN (the customer's phone number), and the BillRefNumber (the account or invoice number provided during payment). This data is the key to automating the ledger.\n\nThe final step is the database matching logic. Your system will query the database for an open invoice that matches the incoming payment details. Once a match is confirmed, the code updates the invoice status from 'Pending' to 'Paid' and can immediately trigger a WhatsApp receipt to the customer, completely automating the cash-collection workflow without human intervention.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The payment notification arrives before the customer even leaves the counter.",
+                "flow": ["Customer pays the Till/Paybill", "Daraja pushes a C2B webhook", "Your server validates and confirms", "Payload delivered instantly"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "This is the exact headache this lesson eliminates.",
+                "compare": [
+                  { "label": "Manual reconciliation", "text": "Owner cross-references M-Pesa SMS by hand for hours", "good": false },
+                  { "label": "Automated C2B match", "text": "TransAmount + BillRefNumber matched to invoice instantly", "good": true }
+                ]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A C2B payment notification arrives. What fields does your matching logic actually need from the payload?",
+              "options": [
+                { "text": "Just the TransAmount", "feedback": "Amount alone isn't enough to match a specific invoice - several invoices could share the same amount.", "correct": false },
+                { "text": "TransAmount, MSISDN, and BillRefNumber", "feedback": "Right. Amount, the payer's phone number, and the account/invoice reference together are what let you confidently match the payment.", "correct": true },
+                { "text": "The customer's full name and ID number", "feedback": "That data isn't part of the Daraja C2B payload - matching relies on the fields Safaricom actually sends.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1339,7 +1434,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Designing the 'retake photo' user flow without frustrating the owner",
               "Handling partial extractions where only the total is visible"
             ],
-            "lessonBody": "Real-world data collection is messy. A shop attendant might take a photo of a receipt in a dimly lit store, use a camera with a scratched lens, or accidentally capture only half the page. If your system blindly accepts these images, it will inject garbage data into the financial ledger. Building a resilient system requires explicit error handling for bad inputs.\n\nInstead of silently failing, you will configure your application to actively detect when an image is illegible. This can be done by evaluating the AI's extraction confidence or, more simply, by validating the required fields in the JSON output. If critical keys like the total amount or the date are missing or flagged as uncertain, the system halts the transaction.\n\nWhen an error is detected, the system must handle it gracefully. You will design a retry loop that triggers an automated WhatsApp reply to the user. The message should be polite and clear, explaining exactly why the extraction failed—for example, 'I couldn't clearly read the total amount. Could you please take another photo with the flash on?'\n\nThis approach also involves deciding how to handle partial extractions. If the total is clear but one line item is smudged, the business rules must dictate whether to reject the entire image or save the partial record for manual review. By designing these fallback mechanisms, you ensure the database remains pristine while minimizing frustration for the person taking the photos."
+            "lessonBody": "Real-world data collection is messy. A shop attendant might take a photo of a receipt in a dimly lit store, use a camera with a scratched lens, or accidentally capture only half the page. If your system blindly accepts these images, it will inject garbage data into the financial ledger. Building a resilient system requires explicit error handling for bad inputs.\n\nInstead of silently failing, you will configure your application to actively detect when an image is illegible. This can be done by evaluating the AI's extraction confidence or, more simply, by validating the required fields in the JSON output. If critical keys like the total amount or the date are missing or flagged as uncertain, the system halts the transaction.\n\nWhen an error is detected, the system must handle it gracefully. You will design a retry loop that triggers an automated WhatsApp reply to the user. The message should be polite and clear, explaining exactly why the extraction failed—for example, 'I couldn't clearly read the total amount. Could you please take another photo with the flash on?'\n\nThis approach also involves deciding how to handle partial extractions. If the total is clear but one line item is smudged, the business rules must dictate whether to reject the entire image or save the partial record for manual review. By designing these fallback mechanisms, you ensure the database remains pristine while minimizing frustration for the person taking the photos.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "A missing required field halts the save, it doesn't just get skipped.",
+                "flow": ["Photo received", "Extraction confidence checked", "Required fields present?", "Yes: save / No: request retake"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "A polite, specific retry beats silently saving garbage data.",
+                "chat": [
+                  { "sender": "customer", "text": "(sends a blurry receipt photo)" },
+                  { "sender": "agent", "text": "I couldn't clearly read the total amount. Could you please take another photo with the flash on?" }
+                ]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A photo comes in where the total amount is unreadable but everything else is clear. What should the system do?",
+              "options": [
+                { "text": "Save the record anyway with the total left blank", "feedback": "That risks silently corrupting the ledger with an incomplete, unflagged record.", "correct": false },
+                { "text": "Halt the transaction and ask for a clearer photo, since the total is a critical field", "feedback": "Right. Missing a required field like the total should trigger the retry flow, not a silent partial save.", "correct": true },
+                { "text": "Guess a reasonable total based on the visible line items", "feedback": "That's exactly the kind of hallucination this lesson's error handling exists to prevent.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1364,7 +1483,31 @@ export const INITIAL_TRACKS: Track[] = [
               "input": "Image of a blue carbon copy receipt with faint text: '2 Pcs unga @250 = 500'",
               "expectedOutput": "{\"items\": [{\"description\": \"Unga\", \"quantity\": 2, \"unitPrice\": 250, \"total\": 500}]}"
             },
-            "lessonBody": "Even with a high-quality image, standard AI models can struggle with the specific nuances of Kenyan commerce. A busy shopkeeper doesn't write perfectly formed sentences; they use heavy shorthand, local slang, and abbreviations. Tuning the Vision model to understand this local context is what separates a generic demo from a production-ready application.\n\nYou will engineer an advanced system prompt that explicitly teaches Gemini how to interpret common local formatting. For example, instructing the model that 'Pcs' means pieces, or that an isolated number accompanied by '//=' or 'Ksh' is the local currency marker. This context prevents the AI from outputting literal misinterpretations of standard shorthand.\n\nHandling dates is another common failure point. Handwritten receipts often write dates as '12/5' without specifying the year, or they mix up the day and month order depending on the writer's habit. Your prompt must guide the LLM to infer the current year based on the system date and strictly enforce a consistent DD/MM/YYYY format in the final JSON output.\n\nCrucially, you must write negative constraints to prevent hallucinations. Vision models sometimes try to be too helpful; if a line item is faded on blue carbon paper, the AI might invent a plausible item to fill the gap. By explicitly commanding the model with instructions like 'If a word is illegible, return UNKNOWN_ITEM rather than guessing,' you maintain absolute data integrity."
+            "lessonBody": "Even with a high-quality image, standard AI models can struggle with the specific nuances of Kenyan commerce. A busy shopkeeper doesn't write perfectly formed sentences; they use heavy shorthand, local slang, and abbreviations. Tuning the Vision model to understand this local context is what separates a generic demo from a production-ready application.\n\nYou will engineer an advanced system prompt that explicitly teaches Gemini how to interpret common local formatting. For example, instructing the model that 'Pcs' means pieces, or that an isolated number accompanied by '//=' or 'Ksh' is the local currency marker. This context prevents the AI from outputting literal misinterpretations of standard shorthand.\n\nHandling dates is another common failure point. Handwritten receipts often write dates as '12/5' without specifying the year, or they mix up the day and month order depending on the writer's habit. Your prompt must guide the LLM to infer the current year based on the system date and strictly enforce a consistent DD/MM/YYYY format in the final JSON output.\n\nCrucially, you must write negative constraints to prevent hallucinations. Vision models sometimes try to be too helpful; if a line item is faded on blue carbon paper, the AI might invent a plausible item to fill the gap. By explicitly commanding the model with instructions like 'If a word is illegible, return UNKNOWN_ITEM rather than guessing,' you maintain absolute data integrity.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The prompt teaches the model Kenyan shorthand, not just English grammar.",
+                "compare": [
+                  { "label": "Literal misreading", "text": "'Pcs' left ambiguous or misparsed", "good": false },
+                  { "label": "With local context", "text": "'Pcs' correctly understood as 'pieces'", "good": true }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "A negative constraint stops the model from being 'too helpful.'",
+                "flow": ["Line item faded on carbon paper", "Model tempted to guess", "Negative constraint blocks guessing", "Outputs UNKNOWN_ITEM instead"]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A line item is faded beyond recognition on a blue carbon-copy receipt. What should Gemini output, per this lesson's prompt design?",
+              "options": [
+                { "text": "Its best guess at what the item probably was", "feedback": "That's exactly what the negative constraint in the prompt is written to prevent.", "correct": false },
+                { "text": "UNKNOWN_ITEM, rather than inventing a plausible-sounding item", "feedback": "Right. An explicit placeholder preserves data integrity - the record shows something was there without fabricating what it was.", "correct": true },
+                { "text": "Skip the line entirely with no record it existed", "feedback": "That loses traceability - an explicit UNKNOWN_ITEM at least flags that a line item was present but illegible.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1384,7 +1527,30 @@ export const INITIAL_TRACKS: Track[] = [
               "Crafting a polite, non-confrontational reminder message",
               "Including a direct M-Pesa payment link or Paybill instructions in the text"
             ],
-            "lessonBody": "Cash flow is the lifeblood of any small business, and delayed payments are a constant threat. However, escalating immediately to aggressive debt collection for a slightly overdue invoice can damage client relationships. The solution is a system of gentle, automated follow-ups that nudge the client before the debt becomes a serious issue.\n\nYou will implement this by designing a scheduled automation, commonly known as a cron job. Using tools like Node-cron or a cloud scheduler, you will configure a script to run automatically every morning. This script is responsible for monitoring the database without requiring the owner to manually click a 'check invoices' button.\n\nThe script queries your database for any invoices where the status remains 'Open' and the due date has passed by a specific threshold, such as three days. For every matching record, the system queues a reminder message. You will learn how to structure these queries efficiently so the database isn't overwhelmed as the business scales.\n\nTone and low friction are the keys to a successful reminder. You will craft a WhatsApp message that is polite and non-confrontational, framing it as a simple check-in. Most importantly, the message will embed the exact M-Pesa Paybill instructions and the specific account number, allowing the customer to pay immediately from their phone with zero additional steps."
+            "lessonBody": "Cash flow is the lifeblood of any small business, and delayed payments are a constant threat. However, escalating immediately to aggressive debt collection for a slightly overdue invoice can damage client relationships. The solution is a system of gentle, automated follow-ups that nudge the client before the debt becomes a serious issue.\n\nYou will implement this by designing a scheduled automation, commonly known as a cron job. Using tools like Node-cron or a cloud scheduler, you will configure a script to run automatically every morning. This script is responsible for monitoring the database without requiring the owner to manually click a 'check invoices' button.\n\nThe script queries your database for any invoices where the status remains 'Open' and the due date has passed by a specific threshold, such as three days. For every matching record, the system queues a reminder message. You will learn how to structure these queries efficiently so the database isn't overwhelmed as the business scales.\n\nTone and low friction are the keys to a successful reminder. You will craft a WhatsApp message that is polite and non-confrontational, framing it as a simple check-in. Most importantly, the message will embed the exact M-Pesa Paybill instructions and the specific account number, allowing the customer to pay immediately from their phone with zero additional steps.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "No manual 'check invoices' button - it just runs.",
+                "flow": ["Cron job runs every morning", "Query: Open + 3+ days overdue", "Reminder queued per match", "Sent automatically, no manual click"]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "Polite, specific, and pays in one tap - no confrontation needed.",
+                "chat": [
+                  { "sender": "agent", "text": "Hi! Just a friendly check-in - Invoice #204 (KES 4,500) is still open. Pay via Paybill 542109, Acc: INV204." }
+                ]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "Why send a gentle 'just checking in' message after 3 days instead of an aggressive debt-collection notice?",
+              "options": [
+                { "text": "Aggressive language violates WhatsApp's policies", "feedback": "That's not the actual constraint here - the reasoning is about the client relationship, not a platform rule.", "correct": false },
+                { "text": "Escalating too fast on a slightly overdue invoice risks damaging the client relationship over what might just be an oversight", "feedback": "Right. A polite nudge preserves the relationship while still prompting payment - aggression is reserved for genuinely serious debt.", "correct": true },
+                { "text": "The M-Pesa API requires a minimum 3-day delay before reminders", "feedback": "That's not a real Daraja constraint - the 3-day threshold is a business decision, not a technical one.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1404,7 +1570,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Flagging an invoice as 'Partially Paid' instead of 'Closed'",
               "Generating an updated receipt reflecting the current balance due"
             ],
-            "lessonBody": "In business-to-business transactions, payments are rarely as simple as a single, full-amount transfer. Clients frequently pay a 50% deposit to initiate work and settle the remainder upon completion. If your reconciliation engine only understands binary 'Paid' or 'Unpaid' states, it will fail to accurately track real-world cash flow.\n\nYou must expand your database schema to account for partial payments. Instead of just a 'totalGross' field, you will introduce 'amountPaid' and 'balanceDue' fields. This allows an invoice to sit in an intermediate 'Partially Paid' state, accurately reflecting the client's current standing with the business.\n\nYour Safaricom Daraja webhook logic must be updated to handle this new math. When a C2B notification arrives, the system will add the incoming TransAmount to the existing amountPaid. It will then calculate the remaining balance. If the balance hits zero, the invoice closes; if money is still owed, the status shifts to partially paid and a new balance is recorded.\n\nFinally, the system needs to communicate this updated status to the client. Upon receiving a partial payment, the PDF engine should automatically generate an updated 'Receipt and Statement' document. This document acknowledges the funds received and clearly highlights the remaining balance, ensuring total transparency between the business and the customer."
+            "lessonBody": "In business-to-business transactions, payments are rarely as simple as a single, full-amount transfer. Clients frequently pay a 50% deposit to initiate work and settle the remainder upon completion. If your reconciliation engine only understands binary 'Paid' or 'Unpaid' states, it will fail to accurately track real-world cash flow.\n\nYou must expand your database schema to account for partial payments. Instead of just a 'totalGross' field, you will introduce 'amountPaid' and 'balanceDue' fields. This allows an invoice to sit in an intermediate 'Partially Paid' state, accurately reflecting the client's current standing with the business.\n\nYour Safaricom Daraja webhook logic must be updated to handle this new math. When a C2B notification arrives, the system will add the incoming TransAmount to the existing amountPaid. It will then calculate the remaining balance. If the balance hits zero, the invoice closes; if money is still owed, the status shifts to partially paid and a new balance is recorded.\n\nFinally, the system needs to communicate this updated status to the client. Upon receiving a partial payment, the PDF engine should automatically generate an updated 'Receipt and Statement' document. This document acknowledges the funds received and clearly highlights the remaining balance, ensuring total transparency between the business and the customer.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Real payments aren't always all-or-nothing.",
+                "compare": [
+                  { "label": "Binary Paid/Unpaid", "text": "Can't represent a 50% deposit accurately", "good": false },
+                  { "label": "amountPaid + balanceDue", "text": "Tracks exactly what's owed, mid-payment", "good": true }
+                ]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "Every new payment updates the same running balance.",
+                "flow": ["C2B payment arrives", "Added to existing amountPaid", "Balance recalculated", "Zero = closed, else = Partially Paid"]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A client pays 50% of a KES 10,000 invoice, then pays the rest two weeks later. What should the invoice status show after the first payment?",
+              "options": [
+                { "text": "Paid", "feedback": "KES 5,000 is still outstanding - marking it fully Paid would hide real money still owed.", "correct": false },
+                { "text": "Partially Paid, with a balanceDue of KES 5,000", "feedback": "Right. This is exactly the intermediate state the amountPaid/balanceDue fields exist to represent.", "correct": true },
+                { "text": "Unpaid, since the invoice isn't fully settled yet", "feedback": "That ignores real progress the client already made - a binary Unpaid status loses that information.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1424,7 +1614,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Handling exchange rate metadata if required by the owner",
               "Tagging records with branch IDs (e.g., 'Westlands', 'Kilimani')"
             ],
-            "lessonBody": "As a business grows, its operational complexity increases. A successful SME in Nairobi might open a second branch across town or start accepting payments in USD from expatriate clients. An invoicing assistant hardcoded to a single currency and a single location will quickly become a bottleneck for a scaling enterprise.\n\nTo handle this, you will redesign your database architecture to support multi-branch and multi-currency logic. You will add specific tags to every invoice record identifying its origin branch, such as 'Westlands' or 'Kilimani'. This ensures that when the owner requests a daily sales summary for one specific shop, the query accurately filters out revenue from other locations.\n\nHandling multiple currencies introduces a critical rule of data integrity: never sum mixed currencies natively. You will update the JSON schema to strictly define the currency of every transaction. If a business accepts both KES and USD, your database must either store them in entirely separate columns or apply an exchange rate conversion at the moment of reporting to avoid wildly inaccurate financial totals.\n\nYou will also adjust the Gemini vision prompts to explicitly look for currency indicators on the handwritten receipts. The AI must be trained to differentiate between a dollar sign and a Kenyan shilling marker, ensuring that a $100 invoice isn't accidentally recorded as 100 KES in the ledger."
+            "lessonBody": "As a business grows, its operational complexity increases. A successful SME in Nairobi might open a second branch across town or start accepting payments in USD from expatriate clients. An invoicing assistant hardcoded to a single currency and a single location will quickly become a bottleneck for a scaling enterprise.\n\nTo handle this, you will redesign your database architecture to support multi-branch and multi-currency logic. You will add specific tags to every invoice record identifying its origin branch, such as 'Westlands' or 'Kilimani'. This ensures that when the owner requests a daily sales summary for one specific shop, the query accurately filters out revenue from other locations.\n\nHandling multiple currencies introduces a critical rule of data integrity: never sum mixed currencies natively. You will update the JSON schema to strictly define the currency of every transaction. If a business accepts both KES and USD, your database must either store them in entirely separate columns or apply an exchange rate conversion at the moment of reporting to avoid wildly inaccurate financial totals.\n\nYou will also adjust the Gemini vision prompts to explicitly look for currency indicators on the handwritten receipts. The AI must be trained to differentiate between a dollar sign and a Kenyan shilling marker, ensuring that a $100 invoice isn't accidentally recorded as 100 KES in the ledger.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Branch-tagged from the start, so reports never mix locations.",
+                "flow": ["Invoice recorded", "Tagged with branch ID (e.g. 'Kilimani')", "Owner requests a branch-specific report", "Query filters to that branch only"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "Summing different currencies natively produces a number that means nothing.",
+                "compare": [
+                  { "label": "Mixed currency sum", "text": "KES 50,000 + $200 summed as '50200'", "good": false },
+                  { "label": "Currency-aware totals", "text": "KES 50,000 and $200 kept and reported separately", "good": true }
+                ]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "An SME opens a second branch and starts occasionally accepting USD from tourists. What's the core rule for your database design?",
+              "options": [
+                { "text": "Convert every USD amount to KES immediately and store one number", "feedback": "That discards the original transaction currency, which matters for accurate reporting and reconciliation.", "correct": false },
+                { "text": "Never sum mixed currencies natively - store currency explicitly per record", "feedback": "Right. Tagging every record with its real currency is what keeps totals meaningful as the business grows.", "correct": true },
+                { "text": "Ignore USD transactions since the business is Kenyan", "feedback": "USD transactions still need to be tracked accurately - ignoring them just creates a gap in the books.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1444,7 +1658,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Ensuring no 'Nil' returns are accidentally generated",
               "Structuring an export CSV or JSON payload for external accounting tools"
             ],
-            "lessonBody": "Compliance with national tax regulations is non-negotiable for modern businesses. The Kenya Revenue Authority (KRA) mandates the use of eTIMS, a system requiring electronic transmission of invoice data. While your assistant isn't a direct eTIMS hardware device, it serves as the crucial data extraction layer that prepares the raw information for compliance.\n\nYour task is to standardize the data payload so it is instantly compatible with formal accounting software. You will format the structured JSON to include mandatory tax fields that the AI extracted, such as the buyer's KRA PIN, the specific VAT category (e.g., 16% standard or zero-rated), and precise, standardized timestamps that match KRA's required format.\n\nHandling missing compliance data is a major challenge. If a handwritten receipt lacks a necessary field, like a PIN, your system must know how to react. You will build fallback logic that either flags the record as 'Requires Manual Review' or applies a default standard if the transaction falls under a specific threshold that doesn't require buyer details.\n\nFinally, you will build an export mechanism. You will create an API endpoint or a secure CSV generation function that allows the business owner or their accountant to bulk-download the week's structured records. This structured export can then be seamlessly uploaded into their official eTIMS-compliant ERP, bridging the gap between messy offline retail and strict digital tax compliance."
+            "lessonBody": "Compliance with national tax regulations is non-negotiable for modern businesses. The Kenya Revenue Authority (KRA) mandates the use of eTIMS, a system requiring electronic transmission of invoice data. While your assistant isn't a direct eTIMS hardware device, it serves as the crucial data extraction layer that prepares the raw information for compliance.\n\nYour task is to standardize the data payload so it is instantly compatible with formal accounting software. You will format the structured JSON to include mandatory tax fields that the AI extracted, such as the buyer's KRA PIN, the specific VAT category (e.g., 16% standard or zero-rated), and precise, standardized timestamps that match KRA's required format.\n\nHandling missing compliance data is a major challenge. If a handwritten receipt lacks a necessary field, like a PIN, your system must know how to react. You will build fallback logic that either flags the record as 'Requires Manual Review' or applies a default standard if the transaction falls under a specific threshold that doesn't require buyer details.\n\nFinally, you will build an export mechanism. You will create an API endpoint or a secure CSV generation function that allows the business owner or their accountant to bulk-download the week's structured records. This structured export can then be seamlessly uploaded into their official eTIMS-compliant ERP, bridging the gap between messy offline retail and strict digital tax compliance.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "The same data you already captured, remapped for KRA.",
+                "flow": ["Structured JSON already captured", "Mapped to eTIMS-required fields", "KRA PIN, VAT category, timestamp format", "Ready for accounting software import"]
+              },
+              {
+                "afterParagraph": 2,
+                "caption": "A gap in compliance data should be visible, not silent.",
+                "compare": [
+                  { "label": "Missing KRA PIN, no fallback", "text": "Record silently incomplete", "good": false },
+                  { "label": "With fallback logic", "text": "Flagged 'Requires Manual Review' instead", "good": true }
+                ]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "A handwritten receipt has no KRA PIN field filled in. What should your system do?",
+              "options": [
+                { "text": "Leave the field blank and export the record as-is", "feedback": "That creates an invisible compliance gap the accountant won't notice until it's a problem.", "correct": false },
+                { "text": "Flag the record as 'Requires Manual Review', per the fallback rule", "feedback": "Right. Making the gap visible is what keeps the export trustworthy without discarding real sales data.", "correct": true },
+                { "text": "Reject and discard the entire receipt", "feedback": "That throws away otherwise-valid sales data over one missing field.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1464,7 +1702,30 @@ export const INITIAL_TRACKS: Track[] = [
               "Calculating the outstanding accounts receivable balance",
               "Formatting the summary cleanly using WhatsApp markdown (bolding, lists)"
             ],
-            "lessonBody": "A system that only stores data but never summarizes it is just a digital filing cabinet. Small business owners rarely have the time to sit at a computer and filter through complex dashboard tables to understand their performance. They need actionable insights delivered directly to them in a format they can read in five seconds.\n\nYou will build an automated reporting engine that runs a comprehensive aggregation script on the first day of every month. This script queries the database for the entirety of the previous month's records, doing the heavy lifting of grouping and summing the data before the owner even asks for it.\n\nThe script calculates three vital metrics: Total Invoiced (representing overall sales performance), Total Collected via M-Pesa (representing actual cash in the bank), and Total Outstanding (representing the accounts receivable that need chasing). This provides an immediate, clear snapshot of the business's financial health.\n\nUsing the WhatsApp Cloud API, you will deliver this summary directly to the owner's phone. You will format the message using WhatsApp's native markdown, using bold text for numbers and bullet points for clarity. By pushing the report to their phone, you ensure the owner actually sees and acts on their financial data without needing to learn a new software interface."
+            "lessonBody": "A system that only stores data but never summarizes it is just a digital filing cabinet. Small business owners rarely have the time to sit at a computer and filter through complex dashboard tables to understand their performance. They need actionable insights delivered directly to them in a format they can read in five seconds.\n\nYou will build an automated reporting engine that runs a comprehensive aggregation script on the first day of every month. This script queries the database for the entirety of the previous month's records, doing the heavy lifting of grouping and summing the data before the owner even asks for it.\n\nThe script calculates three vital metrics: Total Invoiced (representing overall sales performance), Total Collected via M-Pesa (representing actual cash in the bank), and Total Outstanding (representing the accounts receivable that need chasing). This provides an immediate, clear snapshot of the business's financial health.\n\nUsing the WhatsApp Cloud API, you will deliver this summary directly to the owner's phone. You will format the message using WhatsApp's native markdown, using bold text for numbers and bullet points for clarity. By pushing the report to their phone, you ensure the owner actually sees and acts on their financial data without needing to learn a new software interface.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 2,
+                "caption": "Three numbers, calculated before the owner even asks.",
+                "flow": ["1st of the month: script runs", "Sums Total Invoiced", "Sums Total Collected via M-Pesa", "Calculates Total Outstanding"]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "Delivered where the owner already is, no dashboard login required.",
+                "chat": [
+                  { "sender": "agent", "text": "📊 July Summary\nInvoiced: KES 420,000\nCollected: KES 380,000\nOutstanding: KES 40,000" }
+                ]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "Why deliver the monthly summary via WhatsApp instead of building a web dashboard the owner can log into?",
+              "options": [
+                { "text": "Dashboards are technically impossible to build for this use case", "feedback": "Not true - a dashboard is entirely possible, it's just not the best fit for how these owners actually work.", "correct": false },
+                { "text": "SME owners rarely have time to log into a separate tool - meeting them where they already are drives actual usage", "feedback": "Right. A report that arrives on WhatsApp gets read; a dashboard that requires a login often doesn't.", "correct": true },
+                { "text": "WhatsApp is the only channel that supports bold text formatting", "feedback": "Formatting support isn't the actual reason - plenty of dashboards support rich text too.", "correct": false }
+              ]
+            }
           }
         },
         {
@@ -1484,7 +1745,31 @@ export const INITIAL_TRACKS: Track[] = [
               "Deploying the Node.js/Puppeteer service to a cloud provider",
               "Recording the system working in the real world for your portfolio"
             ],
-            "lessonBody": "Building a system in a controlled development environment is only the beginning; real value is created when it interacts with the public. Your final objective is to take the invoicing assistant out of the sandbox and deploy it into a live, production environment where it handles real money and real clients.\n\nThe first major hurdle is migrating the Safaricom Daraja integration from the sandbox to production. You will navigate the Go-Live process, swapping out test credentials for live API keys linked to an actual Till or Paybill number. You will learn the strict networking and SSL requirements Safaricom mandates for production webhooks.\n\nNext, you will deploy your Node.js application to a reliable cloud hosting provider like AWS, Render, or Heroku. Because the application utilizes headless Chrome via Puppeteer for PDF generation, you must configure the server environment correctly, ensuring it has the required memory limits and system dependencies to render PDFs without crashing under load.\n\nOnce deployed, you will onboard a real local business, connecting their live WhatsApp number and M-Pesa details. As they process their first live, handwritten receipt and the system autonomously generates the PDF and reconciles the payment, you will record a short demonstration video. This real-world execution serves as your verified portfolio piece, proving you can build and deploy robust, commercial-grade software."
+            "lessonBody": "Building a system in a controlled development environment is only the beginning; real value is created when it interacts with the public. Your final objective is to take the invoicing assistant out of the sandbox and deploy it into a live, production environment where it handles real money and real clients.\n\nThe first major hurdle is migrating the Safaricom Daraja integration from the sandbox to production. You will navigate the Go-Live process, swapping out test credentials for live API keys linked to an actual Till or Paybill number. You will learn the strict networking and SSL requirements Safaricom mandates for production webhooks.\n\nNext, you will deploy your Node.js application to a reliable cloud hosting provider like AWS, Render, or Heroku. Because the application utilizes headless Chrome via Puppeteer for PDF generation, you must configure the server environment correctly, ensuring it has the required memory limits and system dependencies to render PDFs without crashing under load.\n\nOnce deployed, you will onboard a real local business, connecting their live WhatsApp number and M-Pesa details. As they process their first live, handwritten receipt and the system autonomously generates the PDF and reconciles the payment, you will record a short demonstration video. This real-world execution serves as your verified portfolio piece, proving you can build and deploy robust, commercial-grade software.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 1,
+                "caption": "Sandbox credentials never make it to a live Till number.",
+                "flow": ["Sandbox Daraja credentials", "Swapped for live Till/Paybill keys", "SSL and networking requirements met", "Production webhook goes live"]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "This is the real, live moment that proves your deployed system actually works.",
+                "chat": [
+                  { "sender": "customer", "text": "(sends a photo of today's receipts)" },
+                  { "sender": "agent", "text": "Got it - PDF invoice generated and sent. I'll confirm once the M-Pesa payment comes in." }
+                ]
+              }
+            ],
+            "interactiveCheck": {
+              "type": "quiz",
+              "question": "What ultimately proves you've mastered this course, in the Afridemy model?",
+              "options": [
+                { "text": "A passing score on a final quiz", "feedback": "Afridemy deliberately doesn't grade this way - there are no scores here, on purpose.", "correct": false },
+                { "text": "A real, deployed system processing an actual shop's receipts and M-Pesa payments, with a business owner's quote", "feedback": "Right. A live system handling real receipts and real payments, verified by the business owner - that's the Verified Portfolio.", "correct": true },
+                { "text": "Completing all 12 lessons regardless of whether the system works", "feedback": "Working through the lessons isn't the finish line - a working, verified system is.", "correct": false }
+              ]
+            }
           }
         }
       ]
