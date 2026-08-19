@@ -8,6 +8,7 @@ interface LessonDetailModalProps {
   onClose: () => void;
   onUnlock: () => void;
   onToggleComplete: (stepId: string) => void;
+  onNext?: () => void;
   isUnlocked: boolean;
   trackTitle: string;
   trackPrice: number;
@@ -18,12 +19,17 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
   onClose,
   onUnlock,
   onToggleComplete,
+  onNext,
   isUnlocked,
   trackTitle,
   trackPrice,
 }) => {
   const isLocked = step ? step.isGated && !isUnlocked : false;
   const isCompleted = step?.status === 'completed';
+  // "status" tracks a learner's own progress on this lesson (completed / not yet),
+  // separate from isGated (paywall). Never surface the raw "locked" progress value
+  // here - it reads as "paywalled" even on a free lesson nobody's started yet.
+  const badgeLabel = isLocked ? 'LOCKED' : isCompleted ? 'COMPLETED' : 'AVAILABLE';
 
   return (
     <AnimatePresence>
@@ -57,13 +63,11 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono ${
                   isLocked
                     ? 'bg-gray-100 text-gray-500 flex items-center gap-1'
-                    : isCompleted 
-                    ? 'bg-[#10B981]/15 text-[#10B981]' 
-                    : step.status === 'current' 
-                    ? 'bg-[#F5A623]/20 text-[#F5A623]' 
-                    : 'bg-gray-100 text-gray-500'
+                    : isCompleted
+                    ? 'bg-[#10B981]/15 text-[#10B981]'
+                    : 'bg-[#F5A623]/20 text-[#F5A623]'
                 }`}>
-                  {isLocked ? 'LOCKED' : step.status.toUpperCase()}
+                  {badgeLabel}
                 </span>
               </div>
               <h3 className="text-lg font-black text-[#12102A] leading-snug">
@@ -219,7 +223,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
         {/* Footer Actions */}
         {!isLocked && (
-          <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-start gap-3">
+          <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
             <button
               onClick={() => onToggleComplete(step.id)}
               className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
@@ -231,6 +235,16 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
               <CheckCircle2 className="w-4 h-4" />
               {isCompleted ? 'Completed (Click to Reset)' : 'Mark as Completed'}
             </button>
+
+            {onNext && (
+              <button
+                onClick={onNext}
+                className="px-4 py-2 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-black rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-[0.97]"
+              >
+                Next Lesson
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         )}
 

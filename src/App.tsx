@@ -203,6 +203,12 @@ export default function App() {
   const nextStepFor = (track: Track): Step =>
     track.steps.find(s => s.status !== 'completed') || track.steps[0];
 
+  // Whatever comes immediately after the lesson currently open in the detail modal,
+  // so it can offer a "Next Lesson" action instead of dead-ending after "Mark as Completed".
+  const nextStepAfterSelected = selectedStep
+    ? activeTrack.steps[activeTrack.steps.findIndex(s => s.id === selectedStep.id) + 1]
+    : undefined;
+
   // Calculate live progress
   const completedStepsCount = activeTrack.steps.filter(s => s.status === 'completed').length;
   const totalStepsCount = activeTrack.steps.length || 12;
@@ -545,6 +551,7 @@ export default function App() {
           setIsTrackCheckoutOpen(true);
         }}
         onToggleComplete={handleToggleCompleteStep}
+        onNext={nextStepAfterSelected ? () => setSelectedStep(nextStepAfterSelected) : undefined}
         isUnlocked={isTrackUnlocked(activeTrack.id)}
         trackTitle={activeTrack.title}
         trackPrice={activeTrack.price}
