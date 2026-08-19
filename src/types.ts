@@ -57,6 +57,7 @@ export interface Step {
       caption: string;
       chat?: { sender: 'customer' | 'agent'; text: string }[];
       flow?: string[];
+      compare?: { label: string; text: string; good: boolean }[];
     }[];
   };
 }

@@ -9,6 +9,7 @@ import { FadedPractice } from './FadedPractice';
 import { CodeBlock } from './CodeBlock';
 import { ChatDemo } from './ChatDemo';
 import { FlowDiagram } from './FlowDiagram';
+import { CompareCard } from './CompareCard';
 
 interface LessonPageProps {
   tracks: Track[];
@@ -227,6 +228,7 @@ export const LessonPage: React.FC<LessonPageProps> = ({
                         <figure key={bIdx} className="flex flex-col items-center gap-3 py-2">
                           {brk.chat && <ChatDemo messages={brk.chat} />}
                           {brk.flow && <FlowDiagram steps={brk.flow} />}
+                          {brk.compare && <CompareCard items={brk.compare} />}
                           <figcaption className="text-xs text-[#12102A]/50 font-semibold text-center max-w-sm">
                             {brk.caption}
                           </figcaption>
