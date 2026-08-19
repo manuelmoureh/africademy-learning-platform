@@ -292,29 +292,53 @@ export default function App() {
       return null;
     }
     return (
-      <LessonPage
-        tracks={tracks}
-        track={lessonTrack}
-        step={lessonStep}
-        isUnlocked={isTrackUnlocked(lessonTrack.id)}
-        user={user}
-        isAuthenticated={!!authUserId}
-        authLoading={authLoading}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onSearchSubmit={() => navigate('/systems')}
-        onGoHome={() => navigate('/')}
-        onEnterApp={() => navigate('/systems')}
-        onSelectCourse={(id) => navigate(`/systems/${id}`)}
-        onOpenVerifiedWork={() => navigate('/verified')}
-        onOpenPricing={() => setIsPricingOpen(true)}
-        onOpenAbout={() => navigate('/about')}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onBack={() => navigate(`/systems/${lessonTrack.id}/learn`)}
-        onToggleComplete={handleToggleCompleteStep}
-        onUnlock={() => setIsTrackCheckoutOpen(true)}
-        onNavigateToStep={(stepId) => navigate(`/systems/${lessonTrack.id}/learn/${stepId}`)}
-      />
+      <>
+        <LessonPage
+          tracks={tracks}
+          track={lessonTrack}
+          step={lessonStep}
+          isUnlocked={isTrackUnlocked(lessonTrack.id)}
+          user={user}
+          isAuthenticated={!!authUserId}
+          authLoading={authLoading}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={() => navigate('/systems')}
+          onGoHome={() => navigate('/')}
+          onEnterApp={() => navigate('/systems')}
+          onSelectCourse={(id) => navigate(`/systems/${id}`)}
+          onOpenVerifiedWork={() => navigate('/verified')}
+          onOpenPricing={() => setIsPricingOpen(true)}
+          onOpenAbout={() => navigate('/about')}
+          onOpenAuth={() => setIsAuthOpen(true)}
+          onBack={() => navigate(`/systems/${lessonTrack.id}/learn`)}
+          onToggleComplete={handleToggleCompleteStep}
+          onUnlock={() => setIsTrackCheckoutOpen(true)}
+          onNavigateToStep={(stepId) => navigate(`/systems/${lessonTrack.id}/learn/${stepId}`)}
+        />
+
+        <CheckoutModal
+          isOpen={isTrackCheckoutOpen}
+          onClose={() => setIsTrackCheckoutOpen(false)}
+          onSuccess={() => handlePurchaseTrack(lessonTrack.id)}
+          product={{ name: lessonTrack.title, price: lessonTrack.price }}
+        />
+
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+          currentUser={user}
+          isAuthenticated={!!authUserId}
+          onSignOut={handleSignOut}
+          onLogin={(updatedUser) => {
+            setUser(updatedUser);
+            setPortfolioData(prev => ({
+              ...prev,
+              studentName: updatedUser.name
+            }));
+          }}
+        />
+      </>
     );
   }
 

@@ -367,7 +367,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 className="absolute top-[46%] -translate-y-1/2 -right-9 sm:-right-11 bg-white text-[#12102A] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
-                First 5 Lessons Free
+                First 3 Lessons Free
               </motion.div>
 
               {/* Left side: skill picker, straddling the bottom-left edge so it clears the subject */}
@@ -570,7 +570,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       <span className="text-base font-black text-[#12102A]">KES {track.price.toLocaleString()}</span>
                       <span className="flex items-center gap-1 text-[10px] font-bold text-[#10B981]">
                         <CheckCircle2 className="w-3 h-3" />
-                        First 5 lessons free
+                        First 3 lessons free
                       </span>
                     </div>
                     <button
@@ -747,7 +747,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 q: 'What does it cost?',
-                a: 'The first 5 lessons of every system are free, so you can try it before paying anything.',
+                a: 'The first 3 lessons of every system are free, so you can try it before paying anything.',
               },
             ].map((item) => (
               <details key={item.q} className="group rounded-xl border border-[#12102A]/10 bg-[#F0EEF6] px-5 py-4">

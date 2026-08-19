@@ -89,7 +89,7 @@ export interface Track {
   tags: string[];
   whoBuysThis: string;
   impactStat: string;
-  // One-time price in KES for the full system (first 5 lessons are free regardless -
+  // One-time price in KES for the full system (first 3 lessons are free regardless -
   // that's a sales hook, not tied to this number). Tiered by business value, not step count.
   price: number;
   // Placeholder rating/review count shown on cards until real submissions (track_ratings

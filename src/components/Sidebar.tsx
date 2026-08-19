@@ -66,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {activeTrackProgress}% COMPLETE
             </span>
             <span className="text-[#F5A623]">
-              {track.completedSteps}/{track.steps.length} STEPS
+              {track.steps.filter((s) => s.status === 'completed').length}/{track.steps.length} STEPS
             </span>
           </div>
         </div>
@@ -116,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </p>
             </div>
             <p className="text-xs leading-relaxed text-white/80 mb-3.5 font-medium">
-              The first 5 lessons are free. Unlock the rest of {track.title} for a one-time KES {track.price.toLocaleString()}.
+              The first 3 lessons are free. Unlock the rest of {track.title} for a one-time KES {track.price.toLocaleString()}.
             </p>
             <button
               onClick={onUnlockTrack}

@@ -190,7 +190,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnl
               <p className="text-xs font-bold text-[#12102A]/50 mb-1">Cost</p>
               <p className="text-2xl font-black text-[#12102A]">KES {track.price.toLocaleString()}</p>
               <p className="text-xs text-[#12102A]/60 mt-1">
-                First 5 lessons free, one-time payment for the rest.
+                First 3 lessons free, one-time payment for the rest.
               </p>
             </div>
 
