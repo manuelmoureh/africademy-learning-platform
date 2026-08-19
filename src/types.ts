@@ -22,6 +22,32 @@ export interface Step {
       input: string;
       expectedOutput: string;
     };
+    // The lesson's one active-recall moment (the "testing effect" - Roediger & Karpicke
+    // 2006). For conceptual lessons with no code, a low-stakes multiple-choice check;
+    // 'scenario' mode has no right answer, just per-option feedback, for questions about
+    // judgment rather than fact.
+    interactiveCheck?: {
+      type: 'quiz' | 'scenario';
+      question: string;
+      options: {
+        text: string;
+        feedback: string;
+        correct?: boolean; // only meaningful when type is 'quiz'
+      }[];
+    };
+    // The technical-lesson version of the same active-recall beat: a worked example the
+    // learner reads, then a near-identical problem with the critical piece removed for
+    // them to attempt before the answer is revealed (the "worked example effect" -
+    // Sweller 1988). Ungraded and low-stakes by design - no pass/fail, just attempt then
+    // compare, so it never manufactures fake failure.
+    fadedPractice?: {
+      setup: string;
+      workedExample: string;
+      challenge: string;
+      placeholder: string;
+      solution: string;
+      explanation: string;
+    };
   };
 }
 

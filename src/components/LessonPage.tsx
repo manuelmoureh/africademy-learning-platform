@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles, Lock } from 'lucide-reac
 import { Track, Step, UserAccount } from '../types';
 import { Header } from './Header';
 import { SystemThumbnail } from './SystemThumbnail';
+import { RetrievalCheck } from './RetrievalCheck';
+import { FadedPractice } from './FadedPractice';
 
 interface LessonPageProps {
   tracks: Track[];
@@ -263,6 +265,17 @@ export const LessonPage: React.FC<LessonPageProps> = ({
                   </div>
                 )}
               </div>
+            )}
+
+            {/* The lesson's one active-recall beat (the "testing effect" / "worked example
+                effect") - fadedPractice for hands-on/code lessons, interactiveCheck for
+                conceptual ones. Placed after the concept and worked example, before the
+                recap, so it asks the learner to retrieve rather than just re-read. */}
+            {step.content.fadedPractice && (
+              <FadedPractice data={step.content.fadedPractice} />
+            )}
+            {step.content.interactiveCheck && (
+              <RetrievalCheck data={step.content.interactiveCheck} />
             )}
 
             {/* Recap */}
