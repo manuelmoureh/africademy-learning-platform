@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Step } from '../types';
 import { X, CheckCircle2, Code2, BookOpen, Sparkles, ArrowRight, Lock } from 'lucide-react';
+import { CodeBlock } from './CodeBlock';
 
 interface LessonDetailModalProps {
   step: Step | null;
@@ -224,32 +225,11 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
             {/* Sample Prompt or Code Snippet */}
             {step.content.samplePrompt && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#12102A]/40 font-mono mb-2">
-                  Production System Prompt Blueprint
-                </h4>
-                <div className="p-4 bg-[#12102A] text-white rounded-xl font-mono text-xs overflow-x-auto leading-relaxed border border-[#12102A]/20">
-                  <pre className="whitespace-pre-wrap text-emerald-400">
-                    {step.content.samplePrompt}
-                  </pre>
-                </div>
-              </div>
+              <CodeBlock code={step.content.samplePrompt} label="Production System Prompt Blueprint" colorClass="text-emerald-400" />
             )}
 
             {step.content.codeSnippet && (
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#12102A]/40 font-mono">
-                    TypeScript Implementation
-                  </h4>
-                  <span className="text-[10px] font-mono text-[#12102A]/40">server/agent.ts</span>
-                </div>
-                <div className="p-4 bg-[#12102A] text-white rounded-xl font-mono text-xs overflow-x-auto leading-relaxed">
-                  <pre className="whitespace-pre-wrap text-amber-300">
-                    {step.content.codeSnippet}
-                  </pre>
-                </div>
-              </div>
+              <CodeBlock code={step.content.codeSnippet} label="TypeScript Implementation" colorClass="text-amber-300" />
             )}
 
             {/* Test Case */}

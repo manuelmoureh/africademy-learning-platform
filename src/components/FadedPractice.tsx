@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PenLine, Eye } from 'lucide-react';
 import { Step } from '../types';
+import { CodeBlock } from './CodeBlock';
 
 interface FadedPracticeProps {
   data: NonNullable<Step['content']['fadedPractice']>;
@@ -26,23 +27,9 @@ export const FadedPractice: React.FC<FadedPracticeProps> = ({ data }) => {
 
       <p className="text-sm text-[#12102A]/70 leading-relaxed font-medium">{data.setup}</p>
 
-      <div>
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[#12102A]/40 font-mono mb-2">
-          Worked Example
-        </p>
-        <div className="p-4 bg-[#12102A] text-white rounded-xl font-mono text-xs overflow-x-auto leading-relaxed">
-          <pre className="whitespace-pre-wrap text-emerald-400">{data.workedExample}</pre>
-        </div>
-      </div>
+      <CodeBlock code={data.workedExample} label="Worked Example" colorClass="text-emerald-400" />
 
-      <div>
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[#12102A]/40 font-mono mb-2">
-          Now You Try
-        </p>
-        <div className="p-4 bg-[#12102A] text-white rounded-xl font-mono text-xs overflow-x-auto leading-relaxed">
-          <pre className="whitespace-pre-wrap text-amber-300">{data.challenge}</pre>
-        </div>
-      </div>
+      <CodeBlock code={data.challenge} label="Now You Try" colorClass="text-amber-300" />
 
       <textarea
         value={guess}
@@ -63,14 +50,7 @@ export const FadedPractice: React.FC<FadedPracticeProps> = ({ data }) => {
         </button>
       ) : (
         <div className="space-y-3 pt-1">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#10B981] font-mono mb-2">
-              Solution
-            </p>
-            <div className="p-4 bg-[#12102A] text-white rounded-xl font-mono text-xs overflow-x-auto leading-relaxed">
-              <pre className="whitespace-pre-wrap text-[#10B981]">{data.solution}</pre>
-            </div>
-          </div>
+          <CodeBlock code={data.solution} label="Solution" colorClass="text-[#10B981]" />
           <p className="text-sm text-[#12102A]/80 leading-relaxed font-medium">{data.explanation}</p>
         </div>
       )}

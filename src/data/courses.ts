@@ -97,6 +97,27 @@ export const INITIAL_TRACKS: Track[] = [
               "Understanding the role of LLMs in conversational commerce"
             ],
             "lessonBody": "Most Kenyan SMEs never built a website, and most of their customers never asked for one. The storefront is already WhatsApp: a customer sees a product on Instagram or hears about a shop from a friend, opens a chat, and asks what's in stock. No app to download, no account to create, no browser tab to keep open. That's the whole reason this course exists. If you're going to automate a retail business, you automate where the business already happens.\n\nThere are two completely different products hiding behind the name \"WhatsApp Business.\" The WhatsApp Business App is the free app a shop owner installs on their own phone: one device, one person (or a small team sharing a phone) typing replies by hand. It's what most small businesses use today, and it has a hard ceiling, because a human has to read and answer every single message. The WhatsApp Cloud API is a different product entirely: Meta's hosted API that lets a program, not a person, send and receive those same messages. No app on a phone at all. Your code talks to Meta's servers over HTTPS, and Meta relays messages to and from the customer's WhatsApp app. This is the only version of WhatsApp that an autonomous agent can actually run on, and it's what every remaining lesson in this course is built on top of.\n\nGetting access isn't automatic. A real business has to register with Meta as a developer, create a Business app, and either use a temporary test number or verify their own. That setup work is next lesson, step by step. For now, the important thing to understand is what changes once it's done: instead of a notification popping up on someone's personal phone, an incoming customer message becomes an HTTP request delivered to a webhook URL your code controls. From that moment, everything is programmable.\n\nHere's the shape of the system you're building across this whole course, so each later lesson has somewhere to slot in. A customer message arrives at your webhook. Your code hands that message to an LLM (Gemini, in this course) along with the store's actual live inventory, so the model answers from real stock data instead of guessing. The model decides what to say back, or recognizes that the customer wants to buy something and extracts a structured order. If it's a purchase, your code triggers a real M-Pesa STK push so the customer's phone prompts them for their PIN right there in the chat. Once payment clears, you confirm the order and hand off for delivery. Every one of those steps becomes its own lesson: webhook setup, conversation state, connecting the LLM, injecting inventory, extracting structured orders, M-Pesa integration, and handling everything that goes wrong along the way.\n\nOne more thing worth being honest about before you move on: this lesson is orientation, not construction. You won't write a line of code until lesson 2. That's deliberate. Building the wrong mental model of what WhatsApp Cloud API actually is, and then trying to debug webhook and token issues on top of that confusion, is a much worse experience than spending 25 minutes now making sure the architecture actually makes sense.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 0,
+                "caption": "This is the entire interaction from the customer's side - no app, no account, just a chat.",
+                "chat": [
+                  { "sender": "customer", "text": "Hey, do you have the blue Ankara dress in size M?" },
+                  { "sender": "agent", "text": "Karibu! Yes, we have 3 left in size M, KES 3,200. Want me to hold one for you?" }
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "Every one of these steps becomes its own lesson in this course.",
+                "flow": [
+                  "Customer message arrives at your webhook",
+                  "Gemini reads it plus your live inventory",
+                  "A structured order is extracted",
+                  "M-Pesa STK push sent to their phone",
+                  "Order confirmed, ready for delivery"
+                ]
+              }
+            ],
             "interactiveCheck": {
               "type": "quiz",
               "question": "A shop owner is currently replying to customers herself using the free WhatsApp Business App on her phone. Which one can your automated agent actually plug into?",
@@ -139,6 +160,25 @@ export const INITIAL_TRACKS: Track[] = [
             ],
             "codeSnippet": "app.post('/webhook', (req, res) => {\n  const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];\n  if (message?.type === 'text') {\n    console.log(`Received: ${message.text.body} from ${message.from}`);\n  }\n  res.sendStatus(200);\n});",
             "lessonBody": "The WhatsApp Cloud API differs fundamentally from the consumer or standard Business apps. It is Meta's cloud-hosted infrastructure for sending and receiving WhatsApp messages programmatically at scale. Instead of interacting with a screen, you interact with endpoints. This API allows your Node.js application to listen for incoming messages and dispatch automated replies without requiring a physical device to be powered on or connected to the internet.\n\nTo start, the registration process requires setting up an application in the Meta Developer portal. You must create a Business app, add the WhatsApp product to it, and provision a temporary test number. Meta provides this test number along with a temporary access token. This token acts as your authentication layer when your code makes outbound requests to Meta's servers to send a message back to a customer.\n\nBefore your application can receive messages, you must successfully complete webhook verification. This is a challenge-response mechanism designed to prove you own the server endpoint you are registering. When you configure your webhook URL in the Meta portal, Meta immediately sends a GET request containing a random challenge string. Your server must parse this request and echo the string back with a 200 OK status. If it fails, Meta will not forward any messages to your application.\n\nOnce verified, the actual message payload structure is complex. When a customer texts your agent, Meta sends a POST request with a deeply nested JSON array. Your code must reliably extract the sender's phone number, the message text, and the timestamp from paths like `entry[0].changes[0].value.messages[0]`. Understanding this structure is crucial because a single crash here means the agent goes completely silent for the customer.\n\nFinally, it is important to understand the limits of the development environment. Test numbers allow you to send messages to up to 5 verified recipient phone numbers completely free of charge. This sandbox is perfect for building and testing the agent's logic. Moving to a production number requires a verified Meta Business account and introduces a pricing model based on conversation windows, but the underlying code you write today will remain exactly the same.",
+            "visualBreaks": [
+              {
+                "afterParagraph": 2,
+                "caption": "This is the exact handshake you'll complete in the exercise below.",
+                "flow": [
+                  "Meta sends a GET request with a challenge string",
+                  "Your server checks the verify token matches",
+                  "Server echoes the challenge back with 200 OK",
+                  "Meta starts forwarding real customer messages"
+                ]
+              },
+              {
+                "afterParagraph": 3,
+                "caption": "This single bubble is what your webhook receives as a deeply nested JSON payload - unpacking it correctly is what the code above does.",
+                "chat": [
+                  { "sender": "customer", "text": "Hi, do you have size 40 in stock?" }
+                ]
+              }
+            ],
             "fadedPractice": {
               "setup": "The webhook handler above deals with incoming messages once Meta already trusts your server. But Meta will not send you a single message until your server first passes a one-time verification handshake. When you register the webhook URL in the Meta portal, Meta sends a GET request with a challenge string, and your server has to prove it owns that URL.",
               "workedExample": "// Meta sends: GET /webhook?hub.mode=subscribe&hub.verify_token=YOUR_TOKEN&hub.challenge=918273\napp.get('/webhook', (req, res) => {\n  const mode = req.query['hub.mode'];\n  const token = req.query['hub.verify_token'];\n  const challenge = req.query['hub.challenge'];\n\n  if (mode === 'subscribe' && token === VERIFY_TOKEN) {\n    res.status(200).send(challenge);\n  } else {\n    res.sendStatus(403);\n  }\n});",

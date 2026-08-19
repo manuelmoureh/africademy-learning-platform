@@ -48,6 +48,16 @@ export interface Step {
       solution: string;
       explanation: string;
     };
+    // Visual breaks interleaved between lessonBody paragraphs, so a lesson isn't one long
+    // scroll of text (Mayer's multimedia learning principles: a visual only earns its
+    // place if it signals/reinforces the adjacent text, never decorative). afterParagraph
+    // is the 0-based index of the lessonBody paragraph (split on blank lines) it follows.
+    visualBreaks?: {
+      afterParagraph: number;
+      caption: string;
+      chat?: { sender: 'customer' | 'agent'; text: string }[];
+      flow?: string[];
+    }[];
   };
 }
 

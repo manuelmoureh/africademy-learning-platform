@@ -6,6 +6,9 @@ import { Header } from './Header';
 import { SystemThumbnail } from './SystemThumbnail';
 import { RetrievalCheck } from './RetrievalCheck';
 import { FadedPractice } from './FadedPractice';
+import { CodeBlock } from './CodeBlock';
+import { ChatDemo } from './ChatDemo';
+import { FlowDiagram } from './FlowDiagram';
 
 interface LessonPageProps {
   tracks: Track[];
@@ -208,14 +211,30 @@ export const LessonPage: React.FC<LessonPageProps> = ({
               <SystemThumbnail trackId={track.id} />
             </div>
 
-            {/* The actual lesson */}
+            {/* The actual lesson, with visual breaks interleaved between paragraphs so it
+                isn't one long scroll of text - each break is placed to reinforce the
+                paragraph it follows, not decorate it (Mayer's coherence/signaling). */}
             {step.content.lessonBody && (
-              <div className="space-y-4">
-                {step.content.lessonBody.split(/\n\s*\n/).map((paragraph, idx) => (
-                  <p key={idx} className="text-base text-[#12102A]/80 leading-relaxed font-medium">
-                    {paragraph.trim()}
-                  </p>
-                ))}
+              <div className="space-y-6">
+                {step.content.lessonBody.split(/\n\s*\n/).map((paragraph, idx) => {
+                  const breaks = (step.content.visualBreaks ?? []).filter((b) => b.afterParagraph === idx);
+                  return (
+                    <React.Fragment key={idx}>
+                      <p className="text-base text-[#12102A]/80 leading-relaxed font-medium">
+                        {paragraph.trim()}
+                      </p>
+                      {breaks.map((brk, bIdx) => (
+                        <figure key={bIdx} className="flex flex-col items-center gap-3 py-2">
+                          {brk.chat && <ChatDemo messages={brk.chat} />}
+                          {brk.flow && <FlowDiagram steps={brk.flow} />}
+                          <figcaption className="text-xs text-[#12102A]/50 font-semibold text-center max-w-sm">
+                            {brk.caption}
+                          </figcaption>
+                        </figure>
+                      ))}
+                    </React.Fragment>
+                  );
+                })}
               </div>
             )}
 
@@ -230,28 +249,11 @@ export const LessonPage: React.FC<LessonPageProps> = ({
                 </div>
 
                 {step.content.samplePrompt && (
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#12102A]/40 font-mono mb-2">
-                      Production System Prompt
-                    </p>
-                    <div className="p-4 bg-[#12102A] text-white rounded-xl font-mono text-xs overflow-x-auto leading-relaxed">
-                      <pre className="whitespace-pre-wrap text-emerald-400">{step.content.samplePrompt}</pre>
-                    </div>
-                  </div>
+                  <CodeBlock code={step.content.samplePrompt} label="Production System Prompt" colorClass="text-emerald-400" />
                 )}
 
                 {step.content.codeSnippet && (
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#12102A]/40 font-mono">
-                        Implementation
-                      </p>
-                      <span className="text-[10px] font-mono text-[#12102A]/40">server/agent.ts</span>
-                    </div>
-                    <div className="p-4 bg-[#12102A] text-white rounded-xl font-mono text-xs overflow-x-auto leading-relaxed">
-                      <pre className="whitespace-pre-wrap text-amber-300">{step.content.codeSnippet}</pre>
-                    </div>
-                  </div>
+                  <CodeBlock code={step.content.codeSnippet} label="Implementation" colorClass="text-amber-300" />
                 )}
 
                 {step.content.testCase && (
