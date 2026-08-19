@@ -6,14 +6,13 @@ const rowFade = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0 },
 };
-import { PlayCircle, CheckCircle, Lock, ExternalLink, Code2, ArrowRight } from 'lucide-react';
+import { CheckCircle, Lock, ExternalLink, Code2, ArrowRight } from 'lucide-react';
 
 interface CurriculumRoadmapProps {
   steps: Step[];
   selectedStepId: string | null;
   onSelectStep: (step: Step) => void;
   onToggleCompleteStep: (stepId: string) => void;
-  onOpenSandbox: () => void;
   isUnlocked: boolean;
 }
 
@@ -22,7 +21,6 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
   selectedStepId,
   onSelectStep,
   onToggleCompleteStep,
-  onOpenSandbox,
   isUnlocked,
 }) => {
   const completedCount = steps.filter(s => s.status === 'completed').length;
@@ -135,16 +133,6 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
                   <span className="text-[10px] font-bold px-2 py-1 bg-[#12102A] text-white rounded font-mono">
                     CURRENT
                   </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenSandbox();
-                    }}
-                    className="hidden sm:flex items-center gap-1 text-xs font-bold text-[#12102A] bg-[#F5A623] hover:bg-[#e4971c] px-2.5 py-1 rounded-md transition-colors cursor-pointer"
-                  >
-                    <PlayCircle className="w-3.5 h-3.5" />
-                    Open Lab
-                  </button>
                 </div>
               </motion.div>
             );

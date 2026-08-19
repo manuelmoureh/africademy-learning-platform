@@ -10,7 +10,6 @@ import { Sidebar } from './components/Sidebar';
 import { CurriculumRoadmap } from './components/CurriculumRoadmap';
 import { PortfolioStatus } from './components/PortfolioStatus';
 import { BuildWorkspaceCard } from './components/BuildWorkspaceCard';
-import { WhatsAppSandboxModal } from './components/WhatsAppSandboxModal';
 import { LessonDetailModal } from './components/LessonDetailModal';
 import { PricingModal } from './components/PricingModal';
 import { CheckoutModal } from './components/CheckoutModal';
@@ -179,7 +178,6 @@ export default function App() {
 
   // Modals
   const [selectedStep, setSelectedStep] = useState<Step | null>(null);
-  const [isSandboxOpen, setIsSandboxOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -199,6 +197,11 @@ export default function App() {
 
   const activeTrack = tracks.find(t => t.id === selectedTrackId) || tracks[0];
   const isProUser = user.plan === 'pro';
+
+  // "Start Building" always resumes at the first lesson that isn't done yet, or lesson 1
+  // if nothing's been started.
+  const nextStepFor = (track: Track): Step =>
+    track.steps.find(s => s.status !== 'completed') || track.steps[0];
 
   // Calculate live progress
   const completedStepsCount = activeTrack.steps.filter(s => s.status === 'completed').length;
@@ -345,11 +348,6 @@ export default function App() {
         />
 
         {/* Global Modals on Landing Page */}
-        <WhatsAppSandboxModal
-          isOpen={isSandboxOpen}
-          onClose={() => setIsSandboxOpen(false)}
-        />
-
         <PricingModal
           isOpen={isPricingOpen}
           onClose={() => setIsPricingOpen(false)}
@@ -513,7 +511,6 @@ export default function App() {
                     selectedStepId={selectedStep?.id || null}
                     onSelectStep={(step) => setSelectedStep(step)}
                     onToggleCompleteStep={handleToggleCompleteStep}
-                    onOpenSandbox={() => setIsSandboxOpen(true)}
                     isUnlocked={isTrackUnlocked(activeTrack.id)}
                   />
                 </div>
@@ -528,9 +525,8 @@ export default function App() {
                   />
 
                   <BuildWorkspaceCard
-                    onOpenSandbox={() => setIsSandboxOpen(true)}
-                    onUnlock={() => setIsTrackCheckoutOpen(true)}
-                    isUnlocked={isTrackUnlocked(activeTrack.id)}
+                    onStartBuilding={() => setSelectedStep(nextStepFor(activeTrack))}
+                    nextLessonTitle={nextStepFor(activeTrack).title}
                   />
                 </div>
 
@@ -541,18 +537,9 @@ export default function App() {
       </div>
 
       {/* Interactive Modals */}
-      <WhatsAppSandboxModal
-        isOpen={isSandboxOpen}
-        onClose={() => setIsSandboxOpen(false)}
-      />
-
       <LessonDetailModal
         step={selectedStep}
         onClose={() => setSelectedStep(null)}
-        onOpenSandbox={() => {
-          setSelectedStep(null);
-          setIsSandboxOpen(true);
-        }}
         onUnlock={() => {
           setSelectedStep(null);
           setIsTrackCheckoutOpen(true);

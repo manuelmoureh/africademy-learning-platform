@@ -1,12 +1,11 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Step } from '../types';
-import { X, CheckCircle2, Play, Code2, BookOpen, Sparkles, ArrowRight, Lock } from 'lucide-react';
+import { X, CheckCircle2, Code2, BookOpen, Sparkles, ArrowRight, Lock } from 'lucide-react';
 
 interface LessonDetailModalProps {
   step: Step | null;
   onClose: () => void;
-  onOpenSandbox: () => void;
   onUnlock: () => void;
   onToggleComplete: (stepId: string) => void;
   isUnlocked: boolean;
@@ -17,7 +16,6 @@ interface LessonDetailModalProps {
 export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
   step,
   onClose,
-  onOpenSandbox,
   onUnlock,
   onToggleComplete,
   isUnlocked,
@@ -221,7 +219,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
         {/* Footer Actions */}
         {!isLocked && (
-          <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-between gap-3">
+          <div className="px-6 py-4 bg-[#F0EEF6] border-t border-[#12102A]/10 flex items-center justify-start gap-3">
             <button
               onClick={() => onToggleComplete(step.id)}
               className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
@@ -233,19 +231,6 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
               <CheckCircle2 className="w-4 h-4" />
               {isCompleted ? 'Completed (Click to Reset)' : 'Mark as Completed'}
             </button>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenSandbox();
-                }}
-                className="px-4 py-2 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-xs font-black rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
-              >
-                <Play className="w-3.5 h-3.5 fill-current" />
-                Launch in Sandbox
-              </button>
-            </div>
           </div>
         )}
 

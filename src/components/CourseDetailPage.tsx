@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star, Eye, X } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 import { StarRating } from './StarRating';
+import { SystemThumbnail } from './SystemThumbnail';
 import { fetchUserTrackRating, submitTrackRating } from '../lib/db';
 
 const RateSystem: React.FC<{ trackId: string; userId: string | null; onOpenAuth: () => void }> = ({ trackId, userId, onOpenAuth }) => {
@@ -86,6 +87,7 @@ interface CourseDetailPageProps {
 }
 
 export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnlocked, userId, onBack, onStart, onOpenAuth }) => {
+  const [showDemo, setShowDemo] = useState(false);
   const learnings = Array.from(
     new Set(track.steps.flatMap((s) => s.content.keyLearnings).slice(0, 6))
   );
@@ -117,9 +119,18 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnl
                 {track.trackNumber}
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-[#12102A] tracking-tight mt-1">
-              {track.title}
-            </h1>
+            <div className="flex items-start justify-between gap-3 mt-1">
+              <h1 className="text-3xl sm:text-4xl font-black text-[#12102A] tracking-tight">
+                {track.title}
+              </h1>
+              <button
+                onClick={() => setShowDemo(true)}
+                className="shrink-0 mt-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#12102A]/10 bg-white text-xs font-bold text-[#12102A]/70 hover:text-[#12102A] hover:border-[#12102A]/20 cursor-pointer transition-all active:scale-[0.97]"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                View Demo
+              </button>
+            </div>
             <StarRating rating={track.rating} reviewCount={track.reviewCount} className="mt-2" />
             <p className="text-sm text-[#12102A]/70 mt-3 leading-relaxed font-medium max-w-xl">
               {track.description}
@@ -195,6 +206,44 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnl
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showDemo && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#12102A]/60 backdrop-blur-xs"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setShowDemo(false)}
+          >
+            <motion.div
+              className="bg-[#12102A] rounded-2xl w-full max-w-sm p-8 flex flex-col items-center shadow-2xl"
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 12 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-full flex items-center justify-between mb-6">
+                <p className="text-[10px] font-bold uppercase tracking-widest font-mono text-white/50">
+                  What you'll build
+                </p>
+                <button
+                  onClick={() => setShowDemo(false)}
+                  className="text-white/40 hover:text-white cursor-pointer transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <SystemThumbnail trackId={track.id} />
+              <p className="text-xs text-white/60 text-center mt-6 leading-relaxed">
+                {track.whoBuysThis}
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.section>
   );
 };
