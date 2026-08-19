@@ -242,7 +242,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "40 min",
           "category": "Data & State",
           "summary": "Using Google's Gemini SDK to generate replies based on customer inquiries.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "We replace static keyword replies with Gemini 3.7 Flash, which can understand messy human input. We will initialize the generative AI client and pass the WhatsApp message history to generate contextual, natural responses.",
             "keyLearnings": [
@@ -286,7 +286,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "35 min",
           "category": "Prompt Design",
           "summary": "Designing a persona that greets naturally in English, Swahili, or Sheng, keeps replies short enough to read on a phone, and knows exactly when to stop and hand off to a human.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "A prompt that answers correctly but sounds like a script loses trust fast. This lesson builds the agent's actual voice: warm but brief, price-first, and comfortable matching a customer's own opening, whether that's a formal 'Habari, how can I help?' or a casual 'Sasa, niaje!'.",
             "keyLearnings": [
@@ -744,7 +744,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "35 min",
           "category": "Media Engine",
           "summary": "Send rich media like property brochures (PDFs) based on the user's qualified preferences such as a 2-bedroom in Westlands.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Enhance the prospect's experience by instantly delivering property floor plans and brochures. You will map user preferences to a media database and trigger WhatsApp document messages.",
             "lessonBody": "Providing rich media at the exact moment of high intent drastically increases engagement. When a lead explicitly qualifies themselves for a specific tier of housing, sending an automated property brochure (PDF) or high-quality floor plan keeps them invested. The WhatsApp Cloud API natively supports media messages, making this a seamless experience.\n\nThe challenge lies in dynamic selection. You cannot blast the same brochure to everyone. Your system needs a media mapping table—a database or structured object that links property profiles (e.g., \"2-bedroom Westlands\") to a specific WhatsApp Media ID. When the state engine finishes qualification, it queries this table to find the perfect matching document.\n\nUploading media directly from your server on every request is slow and inefficient. Instead, the best practice is to upload your PDFs to the Meta servers once using the Media API, which returns a persistent Media ID. Your bot then sends messages using this ID, allowing WhatsApp to instantly deliver the file without re-uploading the heavy payload every time.\n\nA raw file attachment is easily ignored. The caption accompanying the PDF is where you drive action. Your code should dynamically generate a caption summarizing the key selling points—such as proximity to a major road or included amenities like a borehole—and include a clear call-to-action urging them to review the brochure and book a viewing.\n\nMastering automated media dispatch turns your bot into a highly capable digital broker, capable of delivering personalized marketing materials instantly, 24/7, without requiring a human agent to manually dig through their files and forward documents.",
@@ -764,7 +764,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "30 min",
           "category": "Lead Scoring",
           "summary": "Use soft-qualification questions to filter out low-intent leads before they consume a human agent's valuable time.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Not all inquiries are ready to buy. Design a gentle funnel that identifies low-budget or 'just browsing' users, redirecting them to an automated email list rather than booking an in-person viewing.",
             "lessonBody": "Human real estate agents spend up to 40% of their time talking to prospects who have zero intention or ability to buy. An automated agent's true value isn't just in finding good leads—it's in ruthlessly filtering out the bad ones. Disqualifying \"tire-kickers\" protects the agency's time and resources.\n\nDisqualification relies on setting hard thresholds. If a user states a budget of KES 20,000 per month but insists on living in Karen or Runda, the system must recognize the mismatch. Instead of pushing this impossible lead to a human agent, the bot triggers a disqualification state.\n\nHandling disqualification requires tact. An abrupt \"you cannot afford this\" damages the brand. Instead, the prompt should instruct the LLM to politely explain the market reality, such as: \"While we don't currently have properties in Karen at that budget, we do have great options in Rongai or Ruaka.\" If they refuse to adjust their criteria, the bot cleanly closes the active qualification loop.\n\nDisqualified leads shouldn't be discarded entirely; they are funneled into a long-term nurture sequence. By tagging them in the CRM (Google Sheets) as \"Low Intent / Future,\" the agency can add them to automated email or WhatsApp newsletter lists for future projects that fit their budget, preserving the relationship without burning immediate manpower.\n\nImplementing this soft-filtering logic ensures the human agents only wake up to notifications for highly qualified, budget-ready prospects, proving the ROI of your automation system immediately.",
@@ -1018,7 +1018,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "40 min",
           "category": "Reconciliation",
           "summary": "Connect to the Safaricom Daraja API to automatically mark invoices as paid when an M-Pesa transaction arrives.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Manual reconciliation is the biggest pain point for Kenyan SMEs. In this lesson, you will set up a webhook to receive M-Pesa C2B (Customer to Business) notifications via the Daraja API, matching the transaction amount and phone number to an open invoice.",
             "keyLearnings": [
@@ -1038,7 +1038,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "35 min",
           "category": "Error Handling",
           "summary": "Detect unreadable receipts and prompt the user for a clearer photo instead of saving garbage data.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Camera phones in low-light shops produce blurry images. You will configure the AI to confidently report when a receipt is illegible, triggering an automated WhatsApp reply asking the shop owner to retake the photo.",
             "keyLearnings": [
@@ -1285,7 +1285,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "40 min",
           "category": "Prompt Design",
           "summary": "Draft the foundational prompt that forces the LLM to rely strictly on the retrieved knowledge base context and politely decline unknown queries.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "The biggest risk in AI support is hallucination. You will write a system prompt that explicitly restricts the agent to the provided context. If a customer asks about a product not mentioned in the retrieved FAQs, the agent must smoothly admit it doesn't know.",
             "lessonBody": "Retrieving the right document chunk is only half the battle; the other half is forcing the LLM to use it correctly. The biggest risk in deploying an AI support agent is hallucination—the AI confidently offering a free refund when the retrieved policy clearly states all sales are final. To prevent this, we must master fact grounding through prompt engineering.\n\nOur system prompt acts as the absolute law for the AI. We inject the retrieved vector chunks directly into the LLM's context window, alongside a strict directive: \"Answer the user's question using ONLY the context provided below.\" This boundary ensures the AI acts as a summarizer of the provided facts, rather than a creative writer inventing new policies.\n\nHandling negative cases is just as important as answering successfully. We must explicitly instruct the AI on what to do if the retrieval step returns irrelevant chunks. The prompt must dictate a graceful failure mode: \"If the provided context does not contain the answer, do not guess. Reply exactly with: 'I don't have that information, let me connect you to a human agent.'\"\n\nTone calibration is the final layer of the prompt. A support agent should reflect the business's brand—warm, polite, and professional. We instruct the LLM to keep answers concise, under three sentences, as long paragraphs perform poorly on mobile WhatsApp screens. We also enforce Kenyan localization, requiring the AI to quote prices consistently in KES and use appropriate greetings like 'Karibu' or 'Pole sana' when dealing with complaints.\n\nTo ensure consistency, we lock the LLM's 'Temperature' parameter to 0 or 0.1. A high temperature makes the AI creative and unpredictable, which is great for writing poetry but disastrous for customer support. A low temperature guarantees deterministic, factual answers that strictly adhere to the retrieved business data.",
@@ -1305,7 +1305,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "35 min",
           "category": "Analysis",
           "summary": "Use the LLM to evaluate the emotional tone of incoming messages to tag high-priority tickets or frustrated customers.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Not all tickets are equal. A customer asking for operating hours can wait, but someone complaining about a missing M-Pesa payment needs immediate attention. We'll use sentiment analysis to automatically tag and escalate urgent or angry messages.",
             "lessonBody": "Not all support tickets are created equal. A customer casually asking for your Sunday operating hours can wait, but a frustrated client complaining about a missing M-Pesa payment or a broken product needs immediate attention. To handle this, we integrate automated sentiment detection to triage incoming messages before the agent even replies.\n\nWe achieve this by adding a lightweight analysis step to our message pipeline. We can use a dedicated API like AWS Comprehend or a fast, low-cost LLM call to evaluate the emotional tone of the incoming text. The goal is to classify the sentiment on a spectrum—such as positive, neutral, or negative—and identify the core intent behind the message.\n\nRelying on simple keyword matching is rarely enough. A customer might say, \"I've been waiting for three days, this is unacceptable,\" without using explicit curse words. Semantic sentiment analysis understands the frustration in the context, accurately flagging it as a negative interaction even when the language is formally polite.\n\nBased on this analysis, the system automatically assigns priority tags in the database. A standard inquiry gets a `P3_Normal` tag, while a detected complaint or a message containing urgency keywords (like 'stuck', 'failed', or 'refund') gets immediately tagged as `P1_Urgent`. This tagging happens in milliseconds, categorizing the queue automatically.\n\nThis automated triage directly impacts the business's Service Level Agreement (SLA). By identifying high-priority tickets instantly, the system can route angry customers to the front of the human manager's queue, or trigger specialized AI workflows that prioritize de-escalation over standard FAQ responses. It transforms a chaotic inbox into an organized, prioritized workflow.",
@@ -1559,7 +1559,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "40 min",
           "category": "Architecture",
           "summary": "Expand your system to handle multiple stylists, doctors, or technicians simultaneously.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "A real salon has multiple staff members with overlapping schedules. We'll upgrade our calendar logic to query a resource array, finding the first available staff member or routing the client to their requested favorite.",
             "lessonBody": "While a single-calendar system works well for a solo consultant, most service businesses—like salons, clinics, or repair shops—operate with multiple staff members. When a client requests a 10 AM slot, the system needs to check availability across all technicians, not just a single master calendar. This requires a shift from a one-to-one architecture to a resource-pooling architecture.\n\nThe most effective way to handle this with Google Calendar is to create a separate, distinct calendar for each staff member under the business's main Google Workspace account. For example, 'Calendar A' for Stylist John and 'Calendar B' for Stylist Jane. Your backend maintains a configuration array mapping staff names to their specific Google Calendar IDs.\n\nWhen querying for availability, the freeBusy endpoint allows you to check multiple calendars in a single API call. By passing an array of all staff calendar IDs, Google returns the busy periods for each. Your backend logic then cross-references this data to find a calendar that has zero busy blocks during the requested time slot.\n\nClient preference adds another layer of complexity. Some clients will say, 'I want to book with Jane.' In this case, your NLU must extract the entity 'Jane' and restrict the freeBusy check to her specific calendar ID. If Jane is booked, the agent shouldn't just say 'No'; it should offer Jane's next available slot, or suggest an immediate slot with another available stylist.\n\nThis multi-resource approach also sets the foundation for basic load balancing. If both John and Jane are free at 10 AM, your system should have a deterministic way to assign the booking—either round-robin (to distribute work evenly) or prioritized by seniority. This business logic lives in your standard code, completely independent of the LLM.",
@@ -1579,7 +1579,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "35 min",
           "category": "Prompt Design",
           "summary": "Craft the system prompt that ensures the AI stays polite, focused on booking, and doesn't get distracted.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "You will design the core AI persona for a Kenyan service business. The agent must warmly greet customers, offer available slots concisely, and refuse to answer questions unrelated to the business.",
             "lessonBody": "The system prompt is the personality and operating manual for your agent. For a service business, hospitality is paramount. The bot needs to sound welcoming, professional, and culturally attuned. Using standard Swahili greetings like 'Karibu' (Welcome) or 'Habari' (Hello) establishes immediate rapport, while avoiding overly robotic or excessively colloquial language.\n\nA critical component of the prompt is constraint enforcement. If a user asks the booking agent about the weather or political news, the agent must not engage. You achieve this through negative prompting: explicit instructions telling the LLM what it must *not* do. For example: 'You are a booking assistant for a salon. Under no circumstances should you answer questions unrelated to our services, pricing, or availability. If asked an off-topic question, politely redirect the user to booking an appointment.'\n\nThe prompt must also dictate formatting for WhatsApp readability. WhatsApp messages should be punchy and easy to scan. You will instruct the LLM to use WhatsApp-specific markdown—bolding *important terms* and using bullet points for listing available times or services. Long, dense paragraphs lead to user drop-off.\n\nTo prevent hallucinations, the prompt must enforce strict adherence to provided context. You will inject the business's operating hours (e.g., 'We are open Monday to Saturday, 8 AM to 6 PM'). The prompt must explicitly state: 'Never offer or agree to an appointment outside of these operating hours.' This acts as a secondary safety net alongside your backend API checks.\n\nFinally, the prompt manages the tone of escalation. If the user asks a complex question the bot cannot confidently answer (e.g., a highly specific medical query for a clinic), the prompt should instruct the LLM to trigger a human handoff protocol, responding with a polite message that a human staff member will take over the chat shortly.",
@@ -1823,7 +1823,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "45 min",
           "category": "Integrations",
           "summary": "Navigating Meta's OAuth flow to connect an Instagram Professional account and Facebook Page for API publishing.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "To publish automatically, we need the right permissions. This lesson covers setting up a Meta App, authenticating a business account, and generating the required long-lived access tokens for seamless background posting.",
             "lessonBody": "To publish content directly to a Facebook Page or an Instagram Professional account, your system must authenticate through the Meta Graph API. This process replaces manual password sharing with secure, token-based authorization via Meta's standard OAuth 2.0 flow.\n\nThe first step involves creating an app in the Meta Developer portal and configuring the Facebook Login for Business product. You must request specific permissions—namely instagram_basic, instagram_content_publish, pages_show_list, and pages_read_engagement—to allow the system to post on the owner's behalf.\n\nWhen a boutique owner onboarding onto your system clicks Connect Facebook, they are redirected to Meta's servers to approve your app. Upon approval, Meta redirects them back to your application with a short-lived authorization code, which your backend immediately exchanges for a User Access Token.\n\nShort-lived tokens expire in hours, which breaks background automation. The system must hit the /oauth/access_token endpoint to trade the short-lived token for a long-lived one, valid for 60 days. It then queries the /me/accounts endpoint to get the specific Page Access Token, which never expires as long as the user's password remains unchanged.\n\nBecause Instagram publishing is routed through the connected Facebook Page, the system queries the Page's instagram_business_account field. Securing this specific Instagram Account ID is mandatory before any publishing requests can be made, completing the authentication pipeline.",
@@ -1843,7 +1843,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "30 min",
           "category": "Media Engine",
           "summary": "Processing product images and ensuring they are hosted on publicly accessible URLs required by the Instagram API.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "The Instagram Graph API cannot accept direct file uploads; it requires a public URL to fetch the image. We will build a pipeline to temporarily host uploaded product photos and pass the correct URL format to the API.",
             "lessonBody": "The Instagram Graph API does not allow you to send image or video files directly in the body of a publishing request. Instead, it requires a publicly accessible URL pointing to the media file, which Meta's servers will then download and process independently.\n\nWhen the business owner uploads a product photo via WhatsApp or a web portal, your system must temporarily store it. The architecture relies on an object storage service like AWS S3 or Google Cloud Storage, saving the image and generating a presigned URL or placing it in a publicly readable bucket temporarily.\n\nInstagram is notoriously strict about image dimensions. Before generating a public URL, the system should inspect the image file. If it doesn't meet the aspect ratio constraints, between 4:5 and 1.91:1, or is in an unsupported format like WebP, the system must convert it to a standard JPEG or reject it with a clear error message.\n\nWhen Meta's servers attempt to fetch the provided media URL, they expect an immediate successful response. If the URL points to a slow cold-storage bucket or a lambda function that needs to wake up, the Meta request will time out and the post will fail. Fast, direct links are essential.\n\nOnce the media has been successfully published to the social feed, the temporary public URL is no longer needed. To avoid hosting costs and prevent the unauthorized scraping of the boutique's product imagery, a background worker is triggered to delete the staged image from the temporary bucket.",
@@ -2050,7 +2050,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "40 min",
           "category": "Forecasting",
           "summary": "Adapt the baseline forecasting model to account for seasonal spikes, holidays, or sudden trend shifts in the market.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Learn to inject a seasonality multiplier into your forecast. This ensures you don't under-order during peak seasons (like holidays) or over-order immediately after the rush ends.",
             "keyLearnings": [
@@ -2071,7 +2071,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "30 min",
           "category": "Analytics",
           "summary": "Identify inventory that isn't moving, flagging slow-moving SKUs so you can liquidate and reallocate budget.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Capital tied up in dust-gathering products is a killer for SMEs. We build an analyzer that flags items with zero movement over 60 days, triggering liquidation alerts before they become dead stock.",
             "keyLearnings": [
@@ -2318,7 +2318,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "40 min",
           "category": "Flow Design",
           "summary": "Design prompts that force the LLM to justify its scores based solely on explicit CV evidence.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "AI hiring tools can introduce bias if not carefully constrained. In this lesson, you write system prompts that strictly map CV facts against the rubric and prevent the model from hallucinating or inferring skills based on unrelated factors.",
             "keyLearnings": [
@@ -2338,7 +2338,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "25 min",
           "category": "Content Engine",
           "summary": "Generate polite, brand-aligned decline emails that provide standard feedback without discouraging candidates.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Applicant experience matters, even for rejected candidates. You'll build a module that drafts professional, empathetic rejection messages tailored to the missing requirements, maintaining the hiring company's good reputation.",
             "keyLearnings": [
@@ -2589,7 +2589,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "35 min",
           "category": "Prompt Design",
           "summary": "Using AI to shift the conversation tone dynamically based on the overdue amount and customer history.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "A KES 2,000 overdue personal invoice shouldn't receive the exact same messaging as a KES 500,000 B2B invoice. You'll design prompt logic that instructs the LLM to adjust its formality, patience, and phrasing based on the account size and context.",
             "lessonBody": "Not all debts are created equal, and your AI agent must understand the difference. A customer who forgot to pay a KES 2,000 personal invoice for a small repair job requires a vastly different approach than a corporate client who is 45 days late on a KES 500,000 B2B service contract. If your agent uses the exact same language for both, it will either insult the corporate client with excessive familiarity or overwhelm the small customer with intimidating legal jargon.\n\nTo solve this, you need to design conditional prompt logic that shifts the LLM's persona based on the invoice value and the customer's profile. Before sending a query to Gemini or GPT-4, your backend must evaluate the account size and select the appropriate system instructions. For smaller amounts, the prompt might instruct the AI to be \"warm, casual, and brief,\" using phrases like \"Hi there, just a quick reminder.\"\n\nFor larger B2B accounts, the prompt must enforce a strict, professional corporate tone. The AI should use formal salutations (\"Dear Operations Team\"), clearly outline the invoice details, and politely request an update on the payment processing status. It should avoid casual pleasantries and focus entirely on the business transaction. This dynamic shifting makes the agent feel like a nuanced human employee rather than a rigid script.\n\nEqually important in tone calibration is setting absolute negative constraints. Regardless of the account size or the customer's response, the AI must never resort to threats, aggression, or illegal collection tactics. Your system prompt must explicitly forbid statements like \"We will report you to the CRB immediately\" unless that is a verified, legally compliant next step authorized by the business owner.\n\nBy mastering tone calibration, you ensure the collections agent protects the business's reputation. It allows the business owner to trust the AI with sensitive client relationships, knowing that it will apply the right amount of pressure without burning bridges or crossing legal boundaries.",
@@ -2610,7 +2610,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "30 min",
           "category": "Logic",
           "summary": "Building logic to correctly acknowledge partial payments while politely requesting the balance.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Customers often pay part of the balance. The system must recognize the Daraja webhook callback, update the CRM, and have the AI acknowledge the receipt of the partial amount while cleanly restating the remaining balance without sounding robotic.",
             "lessonBody": "In the real world of small business finance, customers rarely pay perfectly. When faced with an overdue balance, a customer might pay half now to buy time, or they might send a slightly lower amount because of transaction fees or simple miscalculation. If your system rigidly expects the exact invoice total and fails when it sees anything else, it will create massive confusion. The agent must handle partial payments seamlessly.\n\nWhen your Daraja webhook receives a payment callback, the first step is reconciliation. Your backend script must compare the received amount against the expected invoice total. If the amount is lower, you shouldn't just reject it—you must update the database to reflect the new outstanding balance. The invoice state moves from \"Overdue\" to \"Partially Paid,\" which triggers a completely different logic path for your AI agent.\n\nThe LLM must be prompted to acknowledge the received funds specifically. For example, the system prompt injected into the next WhatsApp message should include the exact amount received and the exact amount remaining. The AI needs to say, \"Thank you for the KES 5,000 payment via M-Pesa. You currently have a remaining balance of KES 3,500.\" This confirms receipt, builds trust, and keeps the pressure on for the remainder without sounding robotic.\n\nFurthermore, a partial payment usually resets the escalation clock. If a customer was on Day 15 (Firm Reminder) but makes a significant partial payment, it is often bad practice to hit them with a Day 16 (Final Notice) message the next morning. Your logic engine should reset their status, giving them a brief grace period before the agent follows up on the remaining balance.\n\nHandling these nuances is what makes an AI agent genuinely useful to a Kenyan SME. By successfully managing partial payments, the agent reduces the administrative burden on the business owner, who no longer has to manually verify M-Pesa messages and text customers back with updated balances.",
@@ -2841,7 +2841,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "45 min",
           "category": "Data & State",
           "summary": "Maintain user session state to manage an active shopping cart over WhatsApp, allowing customers to add or remove items.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Maintain user session state to manage an active shopping cart over WhatsApp. Enable customers to add, remove, or modify items, and generate clear, structured order summaries with KES subtotals.",
             "keyLearnings": [
@@ -2861,7 +2861,7 @@ export const INITIAL_TRACKS: Track[] = [
           "duration": "40 min",
           "category": "Logistics",
           "summary": "Design a conversational flow to capture delivery details accurately and map Nairobi estate names to specific delivery zones.",
-          "isGated": false,
+          "isGated": true,
           "content": {
             "overview": "Design a conversational flow to capture delivery details accurately. Learn techniques to standardize Nairobi estate names (e.g., Kilimani, South B, Ruaka) to map them to specific delivery zones.",
             "keyLearnings": [
