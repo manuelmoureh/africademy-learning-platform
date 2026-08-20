@@ -166,9 +166,11 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
                 </p>
               </div>
 
-              <div className="shrink-0 flex items-center gap-2">
-                <Lock className={`w-3.5 h-3.5 ${isLocked ? 'text-gray-500' : 'text-[#12102A]/40'}`} />
-              </div>
+              {isLocked && (
+                <div className="shrink-0 flex items-center gap-2">
+                  <Lock className="w-3.5 h-3.5 text-gray-500" />
+                </div>
+              )}
             </motion.div>
           );
         })}
