@@ -238,7 +238,7 @@ export default function App() {
   // course's content is reviewed and confirmed complete - courses not in this set still
   // open the older lesson modal (LessonDetailModal), which doesn't render lessonBody,
   // visualBreaks, interactiveCheck, or fadedPractice.
-  const LESSON_PAGE_TRACKS = new Set(['whatsapp-retail-agent', 'lead-capture-bot', 'invoicing-assistant', 'support-ticketing-agent']);
+  const LESSON_PAGE_TRACKS = new Set(['whatsapp-retail-agent', 'lead-capture-bot', 'invoicing-assistant', 'support-ticketing-agent', 'booking-scheduler-agent']);
   const openLesson = (step: Step) => {
     if (LESSON_PAGE_TRACKS.has(activeTrack.id)) {
       navigate(`/systems/${activeTrack.id}/learn/${step.id}`);

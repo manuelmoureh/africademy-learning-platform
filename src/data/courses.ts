@@ -2489,253 +2489,659 @@ export const INITIAL_TRACKS: Track[] = [
     impactStat: 'Bots handle bookings 24/7, so a business never misses one after hours',
     featuredOnHomepage: true,
     steps: [
-        {
-          "id": "book-step-1",
-          "number": "01",
-          "title": "WhatsApp Booking Architectures",
-          "subtitle": "Mapping the conversation to calendar states",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Architecture",
-          "summary": "Learn how to structure a conversational booking flow that moves a client from inquiry to confirmed appointment seamlessly.",
-          "isGated": false,
-          "content": {
-            "overview": "Before writing code, we map out the state machine of a booking interaction. You'll learn how to handle the greeting, service selection, date proposal, and confirmation states typical in a Kenyan salon or clinic.",
-            "lessonBody": "Conversational scheduling is fundamentally different from a web form. On a website, a user sees all available times at once. On WhatsApp, sending a giant wall of times is overwhelming and creates a poor user experience. Instead, the agent must act like a human receptionist, guiding the conversation through a sequence of specific states: greeting, service selection, time preference, and final confirmation.\n\nWe manage this using a state machine. A state machine ensures that the AI doesn't get confused if a user suddenly changes the subject or answers a question out of order. For example, if the current state is AWAITING_SERVICE, the agent expects a service name. If the user says 'kesho' (tomorrow), the agent needs to gently steer them back to picking a service before dealing with the time.\n\nIn a Kenyan salon or clinic, the complexity increases because clients often combine services or request specific staff members. A robust architecture separates the natural language understanding (NLU) from the business logic. The LLM's job is to extract the intent and entities (like 'braids' and 'Tuesday morning'), while standard code (like Node.js) handles the strict state transitions and calendar lookups.\n\nThis separation prevents hallucinations. If you let the LLM guess what times are available, it will confidently offer times that are already booked. By mapping the conversation to strict states, we only prompt the LLM to format the response after our standard code has queried the actual calendar.\n\nFinally, state persistence is crucial. Since WhatsApp webhooks are stateless, you must store the user's phone number and current session state in a database (like PostgreSQL or even a structured Google Sheet for simple deployments). When the next message arrives, your system retrieves the state, processes the input, and moves the user one step closer to a confirmed booking.",
-            "keyLearnings": [
-              "Designing the state machine for conversational scheduling",
-              "Mapping WhatsApp message triggers to booking states",
-              "Handling missing information gracefully without frustrating the user"
-            ]
-          }
-        },
-        {
-          "id": "book-step-2",
-          "number": "02",
-          "title": "Google Calendar API Integration",
-          "subtitle": "Connecting WhatsApp to live availability",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Integrations",
-          "summary": "Set up the Google Calendar API to enable real-time free/busy lookups for your booking agent.",
-          "isGated": false,
-          "content": {
-            "overview": "A booking agent is useless if it double-books. Here we integrate Google Calendar via Node.js, authenticating securely to check actual availability before suggesting a time slot to the customer.",
-            "lessonBody": "The foundation of any reliable scheduling agent is the source of truth for availability. For most small service businesses, this is Google Calendar. It's free, syncs instantly across devices, and staff already know how to use it. Our agent will use the Google Calendar API to read availability and insert new events, acting as an automated receptionist that never sleeps.\n\nAuthenticating with Google APIs requires setting up a Google Cloud Console project and creating a Service Account. A Service Account is a special type of Google account intended to represent a non-human user that needs to authenticate and be authorized to access data in Google APIs. You will generate a JSON key file for this account, which your Node.js application will use to prove its identity.\n\nOnce authenticated, the most critical endpoint is freeBusy.query. Unlike fetching all events (which exposes private client details), freeBusy simply returns time blocks that are occupied. This is exactly what we need to determine if a specific 30-minute slot is open. You pass in a time range (e.g., today between 9 AM and 5 PM) and the calendar ID, and Google responds with an array of busy intervals.\n\nA common pitfall when integrating calendars in Kenya is timezone mismanagement. Google Calendar stores times in UTC, but your business operates in East Africa Time (UTC+3). If your code doesn't explicitly handle the Africa/Nairobi timezone when querying and creating events, your bot will book appointments three hours late. Always use ISO-8601 strings with explicit timezones in your API requests.\n\nFinally, the service account needs permission to view and edit the business's actual calendar. You achieve this by sharing the specific Google Calendar with the service account's email address, just as you would share a calendar with a human colleague. This gives your agent the access it needs without exposing the owner's personal emails or other calendars.",
-            "keyLearnings": [
-              "Authenticating with Google Cloud Service Accounts",
-              "Querying the freeBusy API endpoint for specific time ranges",
-              "Formatting calendar availability into clean WhatsApp text"
-            ],
-            "codeSnippet": "const { google } = require('googleapis');\n\nasync function checkAvailability(calendarId, startTime, endTime) {\n  const calendar = google.calendar({ version: 'v3', auth: jwtClient });\n  const res = await calendar.freebusy.query({\n    requestBody: {\n      timeMin: startTime.toISOString(),\n      timeMax: endTime.toISOString(),\n      items: [{ id: calendarId }]\n    }\n  });\n  return res.data.calendars[calendarId].busy.length === 0;\n}"
-          }
-        },
-        {
-          "id": "book-step-3",
-          "number": "03",
-          "title": "Parsing Natural Language Dates",
-          "subtitle": "Translating casual expressions into strict timestamps",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Data Extraction",
-          "summary": "Use AI to convert casual time expressions and local slang into strict date/time formats for API scheduling.",
-          "isGated": false,
-          "content": {
-            "overview": "Clients don't use strict database timestamps. They say 'tomorrow morning', 'next week Tuesday', or 'kesho asubuhi'. You'll build a prompt that reliably parses these expressions into standardized machine-readable formats.",
-            "lessonBody": "Human beings speak in relative time. A message like 'Can I come in tomorrow around 2?' means nothing to an API. The Google Calendar API requires an absolute ISO-8601 timestamp, like 2026-08-20T14:00:00+03:00. Bridging this gap between human relativity and machine absolute precision is where large language models excel, provided they are given the right context.\n\nThe challenge in the Kenyan market is the mix of English, Swahili, and Sheng. A client might say 'kesho asubuhi' (tomorrow morning), 'Jamo' (Friday), or 'mteja next week' (next week). Standard date-parsing libraries like Date.js or Moment.js struggle with this localized nuance. An LLM, however, can easily interpret these phrases if guided properly.\n\nTo make this work, the LLM must know the current exact date and time. An LLM is a frozen snapshot of weights; it doesn't intrinsically know what 'today' is. In your system prompt, you must dynamically inject the current date, time, and timezone (e.g., 'Today is Thursday, August 19, 2026, 14:30 EAT'). With this anchor, the model can accurately resolve 'kesho' to 'August 20'.\n\nYou will structure the LLM's output using JSON mode. Instead of letting the model reply with a conversational sentence, you instruct it to output a strict JSON object containing the resolved year, month, day, and time. This structured output is then consumed by your Node.js backend to construct the final Date object for the Calendar API.\n\nAmbiguity is another hurdle. If a user says 'afternoon,' what exact time do they mean? Your prompt must instruct the model to either pick a default starting time (e.g., 14:00) and flag it as an estimate, or better yet, return an 'incomplete' status that triggers your state machine to ask a follow-up question: 'What time in the afternoon works best for you?'",
-            "keyLearnings": [
-              "Handling timezone awareness (EAT / UTC+3)",
-              "Prompting the LLM to output strict JSON dates from casual text",
-              "Dealing with ambiguous time requests like 'afternoon'"
-            ],
-            "testCase": {
-              "input": "Can I get my hair done kesho around 2pm?",
-              "expectedOutput": "{\"date\": \"2026-08-20\", \"time\": \"14:00:00\", \"timezone\": \"Africa/Nairobi\"}"
+          {
+            "id": "book-step-1",
+            "number": "01",
+            "title": "WhatsApp Booking Architectures",
+            "subtitle": "Mapping the conversation to calendar states",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Architecture",
+            "summary": "Learn how to structure a conversational booking flow that moves a client from inquiry to confirmed appointment seamlessly.",
+            "isGated": false,
+            "content": {
+              "overview": "Before writing code, we map out the state machine of a booking interaction. You'll learn how to handle the greeting, service selection, date proposal, and confirmation states typical in a Kenyan salon or clinic.",
+              "lessonBody": "Conversational scheduling is fundamentally different from a web form. On a website, a user sees all available times at once. On WhatsApp, sending a giant wall of times is overwhelming and creates a poor user experience. Instead, the agent must act like a human receptionist, guiding the conversation through a sequence of specific states: greeting, service selection, time preference, and final confirmation.\n\nWe manage this using a state machine. A state machine ensures that the AI doesn't get confused if a user suddenly changes the subject or answers a question out of order. For example, if the current state is AWAITING_SERVICE, the agent expects a service name. If the user says 'kesho' (tomorrow), the agent needs to gently steer them back to picking a service before dealing with the time.\n\nIn a Kenyan salon or clinic, the complexity increases because clients often combine services or request specific staff members. A robust architecture separates the natural language understanding (NLU) from the business logic. The LLM's job is to extract the intent and entities (like 'braids' and 'Tuesday morning'), while standard code (like Node.js) handles the strict state transitions and calendar lookups.\n\nThis separation prevents hallucinations. If you let the LLM guess what times are available, it will confidently offer times that are already booked. By mapping the conversation to strict states, we only prompt the LLM to format the response after our standard code has queried the actual calendar.\n\nFinally, state persistence is crucial. Since WhatsApp webhooks are stateless, you must store the user's phone number and current session state in a database (like PostgreSQL or even a structured Google Sheet for simple deployments). When the next message arrives, your system retrieves the state, processes the input, and moves the user one step closer to a confirmed booking.",
+              "keyLearnings": [
+                "Designing the state machine for conversational scheduling",
+                "Mapping WhatsApp message triggers to booking states",
+                "Handling missing information gracefully without frustrating the user"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "The state machine walks every client through the same sequence.",
+                  "flow": [
+                    "Greeting",
+                    "Service selection",
+                    "Time preference",
+                    "Confirmation"
+                  ]
+                },
+                {
+                  "afterParagraph": 3,
+                  "caption": "Only your code, not the LLM, knows what is actually free.",
+                  "compare": [
+                    {
+                      "label": "LLM guesses availability",
+                      "text": "Confidently offers an already-booked time",
+                      "good": false
+                    },
+                    {
+                      "label": "LLM formats after a real calendar lookup",
+                      "text": "Only offers times your code just verified",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A client says 'kesho' (tomorrow) while the state machine is in AWAITING_SERVICE, expecting a service name. What should the agent do?",
+                "options": [
+                  {
+                    "text": "Immediately treat 'kesho' as the appointment date and skip ahead",
+                    "feedback": "Jumping straight to date-handling skips a state the machine still needs filled - the service hasn't been chosen yet.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Gently steer the client back to picking a service before dealing with the time",
+                    "feedback": "Right. The state machine keeps the conversation on track without losing what the client already said.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Ignore the message since it does not match the expected input",
+                    "feedback": "Ignoring it wastes the info the client offered - the agent should acknowledge it and route back to what is still missing.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-2",
+            "number": "02",
+            "title": "Google Calendar API Integration",
+            "subtitle": "Connecting WhatsApp to live availability",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Integrations",
+            "summary": "Set up the Google Calendar API to enable real-time free/busy lookups for your booking agent.",
+            "isGated": false,
+            "content": {
+              "overview": "A booking agent is useless if it double-books. Here we integrate Google Calendar via Node.js, authenticating securely to check actual availability before suggesting a time slot to the customer.",
+              "lessonBody": "The foundation of any reliable scheduling agent is the source of truth for availability. For most small service businesses, this is Google Calendar. It's free, syncs instantly across devices, and staff already know how to use it. Our agent will use the Google Calendar API to read availability and insert new events, acting as an automated receptionist that never sleeps.\n\nAuthenticating with Google APIs requires setting up a Google Cloud Console project and creating a Service Account. A Service Account is a special type of Google account intended to represent a non-human user that needs to authenticate and be authorized to access data in Google APIs. You will generate a JSON key file for this account, which your Node.js application will use to prove its identity.\n\nOnce authenticated, the most critical endpoint is freeBusy.query. Unlike fetching all events (which exposes private client details), freeBusy simply returns time blocks that are occupied. This is exactly what we need to determine if a specific 30-minute slot is open. You pass in a time range (e.g., today between 9 AM and 5 PM) and the calendar ID, and Google responds with an array of busy intervals.\n\nA common pitfall when integrating calendars in Kenya is timezone mismanagement. Google Calendar stores times in UTC, but your business operates in East Africa Time (UTC+3). If your code doesn't explicitly handle the Africa/Nairobi timezone when querying and creating events, your bot will book appointments three hours late. Always use ISO-8601 strings with explicit timezones in your API requests.\n\nFinally, the service account needs permission to view and edit the business's actual calendar. You achieve this by sharing the specific Google Calendar with the service account's email address, just as you would share a calendar with a human colleague. This gives your agent the access it needs without exposing the owner's personal emails or other calendars.",
+              "keyLearnings": [
+                "Authenticating with Google Cloud Service Accounts",
+                "Querying the freeBusy API endpoint for specific time ranges",
+                "Formatting calendar availability into clean WhatsApp text"
+              ],
+              "codeSnippet": "const { google } = require('googleapis');\n\nasync function checkAvailability(calendarId, startTime, endTime) {\n  const calendar = google.calendar({ version: 'v3', auth: jwtClient });\n  const res = await calendar.freebusy.query({\n    requestBody: {\n      timeMin: startTime.toISOString(),\n      timeMax: endTime.toISOString(),\n      items: [{ id: calendarId }]\n    }\n  });\n  return res.data.calendars[calendarId].busy.length === 0;\n}",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "freeBusy only reveals occupied blocks, never private event details.",
+                  "compare": [
+                    {
+                      "label": "Fetching all events",
+                      "text": "Exposes private client names and details",
+                      "good": false
+                    },
+                    {
+                      "label": "freeBusy.query",
+                      "text": "Returns only busy time blocks",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "Your business operates in Nairobi (Africa/Nairobi, UTC+3). A client books a 2:00 PM appointment.",
+                "workedExample": "If your code sends the API request as '2026-08-20T14:00:00Z' (UTC, no offset), Google interprets that as 2:00 PM UTC - which is actually 5:00 PM in Nairobi, three hours later than intended.",
+                "challenge": "Rewrite the timestamp so it correctly represents 2:00 PM Nairobi time.",
+                "placeholder": "The correct ISO-8601 string is '2026-08-20T14:00:00___', using the explicit UTC+3 offset instead of leaving it as UTC.",
+                "solution": "The correct ISO-8601 string is '2026-08-20T14:00:00+03:00', using the explicit UTC+3 offset instead of leaving it as UTC.",
+                "explanation": "Google Calendar stores everything in UTC internally, but your API requests must state the offset explicitly. Without '+03:00', a naive UTC timestamp silently shifts every booking three hours late."
+              }
+            }
+          },
+          {
+            "id": "book-step-3",
+            "number": "03",
+            "title": "Parsing Natural Language Dates",
+            "subtitle": "Translating casual expressions into strict timestamps",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Data Extraction",
+            "summary": "Use AI to convert casual time expressions and local slang into strict date/time formats for API scheduling.",
+            "isGated": false,
+            "content": {
+              "overview": "Clients don't use strict database timestamps. They say 'tomorrow morning', 'next week Tuesday', or 'kesho asubuhi'. You'll build a prompt that reliably parses these expressions into standardized machine-readable formats.",
+              "lessonBody": "Human beings speak in relative time. A message like 'Can I come in tomorrow around 2?' means nothing to an API. The Google Calendar API requires an absolute ISO-8601 timestamp, like 2026-08-20T14:00:00+03:00. Bridging this gap between human relativity and machine absolute precision is where large language models excel, provided they are given the right context.\n\nThe challenge in the Kenyan market is the mix of English, Swahili, and Sheng. A client might say 'kesho asubuhi' (tomorrow morning), 'Jamo' (Friday), or 'mteja next week' (next week). Standard date-parsing libraries like Date.js or Moment.js struggle with this localized nuance. An LLM, however, can easily interpret these phrases if guided properly.\n\nTo make this work, the LLM must know the current exact date and time. An LLM is a frozen snapshot of weights; it doesn't intrinsically know what 'today' is. In your system prompt, you must dynamically inject the current date, time, and timezone (e.g., 'Today is Thursday, August 19, 2026, 14:30 EAT'). With this anchor, the model can accurately resolve 'kesho' to 'August 20'.\n\nYou will structure the LLM's output using JSON mode. Instead of letting the model reply with a conversational sentence, you instruct it to output a strict JSON object containing the resolved year, month, day, and time. This structured output is then consumed by your Node.js backend to construct the final Date object for the Calendar API.\n\nAmbiguity is another hurdle. If a user says 'afternoon,' what exact time do they mean? Your prompt must instruct the model to either pick a default starting time (e.g., 14:00) and flag it as an estimate, or better yet, return an 'incomplete' status that triggers your state machine to ask a follow-up question: 'What time in the afternoon works best for you?'",
+              "keyLearnings": [
+                "Handling timezone awareness (EAT / UTC+3)",
+                "Prompting the LLM to output strict JSON dates from casual text",
+                "Dealing with ambiguous time requests like 'afternoon'"
+              ],
+              "testCase": {
+                "input": "Can I get my hair done kesho around 2pm?",
+                "expectedOutput": "{\"date\": \"2026-08-20\", \"time\": \"14:00:00\", \"timezone\": \"Africa/Nairobi\"}"
+              },
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Sheng and Swahili phrases resolve to the same structured date.",
+                  "chat": [
+                    {
+                      "sender": "customer",
+                      "text": "Naeza kuja kesho asubuhi?"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "(Understood: tomorrow morning)"
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Without being told the current date, can an LLM correctly resolve what a client means by 'kesho' (tomorrow)?",
+                "options": [
+                  {
+                    "text": "Yes, the model always knows today's real date automatically",
+                    "feedback": "An LLM is a frozen snapshot of weights - it has no built-in awareness of 'today' unless your prompt tells it.",
+                    "correct": false
+                  },
+                  {
+                    "text": "No, the current date and time must be injected into the prompt as an anchor first",
+                    "feedback": "Right. That anchor is what lets the model resolve relative expressions accurately.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Only if the client also provides the date in numbers",
+                    "feedback": "That defeats the purpose of accepting casual language at all - the fix is anchoring the prompt with today's date.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-4",
+            "number": "04",
+            "title": "Multi-Staff Resource Management",
+            "subtitle": "Routing bookings to the right calendar",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Architecture",
+            "summary": "Expand your system to handle multiple stylists, doctors, or technicians simultaneously.",
+            "isGated": true,
+            "content": {
+              "overview": "A real salon has multiple staff members with overlapping schedules. We'll upgrade our calendar logic to query a resource array, finding the first available staff member or routing the client to their requested favorite.",
+              "lessonBody": "While a single-calendar system works well for a solo consultant, most service businesses—like salons, clinics, or repair shops—operate with multiple staff members. When a client requests a 10 AM slot, the system needs to check availability across all technicians, not just a single master calendar. This requires a shift from a one-to-one architecture to a resource-pooling architecture.\n\nThe most effective way to handle this with Google Calendar is to create a separate, distinct calendar for each staff member under the business's main Google Workspace account. For example, 'Calendar A' for Stylist John and 'Calendar B' for Stylist Jane. Your backend maintains a configuration array mapping staff names to their specific Google Calendar IDs.\n\nWhen querying for availability, the freeBusy endpoint allows you to check multiple calendars in a single API call. By passing an array of all staff calendar IDs, Google returns the busy periods for each. Your backend logic then cross-references this data to find a calendar that has zero busy blocks during the requested time slot.\n\nClient preference adds another layer of complexity. Some clients will say, 'I want to book with Jane.' In this case, your NLU must extract the entity 'Jane' and restrict the freeBusy check to her specific calendar ID. If Jane is booked, the agent shouldn't just say 'No'; it should offer Jane's next available slot, or suggest an immediate slot with another available stylist.\n\nThis multi-resource approach also sets the foundation for basic load balancing. If both John and Jane are free at 10 AM, your system should have a deterministic way to assign the booking—either round-robin (to distribute work evenly) or prioritized by seniority. This business logic lives in your standard code, completely independent of the LLM.",
+              "keyLearnings": [
+                "Mapping WhatsApp options to specific employee calendar IDs",
+                "Querying multiple calendars simultaneously in a single API call",
+                "Handling fallback logic when a specific staff member is booked"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "One API call checks every staff calendar at once.",
+                  "flow": [
+                    "Pass an array of all staff calendar IDs to freeBusy",
+                    "Google returns busy periods per calendar",
+                    "Backend finds a calendar with zero busy blocks",
+                    "That staff member gets offered to the client"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A client says 'I want to book with Jane,' but Jane is fully booked at the requested time. What should the agent do?",
+                "options": [
+                  {
+                    "text": "Just say 'No' since Jane isn't available",
+                    "feedback": "A flat no loses the booking entirely - the agent has better options available.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Offer Jane's next available slot, or suggest an immediate slot with another stylist",
+                    "feedback": "Right. This keeps the client moving toward a booking instead of turning them away.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Silently book them with whichever stylist is free, without mentioning the switch",
+                    "feedback": "Booking someone with a different stylist without telling them ignores their explicit preference.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-5",
+            "number": "05",
+            "title": "The Core Booking Prompt",
+            "subtitle": "Tuning the persona for hospitality",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Prompt Design",
+            "summary": "Craft the system prompt that ensures the AI stays polite, focused on booking, and doesn't get distracted.",
+            "isGated": true,
+            "content": {
+              "overview": "You will design the core AI persona for a Kenyan service business. The agent must warmly greet customers, offer available slots concisely, and refuse to answer questions unrelated to the business.",
+              "lessonBody": "The system prompt is the personality and operating manual for your agent. For a service business, hospitality is paramount. The bot needs to sound welcoming, professional, and culturally attuned. Using standard Swahili greetings like 'Karibu' (Welcome) or 'Habari' (Hello) establishes immediate rapport, while avoiding overly robotic or excessively colloquial language.\n\nA critical component of the prompt is constraint enforcement. If a user asks the booking agent about the weather or political news, the agent must not engage. You achieve this through negative prompting: explicit instructions telling the LLM what it must *not* do. For example: 'You are a booking assistant for a salon. Under no circumstances should you answer questions unrelated to our services, pricing, or availability. If asked an off-topic question, politely redirect the user to booking an appointment.'\n\nThe prompt must also dictate formatting for WhatsApp readability. WhatsApp messages should be punchy and easy to scan. You will instruct the LLM to use WhatsApp-specific markdown—bolding *important terms* and using bullet points for listing available times or services. Long, dense paragraphs lead to user drop-off.\n\nTo prevent hallucinations, the prompt must enforce strict adherence to provided context. You will inject the business's operating hours (e.g., 'We are open Monday to Saturday, 8 AM to 6 PM'). The prompt must explicitly state: 'Never offer or agree to an appointment outside of these operating hours.' This acts as a secondary safety net alongside your backend API checks.\n\nFinally, the prompt manages the tone of escalation. If the user asks a complex question the bot cannot confidently answer (e.g., a highly specific medical query for a clinic), the prompt should instruct the LLM to trigger a human handoff protocol, responding with a polite message that a human staff member will take over the chat shortly.",
+              "keyLearnings": [
+                "Writing constraint-heavy system prompts",
+                "Injecting business hours and service menus into the context",
+                "Maintaining professional Swahili/English code-switching"
+              ],
+              "samplePrompt": "You are a booking assistant for [Your Client's Salon Name] in Nairobi.\nAlways be polite and use greetings like 'Karibu'.\nOnly offer times within our business hours (Tue-Sun, 9AM-6PM).\nIf a user asks about something other than our services, politely guide them back to booking.\nFormat available times as a bulleted list using WhatsApp markdown.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Negative prompting keeps the agent from engaging off-topic questions.",
+                  "chat": [
+                    {
+                      "sender": "customer",
+                      "text": "What's the weather like today?"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "I'm just here to help with bookings! Would you like to check availability for a service?"
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A client asks the booking bot about unrelated political news. What should a well-constrained prompt make the agent do?",
+                "options": [
+                  {
+                    "text": "Answer the question since being helpful is always good",
+                    "feedback": "Engaging off-topic questions is exactly what negative prompting is designed to prevent.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Politely redirect the conversation back to booking",
+                    "feedback": "Right. This keeps the bot focused on the one job it was built for.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Stay completely silent and send no reply at all",
+                    "feedback": "Silence looks broken to the client - a polite redirect keeps the conversation moving.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-6",
+            "number": "06",
+            "title": "Preventing Double Bookings",
+            "subtitle": "Handling race conditions in live scheduling",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Logic",
+            "summary": "Implement robust locking and verification steps to ensure two users cannot book the same slot simultaneously.",
+            "isGated": true,
+            "content": {
+              "overview": "Concurrency is the enemy of scheduling. We will build a pre-confirmation check that re-verifies calendar availability at the exact moment the user says 'yes', preventing overlapping appointments during peak hours.",
+              "lessonBody": "In software engineering, a race condition occurs when two processes compete for the same resource simultaneously, leading to unpredictable results. In our booking system, this happens when Client A and Client B are both chatting with the bot and are both offered the 10:00 AM slot. If Client A takes 5 minutes to reply 'Yes' and Client B replies instantly, we risk double-booking the slot if we aren't careful.\n\nTo solve this, your architecture must implement a strict pre-confirmation verification check. When a user finally confirms a time, you do not simply trust that the slot is still open based on the initial query made minutes ago. Instead, right before making the events.insert API call, your code must perform a fresh freeBusy query for that specific time block.\n\nIf the secondary check reveals the slot is now busy (meaning someone else grabbed it), the system must cleanly handle the rejection. The bot should send a graceful apology: 'I'm so sorry, but that slot was just taken by another client. However, I have 10:30 AM or 11:00 AM available. Would either of those work?' This transparent approach maintains trust even when conflicts occur.\n\nFor high-volume businesses, you can implement a temporary lock mechanism using a database like Redis. When a slot is offered, you place a short-lived lock (e.g., 3 minutes) on that time. If the user confirms within the window, the booking proceeds. If not, the lock expires, freeing the slot for others. This is similar to how airline ticketing systems hold your seat while you enter payment details.\n\nProperly handling these concurrency edge cases is what separates a toy project from a production-ready business tool. A bot that double-books clients creates chaos in a waiting room, directly damaging the business owner's reputation and leading them to uninstall your system.",
+              "keyLearnings": [
+                "Understanding race conditions in asynchronous booking",
+                "Implementing a final availability check before calendar insertion",
+                "Drafting graceful apology messages when a slot is lost"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Two clients, one slot, a race to confirm first.",
+                  "flow": [
+                    "Client A offered 10:00 AM slot",
+                    "Client B offered the same 10:00 AM slot",
+                    "Client A takes 5 minutes to reply",
+                    "Client B confirms instantly - risk of double-booking"
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "A client confirms a 10:00 AM slot that was offered to them 6 minutes ago. Your code is about to call events.insert.",
+                "workedExample": "If the code trusts the original query from 6 minutes ago and inserts the event directly, it risks double-booking if another client grabbed that same slot in the meantime.",
+                "challenge": "What should happen between the client's \"Yes\" and the events.insert call to prevent this?",
+                "placeholder": "The code must run a ___ freeBusy query for that exact time block right before calling events.insert, not rely on the original query from minutes earlier.",
+                "solution": "The code must run a fresh freeBusy query for that exact time block right before calling events.insert, not rely on the original query from minutes earlier.",
+                "explanation": "This is the pre-confirmation verification check from the lesson - a slot can be taken by someone else in the gap between being offered and being confirmed."
+              }
+            }
+          },
+          {
+            "id": "book-step-7",
+            "number": "07",
+            "title": "M-Pesa Booking Deposits",
+            "subtitle": "Securing appointments with partial payments",
+            "status": "locked",
+            "duration": "55 min",
+            "category": "Payments",
+            "summary": "Integrate Safaricom Daraja API to request a commitment deposit before confirming the calendar slot.",
+            "isGated": true,
+            "content": {
+              "overview": "To drastically reduce no-shows, many Kenyan businesses require a deposit. You will trigger an M-Pesa STK push for a commitment deposit and only create the Google Calendar event once the payment callback succeeds.",
+              "lessonBody": "No-shows are a massive drain on service businesses. When a client books a two-hour slot and doesn't arrive, the business loses both the revenue and the opportunity to book someone else. In the Kenyan market, the most effective deterrent is requiring a non-refundable deposit via M-Pesa before an appointment is officially confirmed.\n\nThis introduces an asynchronous payment step into our state machine. When the client selects a time, the bot does not book the calendar immediately. Instead, it transitions to a PENDING_PAYMENT state and uses the Safaricom Daraja API to trigger an STK Push (M-Pesa Express) directly to the user's phone, requesting a fixed deposit amount, such as KES 500.\n\nThe Daraja API is asynchronous. You trigger the push, but you must wait for Safaricom to send a callback (webhook) to your server with the result (success, insufficient funds, or cancelled by user). While waiting, your system must hold the requested time slot in a 'pending' status, preventing others from booking it, but with a strict timeout (e.g., 5 minutes) after which the hold is released if no payment arrives.\n\nWhen your server receives a successful payment callback from Safaricom, it verifies the transaction ID and amount. Only then does the backend script make the Google Calendar API call to insert the event. Finally, it sends a WhatsApp message confirming the booking and acknowledging receipt of the deposit.\n\nHandling payment failures gracefully is critical. If the STK push times out or is cancelled, the bot should automatically follow up: 'We noticed your deposit didn't go through. Would you like me to send the payment prompt again, or do you need to change the time?' This recovers potentially lost bookings without requiring human intervention.",
+              "keyLearnings": [
+                "Triggering M-Pesa STK Push from a WhatsApp flow",
+                "Listening for Daraja API payment callbacks",
+                "Holding a slot temporarily (pending state) while awaiting payment"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The slot stays reserved only until the payment window closes.",
+                  "flow": [
+                    "Client selects a time slot",
+                    "Bot triggers M-Pesa STK push for deposit",
+                    "Slot held in pending status (5-min timeout)",
+                    "Payment callback succeeds -> calendar event created"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A client selects a time slot but the M-Pesa STK push times out with no payment. What should happen to the slot?",
+                "options": [
+                  {
+                    "text": "It stays permanently held for that client just in case they try again",
+                    "feedback": "Holding it forever blocks other clients from ever booking that time.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The pending hold expires after its timeout, releasing the slot",
+                    "feedback": "Right. This is the strict timeout described in the lesson.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The calendar event gets created anyway, deposit or not",
+                    "feedback": "Creating the event without payment defeats the entire purpose of requiring a deposit.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-8",
+            "number": "08",
+            "title": "Automated Reminder Sequences",
+            "subtitle": "Cutting no-shows with timely alerts",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Automation",
+            "summary": "Build a background job that automatically sends WhatsApp reminders 24 hours and 2 hours before the appointment.",
+            "isGated": true,
+            "content": {
+              "overview": "A booked appointment isn't revenue until the client walks in. We'll set up a cron job that reads upcoming Google Calendar events and fires off automated WhatsApp reminders with confirmation buttons.",
+              "lessonBody": "Securing the booking is only the first half of the battle; the second half is ensuring the client actually shows up. People forget appointments, especially those booked weeks in advance. Automated reminder sequences are proven to reduce no-show rates dramatically by bringing the appointment back to the top of the client's mind.\n\nThe standard best practice for service businesses is a two-touch reminder sequence: one message 24 hours before the appointment, and a final nudge 2 to 3 hours before. To build this, you need a background task—a cron job—that runs at regular intervals (e.g., every 15 minutes) on your server.\n\nThis cron job uses the Google Calendar API to query events occurring within your target timeframes. It filters for events that have not yet received a reminder flag. When a matching event is found, the system extracts the client's phone number from the calendar event's description or extended properties and dispatches a WhatsApp message via the Meta Graph API.\n\nSince these reminders are proactive, outbound messages initiated by the business (outside the standard 24-hour customer service window), WhatsApp Cloud API rules require you to use pre-approved Message Templates. You cannot send arbitrary free-form text. Your template must be approved by Meta and might look like: 'Hi {{1}}, a quick reminder of your appointment tomorrow at {{2}}. Reply YES to confirm.'\n\nFinally, the system needs to process the client's reply. If they reply 'YES,' the bot updates the calendar event title (e.g., prepending '[CONFIRMED]') so the business owner can see at a glance who is definitely coming. If they reply indicating they can't make it, the bot gracefully transitions them into the cancellation or rescheduling flow.",
+              "keyLearnings": [
+                "Querying upcoming calendar events programmatically",
+                "Scheduling recurring background jobs with Node.js/Cron",
+                "Using WhatsApp message templates for proactive outreach"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 3,
+                  "caption": "Proactive reminders need an approved template, not free text.",
+                  "compare": [
+                    {
+                      "label": "Free-form reminder text",
+                      "text": "Blocked outside the 24-hour customer window",
+                      "good": false
+                    },
+                    {
+                      "label": "Pre-approved Message Template",
+                      "text": "Allowed for proactive outbound reminders",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Your cron job wants to send a reminder 24 hours before an appointment, outside the standard customer-service window. What must it use?",
+                "options": [
+                  {
+                    "text": "A normal free-form WhatsApp text message",
+                    "feedback": "Proactive, business-initiated messages outside the 24-hour window aren't allowed as free-form text.",
+                    "correct": false
+                  },
+                  {
+                    "text": "A pre-approved Message Template",
+                    "feedback": "Right. This is required for any business-initiated message outside the service window.",
+                    "correct": true
+                  },
+                  {
+                    "text": "An email instead, since WhatsApp can't send proactive messages at all",
+                    "feedback": "WhatsApp can send proactive messages - it just has to be via an approved template.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-9",
+            "number": "09",
+            "title": "Cancellations & Rescheduling",
+            "subtitle": "Handling changes without manual intervention",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Operations",
+            "summary": "Empower the AI to cancel or move appointments, automatically freeing up calendar space.",
+            "isGated": true,
+            "content": {
+              "overview": "When a client texts 'I need to cancel', the AI shouldn't just say 'okay'—it needs to actually delete the event from Google Calendar so another client can book it. You'll build the logic to identify existing user appointments and modify them.",
+              "lessonBody": "A truly autonomous scheduling agent handles the entire lifecycle of an appointment, including when things go wrong. If a client needs to cancel and the bot only replies with a polite acknowledgment, the slot remains blocked on the calendar. The business owner misses out on potential revenue because the system failed to free up the resource.\n\nTo implement automated rescheduling, your bot must first be able to identify a returning user and look up their upcoming appointments. When a known phone number messages 'I need to change my time,' the backend queries the Google Calendar API for future events where the attendee matches that number. If an event is found, the bot confirms: 'I see you have an appointment on Tuesday at 2 PM. Would you like to cancel or reschedule?'\n\nIf the user chooses to cancel, the system uses the Google Calendar events.delete endpoint to remove the booking entirely. It then sends a confirmation message to the client. Instantly, that time block becomes available in the freeBusy queries for any other client currently chatting with the bot.\n\nRescheduling is essentially a cancellation immediately followed by a new booking flow. To minimize friction, the bot deletes the old event (or modifies it via the events.patch endpoint) only after the user has successfully selected and confirmed a new time slot. This ensures the client doesn't accidentally lose their original slot if they abandon the chat halfway through picking a new time.\n\nFor high-demand businesses, a cancelled appointment triggers a waitlist opportunity. While building a full waitlist manager is complex, a simple implementation involves the bot notifying the business owner on a private admin channel: 'A slot just opened up tomorrow at 2 PM due to a cancellation.' The owner can then manually reach out to waitlisted clients.",
+              "keyLearnings": [
+                "Retrieving a user's existing calendar events by phone number",
+                "Using the Calendar API to delete or patch events",
+                "Managing edge cases when multiple upcoming events exist"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Deleting the event is what actually frees the slot for someone else.",
+                  "flow": [
+                    "Client requests cancellation",
+                    "events.delete removes the booking",
+                    "Time block instantly reopens",
+                    "Slot appears in freeBusy for other clients"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "When rescheduling, why does the lesson recommend deleting the old event only after the new time is confirmed, rather than deleting it first?",
+                "options": [
+                  {
+                    "text": "It does not matter which order you do it in",
+                    "feedback": "Order matters here - deleting first creates a real risk to the client.",
+                    "correct": false
+                  },
+                  {
+                    "text": "So the client does not lose their original slot if they abandon the chat while picking a new time",
+                    "feedback": "Right. This protects the client from ending up with no booking at all.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Google Calendar requires events to be deleted last for technical reasons",
+                    "feedback": "This is not a Google Calendar API restriction - it is a deliberate design choice.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-10",
+            "number": "10",
+            "title": "Waitlists & Peak Hour Queueing",
+            "subtitle": "Maximizing revenue on fully booked days",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Logic",
+            "summary": "Implement an automated waitlist that captures high-intent leads and notifies them if a cancellation frees up a slot.",
+            "isGated": true,
+            "content": {
+              "overview": "When the calendar is full, you shouldn't just turn customers away. Learn how to implement an automated waitlist that captures high-intent leads and notifies them if a cancellation frees up a slot.",
+              "lessonBody": "For popular salons or specialized clinics, weekends and evenings are often fully booked days in advance. A naive scheduling bot simply says, 'Sorry, we have no availability,' turning away a willing customer and permanently losing the lead. A sophisticated agent captures that intent by offering a spot on a waitlist.\n\nImplementing a waitlist requires secondary storage outside of Google Calendar, as Calendar is designed for confirmed events, not tentative requests. You can use a simple PostgreSQL table or even a dedicated Google Sheet to record the user's phone number, requested service, and preferred date range. When the bot detects that all slots for a requested day are full, it pivots: 'We are fully booked on Saturday, but cancellations happen. Would you like me to notify you if a spot opens up?'\n\nThe true value of the waitlist is realized through the cancellation flow you built in the previous lesson. When Client A cancels their Saturday 2 PM slot, your backend shouldn't just delete the event. It should immediately query your waitlist database for any users who requested Saturday afternoon.\n\nIf a match is found, the system dispatches an automated, proactive WhatsApp template message to the waitlisted user: 'Hi! A slot just opened up on Saturday at 2 PM for your requested service. Reply BOOK within 10 minutes to claim it.' This creates urgency and fills the newly opened slot almost instantly, protecting the business's utilization rate.\n\nTo manage concurrency and prevent multiple waitlisted users from fighting over one slot, you must message them sequentially or use a strict first-come, first-served lock. Sequential messaging—notifying the oldest waitlist entry first, waiting 10 minutes, then notifying the next—is the fairest approach and ensures a smooth user experience without double-booking accidents.",
+              "keyLearnings": [
+                "Capturing high-intent leads when availability is zero",
+                "Storing and querying waitlist data separate from Calendar",
+                "Automating proactive notifications upon cancellations"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "A full calendar does not have to mean a lost lead.",
+                  "flow": [
+                    "Day is fully booked",
+                    "Bot offers a waitlist spot instead of just declining",
+                    "Request stored with phone number + preferred date",
+                    "Cancellation later triggers a match check"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A Saturday 2 PM slot opens up from a cancellation, and 3 people are waitlisted for Saturday afternoon. What's the fairest way to notify them?",
+                "options": [
+                  {
+                    "text": "Message all 3 at once and give the slot to whoever replies first",
+                    "feedback": "That risks multiple people trying to claim the same slot simultaneously - the same race condition from an earlier lesson.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Message the oldest waitlist entry first, wait, then move to the next if no reply",
+                    "feedback": "Right. Sequential, first-come notification is the fairest approach.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Randomly pick one of the 3 without notifying the others at all",
+                    "feedback": "Skipping the others entirely is not fair, and wastes the chance to fill the slot quickly if the first pick does not respond.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-11",
+            "number": "11",
+            "title": "Calendar Utilization Analytics",
+            "subtitle": "Giving owners visibility into business performance",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Reporting",
+            "summary": "Generate weekly utilization summaries so the business owner knows their busiest days and top staff.",
+            "isGated": true,
+            "content": {
+              "overview": "A good automation system doesn't just run; it reports. You'll create a simple script that aggregates completed calendar events and sends a weekly WhatsApp summary to the owner, highlighting no-show rates and peak booking hours.",
+              "lessonBody": "Small business owners rarely have time to manually analyze their scheduling data. They know when they feel busy, but they often lack hard numbers on utilization rates, popular services, or staff performance. By building an analytics module into your scheduling agent, you elevate the system from a simple booking tool to a valuable business intelligence asset.\n\nThe analytics engine runs as a scheduled weekly cron job—typically on a Sunday evening. It queries the Google Calendar API for all events that occurred in the past seven days. By parsing the event descriptions and titles (where you previously injected service types and status tags like '[CONFIRMED]' or '[NO-SHOW]'), the script aggregates the raw data into actionable metrics.\n\nKey metrics for a service business include the total number of completed appointments, the most requested service, the busiest day of the week, and the dreaded no-show rate. For multi-staff setups, the report can also break down utilization by employee, highlighting who is fully booked and who has excess capacity.\n\nThe delivery mechanism is just as important as the data. Business owners are more likely to read a concise WhatsApp message than log into a complex dashboard. Your script formats the aggregated data into a clean, easy-to-read WhatsApp text utilizing emojis for visual hierarchy (e.g., 📅 Total Bookings: 45, ✂️ Top Service: Braids, 📉 No-Show Rate: 5%).\n\nProviding this weekly digest reinforces the value of your system. Every time the owner receives the report, they are tangibly reminded of how much work the AI agent is handling on their behalf. It shifts their perception of your software from a cost center to a critical business partner.",
+              "keyLearnings": [
+                "Aggregating calendar data for business insights",
+                "Calculating no-show vs. completion rates",
+                "Formatting clean, actionable reporting messages"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A week of raw calendar events becomes a few readable numbers.",
+                  "flow": [
+                    "Query all events from the past 7 days",
+                    "Parse status tags like [CONFIRMED] / [NO-SHOW]",
+                    "Aggregate into totals, top service, no-show rate",
+                    "Format into a WhatsApp-readable weekly digest"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the lesson recommend sending the weekly report as a WhatsApp message instead of a dashboard link?",
+                "options": [
+                  {
+                    "text": "Dashboards are technically impossible to build for this system",
+                    "feedback": "A dashboard is entirely possible to build - the reasoning here is about what the owner will actually read.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Business owners are more likely to actually read a concise WhatsApp message than log into a dashboard",
+                    "feedback": "Right. Getting the report actually read is what reinforces the value of the system.",
+                    "correct": true
+                  },
+                  {
+                    "text": "WhatsApp messages are more secure than dashboards",
+                    "feedback": "Security is not the reason given here - it is about the report actually getting read.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "book-step-12",
+            "number": "12",
+            "title": "Verified Portfolio Deployment",
+            "subtitle": "Launching your real-world scheduling agent",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Deployment",
+            "summary": "Deploy your booking agent to a live WhatsApp number and verify it with a real Kenyan service business.",
+            "isGated": true,
+            "content": {
+              "overview": "It's time to go live. You will connect your fully functioning booking bot to a live WhatsApp Business number, hook it up to a real Google Calendar, and have a local salon or clinic owner test it. Complete this to earn your Verified Portfolio status.",
+              "lessonBody": "Building the system locally is practice; deploying it for a real business is proof. This final lesson guides you through taking your Node.js application out of development and into a production environment. You will host your webhook on a reliable cloud provider like Render, Heroku, or a DigitalOcean droplet, ensuring it runs 24/7 and uses HTTPS, a strict requirement for Meta's WhatsApp Cloud API.\n\nFirst, you will finalize the Meta App configuration. This involves securing a dedicated phone number for the business, verifying it through the WhatsApp Business portal, and pointing the Meta webhook configuration to your live production server's URL. You must ensure your server correctly handles Meta's verification challenge tokens and securely parses incoming message payloads.\n\nNext, you will connect the live system to the business owner's actual Google Calendar. This requires carefully guiding the owner through sharing their calendar with your service account email. You must run thorough end-to-end tests: booking an appointment via WhatsApp and verifying it appears instantly on their phone, then deleting it via WhatsApp and watching it disappear. Real-world testing exposes edge cases you may have missed during development.\n\nThe core requirement for completing this course is the Verified Portfolio deliverable. Afridemy doesn't issue certificates based on automated tests. You must record a short, raw video demonstrating the bot successfully handling a booking flow on a live WhatsApp number, resulting in an event appearing on a calendar.\n\nFinally, you must obtain a short quote or testimonial from the business owner verifying that the system works and solves a real problem for them. This combination—a live link, a video demo, and client validation—proves you can build and deploy real-world automation, giving you a powerful asset to sell your services to other local businesses.",
+              "keyLearnings": [
+                "Deploying the Node.js webhook securely to production",
+                "Finalizing the WhatsApp Cloud API webhook connection",
+                "Recording a live demo and capturing the owner's verification quote"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 3,
+                  "caption": "Three things combine into one verified portfolio entry.",
+                  "flow": [
+                    "Live link to the working WhatsApp bot",
+                    "Short video demo of a real booking flow",
+                    "Verified quote from the business owner",
+                    "= Verified Portfolio status"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "According to this lesson, how does Afridemy verify that you can actually build and deploy this system?",
+                "options": [
+                  {
+                    "text": "By grading an automated test suite",
+                    "feedback": "Afridemy does not issue certificates based on automated tests.",
+                    "correct": false
+                  },
+                  {
+                    "text": "A live link, a video demo of a real booking flow, and a verified quote from the business owner",
+                    "feedback": "Right. That combination is the actual proof of capability.",
+                    "correct": true
+                  },
+                  {
+                    "text": "By reviewing your source code privately",
+                    "feedback": "The verification is not about reviewing code in private - it is proof from a real deployment and a real business owner.",
+                    "correct": false
+                  }
+                ]
+              }
             }
           }
-        },
-        {
-          "id": "book-step-4",
-          "number": "04",
-          "title": "Multi-Staff Resource Management",
-          "subtitle": "Routing bookings to the right calendar",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Architecture",
-          "summary": "Expand your system to handle multiple stylists, doctors, or technicians simultaneously.",
-          "isGated": true,
-          "content": {
-            "overview": "A real salon has multiple staff members with overlapping schedules. We'll upgrade our calendar logic to query a resource array, finding the first available staff member or routing the client to their requested favorite.",
-            "lessonBody": "While a single-calendar system works well for a solo consultant, most service businesses—like salons, clinics, or repair shops—operate with multiple staff members. When a client requests a 10 AM slot, the system needs to check availability across all technicians, not just a single master calendar. This requires a shift from a one-to-one architecture to a resource-pooling architecture.\n\nThe most effective way to handle this with Google Calendar is to create a separate, distinct calendar for each staff member under the business's main Google Workspace account. For example, 'Calendar A' for Stylist John and 'Calendar B' for Stylist Jane. Your backend maintains a configuration array mapping staff names to their specific Google Calendar IDs.\n\nWhen querying for availability, the freeBusy endpoint allows you to check multiple calendars in a single API call. By passing an array of all staff calendar IDs, Google returns the busy periods for each. Your backend logic then cross-references this data to find a calendar that has zero busy blocks during the requested time slot.\n\nClient preference adds another layer of complexity. Some clients will say, 'I want to book with Jane.' In this case, your NLU must extract the entity 'Jane' and restrict the freeBusy check to her specific calendar ID. If Jane is booked, the agent shouldn't just say 'No'; it should offer Jane's next available slot, or suggest an immediate slot with another available stylist.\n\nThis multi-resource approach also sets the foundation for basic load balancing. If both John and Jane are free at 10 AM, your system should have a deterministic way to assign the booking—either round-robin (to distribute work evenly) or prioritized by seniority. This business logic lives in your standard code, completely independent of the LLM.",
-            "keyLearnings": [
-              "Mapping WhatsApp options to specific employee calendar IDs",
-              "Querying multiple calendars simultaneously in a single API call",
-              "Handling fallback logic when a specific staff member is booked"
-            ]
-          }
-        },
-        {
-          "id": "book-step-5",
-          "number": "05",
-          "title": "The Core Booking Prompt",
-          "subtitle": "Tuning the persona for hospitality",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Prompt Design",
-          "summary": "Craft the system prompt that ensures the AI stays polite, focused on booking, and doesn't get distracted.",
-          "isGated": true,
-          "content": {
-            "overview": "You will design the core AI persona for a Kenyan service business. The agent must warmly greet customers, offer available slots concisely, and refuse to answer questions unrelated to the business.",
-            "lessonBody": "The system prompt is the personality and operating manual for your agent. For a service business, hospitality is paramount. The bot needs to sound welcoming, professional, and culturally attuned. Using standard Swahili greetings like 'Karibu' (Welcome) or 'Habari' (Hello) establishes immediate rapport, while avoiding overly robotic or excessively colloquial language.\n\nA critical component of the prompt is constraint enforcement. If a user asks the booking agent about the weather or political news, the agent must not engage. You achieve this through negative prompting: explicit instructions telling the LLM what it must *not* do. For example: 'You are a booking assistant for a salon. Under no circumstances should you answer questions unrelated to our services, pricing, or availability. If asked an off-topic question, politely redirect the user to booking an appointment.'\n\nThe prompt must also dictate formatting for WhatsApp readability. WhatsApp messages should be punchy and easy to scan. You will instruct the LLM to use WhatsApp-specific markdown—bolding *important terms* and using bullet points for listing available times or services. Long, dense paragraphs lead to user drop-off.\n\nTo prevent hallucinations, the prompt must enforce strict adherence to provided context. You will inject the business's operating hours (e.g., 'We are open Monday to Saturday, 8 AM to 6 PM'). The prompt must explicitly state: 'Never offer or agree to an appointment outside of these operating hours.' This acts as a secondary safety net alongside your backend API checks.\n\nFinally, the prompt manages the tone of escalation. If the user asks a complex question the bot cannot confidently answer (e.g., a highly specific medical query for a clinic), the prompt should instruct the LLM to trigger a human handoff protocol, responding with a polite message that a human staff member will take over the chat shortly.",
-            "keyLearnings": [
-              "Writing constraint-heavy system prompts",
-              "Injecting business hours and service menus into the context",
-              "Maintaining professional Swahili/English code-switching"
-            ],
-            "samplePrompt": "You are a booking assistant for [Your Client's Salon Name] in Nairobi.\nAlways be polite and use greetings like 'Karibu'.\nOnly offer times within our business hours (Tue-Sun, 9AM-6PM).\nIf a user asks about something other than our services, politely guide them back to booking.\nFormat available times as a bulleted list using WhatsApp markdown."
-          }
-        },
-        {
-          "id": "book-step-6",
-          "number": "06",
-          "title": "Preventing Double Bookings",
-          "subtitle": "Handling race conditions in live scheduling",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Logic",
-          "summary": "Implement robust locking and verification steps to ensure two users cannot book the same slot simultaneously.",
-          "isGated": true,
-          "content": {
-            "overview": "Concurrency is the enemy of scheduling. We will build a pre-confirmation check that re-verifies calendar availability at the exact moment the user says 'yes', preventing overlapping appointments during peak hours.",
-            "lessonBody": "In software engineering, a race condition occurs when two processes compete for the same resource simultaneously, leading to unpredictable results. In our booking system, this happens when Client A and Client B are both chatting with the bot and are both offered the 10:00 AM slot. If Client A takes 5 minutes to reply 'Yes' and Client B replies instantly, we risk double-booking the slot if we aren't careful.\n\nTo solve this, your architecture must implement a strict pre-confirmation verification check. When a user finally confirms a time, you do not simply trust that the slot is still open based on the initial query made minutes ago. Instead, right before making the events.insert API call, your code must perform a fresh freeBusy query for that specific time block.\n\nIf the secondary check reveals the slot is now busy (meaning someone else grabbed it), the system must cleanly handle the rejection. The bot should send a graceful apology: 'I'm so sorry, but that slot was just taken by another client. However, I have 10:30 AM or 11:00 AM available. Would either of those work?' This transparent approach maintains trust even when conflicts occur.\n\nFor high-volume businesses, you can implement a temporary lock mechanism using a database like Redis. When a slot is offered, you place a short-lived lock (e.g., 3 minutes) on that time. If the user confirms within the window, the booking proceeds. If not, the lock expires, freeing the slot for others. This is similar to how airline ticketing systems hold your seat while you enter payment details.\n\nProperly handling these concurrency edge cases is what separates a toy project from a production-ready business tool. A bot that double-books clients creates chaos in a waiting room, directly damaging the business owner's reputation and leading them to uninstall your system.",
-            "keyLearnings": [
-              "Understanding race conditions in asynchronous booking",
-              "Implementing a final availability check before calendar insertion",
-              "Drafting graceful apology messages when a slot is lost"
-            ]
-          }
-        },
-        {
-          "id": "book-step-7",
-          "number": "07",
-          "title": "M-Pesa Booking Deposits",
-          "subtitle": "Securing appointments with partial payments",
-          "status": "locked",
-          "duration": "55 min",
-          "category": "Payments",
-          "summary": "Integrate Safaricom Daraja API to request a commitment deposit before confirming the calendar slot.",
-          "isGated": true,
-          "content": {
-            "overview": "To drastically reduce no-shows, many Kenyan businesses require a deposit. You will trigger an M-Pesa STK push for a commitment deposit and only create the Google Calendar event once the payment callback succeeds.",
-            "lessonBody": "No-shows are a massive drain on service businesses. When a client books a two-hour slot and doesn't arrive, the business loses both the revenue and the opportunity to book someone else. In the Kenyan market, the most effective deterrent is requiring a non-refundable deposit via M-Pesa before an appointment is officially confirmed.\n\nThis introduces an asynchronous payment step into our state machine. When the client selects a time, the bot does not book the calendar immediately. Instead, it transitions to a PENDING_PAYMENT state and uses the Safaricom Daraja API to trigger an STK Push (M-Pesa Express) directly to the user's phone, requesting a fixed deposit amount, such as KES 500.\n\nThe Daraja API is asynchronous. You trigger the push, but you must wait for Safaricom to send a callback (webhook) to your server with the result (success, insufficient funds, or cancelled by user). While waiting, your system must hold the requested time slot in a 'pending' status, preventing others from booking it, but with a strict timeout (e.g., 5 minutes) after which the hold is released if no payment arrives.\n\nWhen your server receives a successful payment callback from Safaricom, it verifies the transaction ID and amount. Only then does the backend script make the Google Calendar API call to insert the event. Finally, it sends a WhatsApp message confirming the booking and acknowledging receipt of the deposit.\n\nHandling payment failures gracefully is critical. If the STK push times out or is cancelled, the bot should automatically follow up: 'We noticed your deposit didn't go through. Would you like me to send the payment prompt again, or do you need to change the time?' This recovers potentially lost bookings without requiring human intervention.",
-            "keyLearnings": [
-              "Triggering M-Pesa STK Push from a WhatsApp flow",
-              "Listening for Daraja API payment callbacks",
-              "Holding a slot temporarily (pending state) while awaiting payment"
-            ]
-          }
-        },
-        {
-          "id": "book-step-8",
-          "number": "08",
-          "title": "Automated Reminder Sequences",
-          "subtitle": "Cutting no-shows with timely alerts",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Automation",
-          "summary": "Build a background job that automatically sends WhatsApp reminders 24 hours and 2 hours before the appointment.",
-          "isGated": true,
-          "content": {
-            "overview": "A booked appointment isn't revenue until the client walks in. We'll set up a cron job that reads upcoming Google Calendar events and fires off automated WhatsApp reminders with confirmation buttons.",
-            "lessonBody": "Securing the booking is only the first half of the battle; the second half is ensuring the client actually shows up. People forget appointments, especially those booked weeks in advance. Automated reminder sequences are proven to reduce no-show rates dramatically by bringing the appointment back to the top of the client's mind.\n\nThe standard best practice for service businesses is a two-touch reminder sequence: one message 24 hours before the appointment, and a final nudge 2 to 3 hours before. To build this, you need a background task—a cron job—that runs at regular intervals (e.g., every 15 minutes) on your server.\n\nThis cron job uses the Google Calendar API to query events occurring within your target timeframes. It filters for events that have not yet received a reminder flag. When a matching event is found, the system extracts the client's phone number from the calendar event's description or extended properties and dispatches a WhatsApp message via the Meta Graph API.\n\nSince these reminders are proactive, outbound messages initiated by the business (outside the standard 24-hour customer service window), WhatsApp Cloud API rules require you to use pre-approved Message Templates. You cannot send arbitrary free-form text. Your template must be approved by Meta and might look like: 'Hi {{1}}, a quick reminder of your appointment tomorrow at {{2}}. Reply YES to confirm.'\n\nFinally, the system needs to process the client's reply. If they reply 'YES,' the bot updates the calendar event title (e.g., prepending '[CONFIRMED]') so the business owner can see at a glance who is definitely coming. If they reply indicating they can't make it, the bot gracefully transitions them into the cancellation or rescheduling flow.",
-            "keyLearnings": [
-              "Querying upcoming calendar events programmatically",
-              "Scheduling recurring background jobs with Node.js/Cron",
-              "Using WhatsApp message templates for proactive outreach"
-            ]
-          }
-        },
-        {
-          "id": "book-step-9",
-          "number": "09",
-          "title": "Cancellations & Rescheduling",
-          "subtitle": "Handling changes without manual intervention",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Operations",
-          "summary": "Empower the AI to cancel or move appointments, automatically freeing up calendar space.",
-          "isGated": true,
-          "content": {
-            "overview": "When a client texts 'I need to cancel', the AI shouldn't just say 'okay'—it needs to actually delete the event from Google Calendar so another client can book it. You'll build the logic to identify existing user appointments and modify them.",
-            "lessonBody": "A truly autonomous scheduling agent handles the entire lifecycle of an appointment, including when things go wrong. If a client needs to cancel and the bot only replies with a polite acknowledgment, the slot remains blocked on the calendar. The business owner misses out on potential revenue because the system failed to free up the resource.\n\nTo implement automated rescheduling, your bot must first be able to identify a returning user and look up their upcoming appointments. When a known phone number messages 'I need to change my time,' the backend queries the Google Calendar API for future events where the attendee matches that number. If an event is found, the bot confirms: 'I see you have an appointment on Tuesday at 2 PM. Would you like to cancel or reschedule?'\n\nIf the user chooses to cancel, the system uses the Google Calendar events.delete endpoint to remove the booking entirely. It then sends a confirmation message to the client. Instantly, that time block becomes available in the freeBusy queries for any other client currently chatting with the bot.\n\nRescheduling is essentially a cancellation immediately followed by a new booking flow. To minimize friction, the bot deletes the old event (or modifies it via the events.patch endpoint) only after the user has successfully selected and confirmed a new time slot. This ensures the client doesn't accidentally lose their original slot if they abandon the chat halfway through picking a new time.\n\nFor high-demand businesses, a cancelled appointment triggers a waitlist opportunity. While building a full waitlist manager is complex, a simple implementation involves the bot notifying the business owner on a private admin channel: 'A slot just opened up tomorrow at 2 PM due to a cancellation.' The owner can then manually reach out to waitlisted clients.",
-            "keyLearnings": [
-              "Retrieving a user's existing calendar events by phone number",
-              "Using the Calendar API to delete or patch events",
-              "Managing edge cases when multiple upcoming events exist"
-            ]
-          }
-        },
-        {
-          "id": "book-step-10",
-          "number": "10",
-          "title": "Waitlists & Peak Hour Queueing",
-          "subtitle": "Maximizing revenue on fully booked days",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Logic",
-          "summary": "Implement an automated waitlist that captures high-intent leads and notifies them if a cancellation frees up a slot.",
-          "isGated": true,
-          "content": {
-            "overview": "When the calendar is full, you shouldn't just turn customers away. Learn how to implement an automated waitlist that captures high-intent leads and notifies them if a cancellation frees up a slot.",
-            "lessonBody": "For popular salons or specialized clinics, weekends and evenings are often fully booked days in advance. A naive scheduling bot simply says, 'Sorry, we have no availability,' turning away a willing customer and permanently losing the lead. A sophisticated agent captures that intent by offering a spot on a waitlist.\n\nImplementing a waitlist requires secondary storage outside of Google Calendar, as Calendar is designed for confirmed events, not tentative requests. You can use a simple PostgreSQL table or even a dedicated Google Sheet to record the user's phone number, requested service, and preferred date range. When the bot detects that all slots for a requested day are full, it pivots: 'We are fully booked on Saturday, but cancellations happen. Would you like me to notify you if a spot opens up?'\n\nThe true value of the waitlist is realized through the cancellation flow you built in the previous lesson. When Client A cancels their Saturday 2 PM slot, your backend shouldn't just delete the event. It should immediately query your waitlist database for any users who requested Saturday afternoon.\n\nIf a match is found, the system dispatches an automated, proactive WhatsApp template message to the waitlisted user: 'Hi! A slot just opened up on Saturday at 2 PM for your requested service. Reply BOOK within 10 minutes to claim it.' This creates urgency and fills the newly opened slot almost instantly, protecting the business's utilization rate.\n\nTo manage concurrency and prevent multiple waitlisted users from fighting over one slot, you must message them sequentially or use a strict first-come, first-served lock. Sequential messaging—notifying the oldest waitlist entry first, waiting 10 minutes, then notifying the next—is the fairest approach and ensures a smooth user experience without double-booking accidents.",
-            "keyLearnings": [
-              "Capturing high-intent leads when availability is zero",
-              "Storing and querying waitlist data separate from Calendar",
-              "Automating proactive notifications upon cancellations"
-            ]
-          }
-        },
-        {
-          "id": "book-step-11",
-          "number": "11",
-          "title": "Calendar Utilization Analytics",
-          "subtitle": "Giving owners visibility into business performance",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Reporting",
-          "summary": "Generate weekly utilization summaries so the business owner knows their busiest days and top staff.",
-          "isGated": true,
-          "content": {
-            "overview": "A good automation system doesn't just run; it reports. You'll create a simple script that aggregates completed calendar events and sends a weekly WhatsApp summary to the owner, highlighting no-show rates and peak booking hours.",
-            "lessonBody": "Small business owners rarely have time to manually analyze their scheduling data. They know when they feel busy, but they often lack hard numbers on utilization rates, popular services, or staff performance. By building an analytics module into your scheduling agent, you elevate the system from a simple booking tool to a valuable business intelligence asset.\n\nThe analytics engine runs as a scheduled weekly cron job—typically on a Sunday evening. It queries the Google Calendar API for all events that occurred in the past seven days. By parsing the event descriptions and titles (where you previously injected service types and status tags like '[CONFIRMED]' or '[NO-SHOW]'), the script aggregates the raw data into actionable metrics.\n\nKey metrics for a service business include the total number of completed appointments, the most requested service, the busiest day of the week, and the dreaded no-show rate. For multi-staff setups, the report can also break down utilization by employee, highlighting who is fully booked and who has excess capacity.\n\nThe delivery mechanism is just as important as the data. Business owners are more likely to read a concise WhatsApp message than log into a complex dashboard. Your script formats the aggregated data into a clean, easy-to-read WhatsApp text utilizing emojis for visual hierarchy (e.g., 📅 Total Bookings: 45, ✂️ Top Service: Braids, 📉 No-Show Rate: 5%).\n\nProviding this weekly digest reinforces the value of your system. Every time the owner receives the report, they are tangibly reminded of how much work the AI agent is handling on their behalf. It shifts their perception of your software from a cost center to a critical business partner.",
-            "keyLearnings": [
-              "Aggregating calendar data for business insights",
-              "Calculating no-show vs. completion rates",
-              "Formatting clean, actionable reporting messages"
-            ]
-          }
-        },
-        {
-          "id": "book-step-12",
-          "number": "12",
-          "title": "Verified Portfolio Deployment",
-          "subtitle": "Launching your real-world scheduling agent",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Deployment",
-          "summary": "Deploy your booking agent to a live WhatsApp number and verify it with a real Kenyan service business.",
-          "isGated": true,
-          "content": {
-            "overview": "It's time to go live. You will connect your fully functioning booking bot to a live WhatsApp Business number, hook it up to a real Google Calendar, and have a local salon or clinic owner test it. Complete this to earn your Verified Portfolio status.",
-            "lessonBody": "Building the system locally is practice; deploying it for a real business is proof. This final lesson guides you through taking your Node.js application out of development and into a production environment. You will host your webhook on a reliable cloud provider like Render, Heroku, or a DigitalOcean droplet, ensuring it runs 24/7 and uses HTTPS, a strict requirement for Meta's WhatsApp Cloud API.\n\nFirst, you will finalize the Meta App configuration. This involves securing a dedicated phone number for the business, verifying it through the WhatsApp Business portal, and pointing the Meta webhook configuration to your live production server's URL. You must ensure your server correctly handles Meta's verification challenge tokens and securely parses incoming message payloads.\n\nNext, you will connect the live system to the business owner's actual Google Calendar. This requires carefully guiding the owner through sharing their calendar with your service account email. You must run thorough end-to-end tests: booking an appointment via WhatsApp and verifying it appears instantly on their phone, then deleting it via WhatsApp and watching it disappear. Real-world testing exposes edge cases you may have missed during development.\n\nThe core requirement for completing this course is the Verified Portfolio deliverable. Afridemy doesn't issue certificates based on automated tests. You must record a short, raw video demonstrating the bot successfully handling a booking flow on a live WhatsApp number, resulting in an event appearing on a calendar.\n\nFinally, you must obtain a short quote or testimonial from the business owner verifying that the system works and solves a real problem for them. This combination—a live link, a video demo, and client validation—proves you can build and deploy real-world automation, giving you a powerful asset to sell your services to other local businesses.",
-            "keyLearnings": [
-              "Deploying the Node.js webhook securely to production",
-              "Finalizing the WhatsApp Cloud API webhook connection",
-              "Recording a live demo and capturing the owner's verification quote"
-            ]
-          }
-        }
-      ]
+        ]
   },
   {
     id: 'social-content-agent',
