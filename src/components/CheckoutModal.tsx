@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check, CreditCard, ArrowRight, Loader2, Smartphone, AlertCircle } from 'lucide-react';
+import { X, Check, CreditCard, ArrowRight, Loader2, Smartphone, AlertCircle, Tag } from 'lucide-react';
+import { COUPONS } from '../data/coupons';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -26,6 +27,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'card'>('mpesa');
   const [status, setStatus] = useState<'idle' | 'starting' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponError, setCouponError] = useState('');
+
+  const discount = appliedCoupon ? COUPONS[appliedCoupon] : 0;
+  const finalPrice = discount ? Math.round(product.price * (1 - discount)) : product.price;
+  const finalPriceDisplay = `KES ${finalPrice.toLocaleString()}`;
+
+  const handleApplyCoupon = () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    if (COUPONS[code]) {
+      setAppliedCoupon(code);
+      setCouponError('');
+    } else {
+      setAppliedCoupon(null);
+      setCouponError('That code is not valid.');
+    }
+  };
 
   const handlePay = async () => {
     if (!userId || !email) {
@@ -46,6 +66,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           userId,
           email,
           channels: paymentMethod === 'mpesa' ? ['mobile_money'] : ['card'],
+          couponCode: appliedCoupon,
         }),
       });
       const data = await res.json();
@@ -110,13 +131,71 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           <div className="p-4 rounded-xl bg-[#12102A] text-white flex items-center justify-between">
             <div>
               <p className="text-xs text-white/70 font-mono">One-time payment</p>
-              <p className="text-2xl font-black text-white">{priceDisplay}</p>
+              {discount > 0 ? (
+                <div className="flex items-baseline gap-2">
+                  <p className="text-2xl font-black text-white">{finalPriceDisplay}</p>
+                  <p className="text-sm text-white/40 line-through">{priceDisplay}</p>
+                </div>
+              ) : (
+                <p className="text-2xl font-black text-white">{priceDisplay}</p>
+              )}
             </div>
             <div className="text-right">
               <span className="text-[10px] font-bold font-mono px-2 py-1 bg-[#F5A623] text-[#12102A] rounded">
                 INSTANT UNLOCK
               </span>
             </div>
+          </div>
+
+          {/* Coupon Code */}
+          <div>
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30">
+                <div className="flex items-center gap-2 text-xs font-bold text-[#10B981]">
+                  <Tag className="w-3.5 h-3.5" />
+                  {appliedCoupon} applied - {Math.round(discount * 100)}% off
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAppliedCoupon(null);
+                    setCouponInput('');
+                  }}
+                  disabled={status === 'starting'}
+                  className="text-[11px] font-bold text-[#12102A]/50 hover:text-[#12102A] cursor-pointer disabled:opacity-50"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) => {
+                      setCouponInput(e.target.value);
+                      setCouponError('');
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                    disabled={status === 'starting'}
+                    placeholder="Have a discount code?"
+                    className="flex-1 px-3 py-2.5 rounded-xl border border-[#12102A]/10 text-xs font-mono placeholder:text-[#12102A]/30 focus:outline-none focus:border-[#F5A623] disabled:opacity-60"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={status === 'starting' || !couponInput.trim()}
+                    className="px-4 py-2.5 rounded-xl bg-[#12102A]/5 hover:bg-[#12102A]/10 text-[#12102A] text-xs font-bold cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {couponError && (
+                  <p className="text-[11px] text-red-600 mt-1.5 font-medium">{couponError}</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Payment Method Preference */}
@@ -204,7 +283,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </>
             ) : (
               <>
-                Continue to Payment ({priceDisplay})
+                Continue to Payment ({finalPriceDisplay})
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

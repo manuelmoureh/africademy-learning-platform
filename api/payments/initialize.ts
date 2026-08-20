@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { randomUUID } from 'crypto';
 import { INITIAL_TRACKS } from '../../src/data/courses';
+import { COUPONS } from '../../src/data/coupons';
 import { getSupabaseAdmin } from '../_lib/supabaseAdmin';
 
 // Starts a real Paystack transaction for a one-time track unlock. The price is looked up
@@ -18,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const { trackId, userId, email, channels } = req.body || {};
+  const { trackId, userId, email, channels, couponCode } = req.body || {};
   if (!trackId || typeof trackId !== 'string') {
     res.status(400).json({ error: 'trackId is required' });
     return;
@@ -38,6 +39,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  const normalizedCoupon = typeof couponCode === 'string' ? couponCode.trim().toUpperCase() : '';
+  const discount = COUPONS[normalizedCoupon] || 0;
+  const chargeAmount = discount > 0 ? Math.round(track.price * (1 - discount)) : track.price;
+
   const reference = `af_${trackId}_${Date.now()}_${randomUUID().slice(0, 8)}`;
   const origin = req.headers.origin || `https://${req.headers.host}`;
 
@@ -50,12 +55,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       body: JSON.stringify({
         email,
-        amount: track.price * 100, // Paystack expects the smallest currency unit
+        amount: chargeAmount * 100, // Paystack expects the smallest currency unit
         currency: 'KES',
         reference,
         callback_url: `${origin}/payment/callback`,
         channels: Array.isArray(channels) && channels.length > 0 ? channels : undefined,
-        metadata: { trackId, userId, trackTitle: track.title },
+        metadata: {
+          trackId,
+          userId,
+          trackTitle: track.title,
+          couponCode: discount > 0 ? normalizedCoupon : undefined,
+        },
       }),
     });
 
@@ -71,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       user_id: userId,
       track_id: trackId,
       reference,
-      amount: track.price,
+      amount: chargeAmount,
       currency: 'KES',
       status: 'pending',
     });
