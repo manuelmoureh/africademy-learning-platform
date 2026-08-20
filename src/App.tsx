@@ -10,7 +10,6 @@ import { Sidebar } from './components/Sidebar';
 import { CurriculumRoadmap } from './components/CurriculumRoadmap';
 import { PortfolioStatus } from './components/PortfolioStatus';
 import { BuildWorkspaceCard } from './components/BuildWorkspaceCard';
-import { LessonDetailModal } from './components/LessonDetailModal';
 import { LessonPage } from './components/LessonPage';
 import { CheckoutModal } from './components/CheckoutModal';
 import { AuthModal } from './components/AuthModal';
@@ -192,7 +191,6 @@ export default function App() {
   const [portfolioData, setPortfolioData] = useState<PortfolioVerification>(INITIAL_PORTFOLIO_VERIFICATION);
 
   // Modals
-  const [selectedStep, setSelectedStep] = useState<Step | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
@@ -234,24 +232,9 @@ export default function App() {
   const nextStepFor = (track: Track): Step =>
     track.steps.find(s => s.status !== 'completed') || track.steps[0];
 
-  // The new full-page lesson experience (LessonPage) is rolled out per-course as each
-  // course's content is reviewed and confirmed complete - courses not in this set still
-  // open the older lesson modal (LessonDetailModal), which doesn't render lessonBody,
-  // visualBreaks, interactiveCheck, or fadedPractice.
-  const LESSON_PAGE_TRACKS = new Set(['whatsapp-retail-agent', 'lead-capture-bot', 'invoicing-assistant', 'support-ticketing-agent', 'booking-scheduler-agent', 'social-content-agent', 'inventory-restock-agent', 'hr-screening-agent', 'payment-collections-agent', 'food-ordering-agent']);
   const openLesson = (step: Step) => {
-    if (LESSON_PAGE_TRACKS.has(activeTrack.id)) {
-      navigate(`/systems/${activeTrack.id}/learn/${step.id}`);
-    } else {
-      setSelectedStep(step);
-    }
+    navigate(`/systems/${activeTrack.id}/learn/${step.id}`);
   };
-
-  // Whatever comes immediately after the lesson currently open in the detail modal,
-  // so it can offer a "Next Lesson" action instead of dead-ending after "Mark as Completed".
-  const nextStepAfterSelected = selectedStep
-    ? activeTrack.steps[activeTrack.steps.findIndex(s => s.id === selectedStep.id) + 1]
-    : undefined;
 
   // Calculate live progress
   const completedStepsCount = activeTrack.steps.filter(s => s.status === 'completed').length;
@@ -283,13 +266,6 @@ export default function App() {
 
     if (authUserId) {
       setStepProgress(authUserId, selectedTrackId, stepId, newlyCompleted);
-    }
-
-    if (selectedStep && selectedStep.id === stepId) {
-      setSelectedStep(prev => prev ? {
-        ...prev,
-        status: prev.status === 'completed' ? 'current' : 'completed'
-      } : null);
     }
   };
 
@@ -607,7 +583,7 @@ export default function App() {
                 <div className="lg:col-span-2 flex flex-col gap-6">
                   <CurriculumRoadmap
                     steps={activeTrack.steps}
-                    selectedStepId={selectedStep?.id || null}
+                    selectedStepId={null}
                     onSelectStep={openLesson}
                     onToggleCompleteStep={handleToggleCompleteStep}
                     isUnlocked={isTrackUnlocked(activeTrack.id)}
@@ -636,20 +612,6 @@ export default function App() {
       </div>
 
       {/* Interactive Modals */}
-      <LessonDetailModal
-        step={selectedStep}
-        onClose={() => setSelectedStep(null)}
-        onUnlock={() => {
-          setSelectedStep(null);
-          openCheckout();
-        }}
-        onToggleComplete={handleToggleCompleteStep}
-        onNext={nextStepAfterSelected ? () => setSelectedStep(nextStepAfterSelected) : undefined}
-        isUnlocked={isTrackUnlocked(activeTrack.id)}
-        trackTitle={activeTrack.title}
-        trackPrice={activeTrack.price}
-      />
-
       <CheckoutModal
         isOpen={isTrackCheckoutOpen}
         onClose={() => setIsTrackCheckoutOpen(false)}
