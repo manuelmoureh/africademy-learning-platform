@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '../_lib/supabaseAdmin.js';
+import { sendAdminEmail } from '../_lib/resend.js';
 
 // Disable Vercel's automatic body parsing - signature verification has to run against the
 // exact raw bytes Paystack sent, not a re-serialized JSON.parse of them, or a byte-for-byte
@@ -68,6 +69,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .update({ status: 'success', paid_at: new Date().toISOString() })
       .eq('reference', tx.reference);
     if (error) console.error('Webhook: failed to record successful purchase', error);
+
+    await sendAdminEmail(
+      `Payment received: ${tx.metadata?.trackTitle || tx.reference}`,
+      `
+        <h2>Payment received</h2>
+        <p><strong>System:</strong> ${tx.metadata?.trackTitle || '-'}</p>
+        <p><strong>Amount:</strong> KES ${(tx.amount / 100).toLocaleString()}</p>
+        <p><strong>Customer email:</strong> ${tx.customer?.email || '-'}</p>
+        <p><strong>Reference:</strong> ${tx.reference}</p>
+      `
+    );
   }
 
   // Paystack expects a fast 200 acknowledgement regardless of downstream processing detail.
