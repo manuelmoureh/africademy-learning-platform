@@ -23,22 +23,24 @@ import { AboutPage } from './components/AboutPage';
 import { VerifiedWorkPage } from './components/VerifiedWorkPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/TermsOfServicePage';
+import { PaymentCallbackPage } from './components/PaymentCallbackPage';
 import { CommunityView } from './components/CommunityView';
 import { INITIAL_TRACKS, INITIAL_PORTFOLIO_VERIFICATION } from './data/courses';
 import { Step, Track, UserAccount, PortfolioVerification } from './types';
 import { Play, Sparkles, CheckCheck, ShieldCheck, Check } from 'lucide-react';
 import { supabase } from './lib/supabase';
-import { fetchUserProgress, setStepProgress } from './lib/db';
+import { fetchUserProgress, setStepProgress, fetchUserPurchases } from './lib/db';
 import { trackPageView } from './lib/analytics';
 
 // Maps the URL to what used to be `viewMode`/`activeNav` state, so every page the app
 // can show has a real, bookmarkable, back-button-friendly URL instead of living entirely
 // in memory.
-function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'lesson' | 'app'; activeNav: string; trackId: string | null; stepId: string | null } {
+function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'lesson' | 'payment-callback' | 'app'; activeNav: string; trackId: string | null; stepId: string | null } {
   if (pathname === '/about') return { view: 'about', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/privacy') return { view: 'privacy', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/terms') return { view: 'terms', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/verified') return { view: 'verified-work', activeNav: '', trackId: null, stepId: null };
+  if (pathname === '/payment/callback') return { view: 'payment-callback', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/community') return { view: 'app', activeNav: 'community', trackId: null, stepId: null };
   if (pathname === '/systems') return { view: 'app', activeNav: 'catalog', trackId: null, stepId: null };
 
@@ -186,13 +188,33 @@ export default function App() {
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isTrackCheckoutOpen, setIsTrackCheckoutOpen] = useState(false);
 
-  // Per-system one-time purchase, stubbed client-side for now: this array should
-  // eventually be a real Supabase record tied to a completed payment, not just local
-  // state, but that backend wiring is an explicitly separate follow-up.
+  // Real, paid track unlocks. purchasedTrackIds is populated from the purchases table
+  // (the actual source of truth, written server-side once Paystack confirms payment) and
+  // kept in local state only as an optimistic cache, so the UI updates instantly right
+  // after a purchase without waiting on a refetch.
   const [purchasedTrackIds, setPurchasedTrackIds] = useState<string[]>([]);
   const isTrackUnlocked = (trackId: string) => purchasedTrackIds.includes(trackId);
   const handlePurchaseTrack = (trackId: string) => {
     setPurchasedTrackIds(prev => (prev.includes(trackId) ? prev : [...prev, trackId]));
+  };
+
+  useEffect(() => {
+    if (!authUserId) {
+      setPurchasedTrackIds([]);
+      return;
+    }
+    fetchUserPurchases(authUserId).then(setPurchasedTrackIds);
+  }, [authUserId]);
+
+  // A real purchase has to be tied to a real signed-in account (that's who gets the
+  // unlock recorded against them) - if someone hits "Unlock" while signed out, prompt
+  // sign-in first instead of opening a checkout that can't actually complete.
+  const openCheckout = () => {
+    if (!authUserId) {
+      setIsAuthOpen(true);
+      return;
+    }
+    setIsTrackCheckoutOpen(true);
   };
 
   const activeTrack = tracks.find(t => t.id === selectedTrackId) || tracks[0];
@@ -287,15 +309,16 @@ export default function App() {
           onOpenAuth={() => setIsAuthOpen(true)}
           onBack={() => navigate(`/systems/${lessonTrack.id}/learn`)}
           onToggleComplete={handleToggleCompleteStep}
-          onUnlock={() => setIsTrackCheckoutOpen(true)}
+          onUnlock={openCheckout}
           onNavigateToStep={(stepId) => navigate(`/systems/${lessonTrack.id}/learn/${stepId}`)}
         />
 
         <CheckoutModal
           isOpen={isTrackCheckoutOpen}
           onClose={() => setIsTrackCheckoutOpen(false)}
-          onSuccess={() => handlePurchaseTrack(lessonTrack.id)}
-          product={{ name: lessonTrack.title, price: lessonTrack.price }}
+          product={{ id: lessonTrack.id, name: lessonTrack.title, price: lessonTrack.price }}
+          userId={authUserId}
+          email={user.email || null}
         />
 
         <AuthModal
@@ -341,6 +364,23 @@ export default function App() {
 
   if (viewMode === 'terms') {
     return <TermsOfServicePage onBack={() => navigate('/')} />;
+  }
+
+  if (viewMode === 'payment-callback') {
+    const reference = new URLSearchParams(location.search).get('reference');
+    return (
+      <PaymentCallbackPage
+        reference={reference}
+        onDone={(trackId) => {
+          if (trackId) {
+            handlePurchaseTrack(trackId);
+            navigate(`/systems/${trackId}/learn`);
+          } else {
+            navigate('/');
+          }
+        }}
+      />
+    );
   }
 
   if (viewMode === 'verified-work') {
@@ -458,7 +498,7 @@ export default function App() {
           <Sidebar
             track={activeTrack}
             onBrowseAll={() => navigate('/systems')}
-            onUnlockTrack={() => setIsTrackCheckoutOpen(true)}
+            onUnlockTrack={openCheckout}
             isUnlocked={isTrackUnlocked(activeTrack.id)}
             activeTrackProgress={progressPercent}
           />
@@ -561,7 +601,7 @@ export default function App() {
         onClose={() => setSelectedStep(null)}
         onUnlock={() => {
           setSelectedStep(null);
-          setIsTrackCheckoutOpen(true);
+          openCheckout();
         }}
         onToggleComplete={handleToggleCompleteStep}
         onNext={nextStepAfterSelected ? () => setSelectedStep(nextStepAfterSelected) : undefined}
@@ -573,8 +613,9 @@ export default function App() {
       <CheckoutModal
         isOpen={isTrackCheckoutOpen}
         onClose={() => setIsTrackCheckoutOpen(false)}
-        onSuccess={() => handlePurchaseTrack(activeTrack.id)}
-        product={{ name: activeTrack.title, price: activeTrack.price }}
+        product={{ id: activeTrack.id, name: activeTrack.title, price: activeTrack.price }}
+        userId={authUserId}
+        email={user.email || null}
       />
 
       <AuthModal

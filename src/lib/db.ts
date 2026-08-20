@@ -18,6 +18,22 @@ export async function fetchUserProgress(userId: string): Promise<ProgressRow[]> 
   return data ?? [];
 }
 
+// Real, paid track unlocks - the source of truth App.tsx uses for isTrackUnlocked(),
+// replacing the old purchasedTrackIds-only-in-memory stub. Rows only ever reach 'success'
+// via the server (api/payments/verify.ts or webhook.ts), never written by the client.
+export async function fetchUserPurchases(userId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('purchases')
+    .select('track_id')
+    .eq('user_id', userId)
+    .eq('status', 'success');
+  if (error) {
+    console.error('fetchUserPurchases failed', error);
+    return [];
+  }
+  return (data ?? []).map((row) => row.track_id);
+}
+
 export async function fetchUserEnrollments(userId: string): Promise<string[]> {
   const { data, error } = await supabase
     .from('enrollments')
