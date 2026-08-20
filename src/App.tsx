@@ -234,11 +234,13 @@ export default function App() {
   const nextStepFor = (track: Track): Step =>
     track.steps.find(s => s.status !== 'completed') || track.steps[0];
 
-  // Pilot: the new full-page lesson experience is live on the WhatsApp course only,
-  // approved and ready to roll out further once reviewed. Every other course still
-  // opens the lesson modal until that happens.
+  // The new full-page lesson experience (LessonPage) is rolled out per-course as each
+  // course's content is reviewed and confirmed complete - courses not in this set still
+  // open the older lesson modal (LessonDetailModal), which doesn't render lessonBody,
+  // visualBreaks, interactiveCheck, or fadedPractice.
+  const LESSON_PAGE_TRACKS = new Set(['whatsapp-retail-agent', 'lead-capture-bot']);
   const openLesson = (step: Step) => {
-    if (activeTrack.id === 'whatsapp-retail-agent') {
+    if (LESSON_PAGE_TRACKS.has(activeTrack.id)) {
       navigate(`/systems/${activeTrack.id}/learn/${step.id}`);
     } else {
       setSelectedStep(step);
