@@ -64,9 +64,9 @@ const Counter: React.FC<CounterProps> = ({ target, prefix = '', suffix = '' }) =
       return;
     }
     const controls = animate(0, target, {
-      duration: 1.6,
-      delay: 0.5,
-      ease: [0.16, 1, 0.3, 1],
+      duration: 2,
+      delay: 0.3,
+      ease: 'linear',
       onUpdate: (v) => setDisplay(v),
     });
     return () => controls.stop();
