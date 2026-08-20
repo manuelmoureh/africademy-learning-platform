@@ -488,7 +488,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             return (
               <motion.button
                 key={track.id}
-                onClick={onEnterApp}
+                onClick={() => onSelectCourse(track.id)}
                 whileHover={reduce ? undefined : { y: -3 }}
                 whileTap={reduce ? undefined : { scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
