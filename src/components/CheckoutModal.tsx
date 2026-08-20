@@ -108,7 +108,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       }
 
       window.location.href = data.authorization_url;
-    } catch {
+    } catch (err) {
+      console.error('CheckoutModal handlePay failed', err);
       setStatus('error');
       setErrorMessage('Something went wrong. Check your connection and try again.');
     }

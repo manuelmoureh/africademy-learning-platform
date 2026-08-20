@@ -126,7 +126,7 @@ export default function App() {
         .from('profiles')
         .select('name, email, plan, location, avatar_url')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       if (!active) return;
       if (profile) {
         const parts = profile.name.trim().split(' ');

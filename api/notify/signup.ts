@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendAdminEmail } from '../_lib/resend.js';
+import { sendAdminEmail, escapeHtml } from '../_lib/resend.js';
 
 // Called by a Supabase Database Webhook on INSERT into public.profiles (Database >
 // Webhooks in the Supabase dashboard). Supabase has no built-in "email the owner on
@@ -29,10 +29,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `New Afridemy sign-up: ${record.name || record.email}`,
     `
       <h2>New sign-up</h2>
-      <p><strong>Name:</strong> ${record.name || '-'}</p>
-      <p><strong>Email:</strong> ${record.email || '-'}</p>
-      <p><strong>Location:</strong> ${record.location || '-'}</p>
-      <p><strong>Signed up at:</strong> ${record.created_at || '-'}</p>
+      <p><strong>Name:</strong> ${escapeHtml(record.name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(record.email)}</p>
+      <p><strong>Location:</strong> ${escapeHtml(record.location)}</p>
+      <p><strong>Signed up at:</strong> ${escapeHtml(record.created_at)}</p>
     `
   );
 

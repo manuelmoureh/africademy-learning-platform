@@ -84,8 +84,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           .from('profiles')
           .select('name, email, plan, location, avatar_url')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle();
         if (profileError) throw profileError;
+        if (!profile) throw new Error("We couldn't find your profile yet - please try again in a moment.");
         onLogin(buildUserAccount(profile as ProfileRow));
         onClose();
       } else {
@@ -98,8 +99,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           .from('profiles')
           .select('name, email, plan, location, avatar_url')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle();
         if (profileError) throw profileError;
+        if (!profile) throw new Error("We couldn't find your profile yet - please try again in a moment.");
         onLogin(buildUserAccount(profile as ProfileRow));
         onClose();
       }

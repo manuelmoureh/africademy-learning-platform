@@ -1,3 +1,16 @@
+// Escapes user-controlled values before they're interpolated into an HTML email body.
+// Both signup and payment payloads (name, email, location) originate from data a client
+// ultimately controls, so unescaped interpolation would let HTML/link injection reach an
+// admin's inbox.
+export function escapeHtml(value: unknown): string {
+  return String(value ?? '-')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Server-only helper for admin notification emails (new sign-ups, payments). Not user-facing
 // mail - that's Supabase Auth's job. Fails soft: callers log and continue on error rather
 // than blocking the request that triggered the notification (a signup or a payment should

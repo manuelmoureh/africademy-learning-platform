@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '../_lib/supabaseAdmin.js';
-import { sendAdminEmail } from '../_lib/resend.js';
+import { sendAdminEmail, escapeHtml } from '../_lib/resend.js';
 
 // Disable Vercel's automatic body parsing - signature verification has to run against the
 // exact raw bytes Paystack sent, not a re-serialized JSON.parse of them, or a byte-for-byte
@@ -74,10 +74,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       `Payment received: ${tx.metadata?.trackTitle || tx.reference}`,
       `
         <h2>Payment received</h2>
-        <p><strong>System:</strong> ${tx.metadata?.trackTitle || '-'}</p>
+        <p><strong>System:</strong> ${escapeHtml(tx.metadata?.trackTitle)}</p>
         <p><strong>Amount:</strong> KES ${(tx.amount / 100).toLocaleString()}</p>
-        <p><strong>Customer email:</strong> ${tx.customer?.email || '-'}</p>
-        <p><strong>Reference:</strong> ${tx.reference}</p>
+        <p><strong>Customer email:</strong> ${escapeHtml(tx.customer?.email)}</p>
+        <p><strong>Reference:</strong> ${escapeHtml(tx.reference)}</p>
       `
     );
   }
