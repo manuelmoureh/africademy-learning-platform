@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseAdmin } from '../_lib/supabaseAdmin';
+import { getSupabaseAdmin } from '../_lib/supabaseAdmin.js';
 
 // Called by the /payment/callback page right after Paystack redirects the browser back,
 // so the purchase unlocks immediately rather than waiting on the webhook (which can't

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { getSupabaseAdmin } from '../_lib/supabaseAdmin';
+import { getSupabaseAdmin } from '../_lib/supabaseAdmin.js';
 
 // Disable Vercel's automatic body parsing - signature verification has to run against the
 // exact raw bytes Paystack sent, not a re-serialized JSON.parse of them, or a byte-for-byte

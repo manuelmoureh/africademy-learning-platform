@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { randomUUID } from 'crypto';
-import { INITIAL_TRACKS } from '../../src/data/courses';
-import { COUPONS } from '../../src/data/coupons';
-import { getSupabaseAdmin } from '../_lib/supabaseAdmin';
+import { INITIAL_TRACKS } from '../../src/data/courses.js';
+import { COUPONS } from '../../src/data/coupons.js';
+import { getSupabaseAdmin } from '../_lib/supabaseAdmin.js';
 
 // Starts a real Paystack transaction for a one-time track unlock. The price is looked up
 // server-side from INITIAL_TRACKS - never trust an amount the client sends, or someone
