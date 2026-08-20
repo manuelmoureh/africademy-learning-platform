@@ -4411,255 +4411,676 @@ export const INITIAL_TRACKS: Track[] = [
     whoBuysThis: 'Growing SMEs that hire regularly',
     impactStat: 'Automated screening reads every CV the same way, so no candidate gets missed in the pile',
     steps: [
-        {
-          "id": "hr-step-1",
-          "number": "01",
-          "title": "Structured Resume Parsing",
-          "subtitle": "From messy PDFs to clean JSON",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Data Extraction",
-          "summary": "Learn how to use AI to reliably extract structured candidate information from unstructured CV PDFs and Word documents.",
-          "isGated": false,
-          "content": {
-            "overview": "Resume parsing is the foundation of any HR agent. In this lesson, you build a pipeline to extract raw text from candidate CVs and use an LLM to map that text into a standardized JSON schema representing their skills, experience, and education.",
-            "keyLearnings": [
-              "Extracting clean text from PDF and Word documents using Python libraries",
-              "Defining a strict Pydantic JSON schema for candidate profiles",
-              "Handling missing data gracefully when a candidate's CV is incomplete"
-            ],
-            "lessonBody": "Extracting information from resumes is notoriously difficult because every candidate formats their document differently. Unlike a web form where fields are rigidly defined, a PDF or Word document is essentially a digital piece of paper. The first step in building an HR agent is converting that unstructured layout into clean, machine-readable text.\n\nFor this system, you will use Python libraries like `PyMuPDF` or `pdfplumber` to strip the text out of uploaded CVs. These tools read the underlying document structure rather than just taking a picture, which preserves the reading order better than basic OCR. However, you will immediately notice that the resulting text is often a messy wall of words, stripping away tables and column layouts that the candidate used to organize their experience.\n\nThis is where the Large Language Model comes in. Rather than writing brittle regular expressions to find email addresses or dates, you pass the raw extracted text to a model like Gemini or GPT-4, instructing it to map the chaotic text into a clean structure. The model acts as a highly intelligent parser that can understand context—knowing that \"Jan 2019 - Present\" next to \"Safaricom\" indicates current employment.\n\nTo ensure the AI doesn't just return another messy text block, you will define a strict JSON schema using a library like Pydantic. This schema enforces exactly what data points you need—such as `years_experience` as an integer and `skills` as an array of strings. By locking the LLM to this schema, you guarantee that the next phase of your application receives predictable data, even if a candidate forgot to include their graduation year."
+          {
+            "id": "hr-step-1",
+            "number": "01",
+            "title": "Structured Resume Parsing",
+            "subtitle": "From messy PDFs to clean JSON",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Data Extraction",
+            "summary": "Learn how to use AI to reliably extract structured candidate information from unstructured CV PDFs and Word documents.",
+            "isGated": false,
+            "content": {
+              "overview": "Resume parsing is the foundation of any HR agent. In this lesson, you build a pipeline to extract raw text from candidate CVs and use an LLM to map that text into a standardized JSON schema representing their skills, experience, and education.",
+              "keyLearnings": [
+                "Extracting clean text from PDF and Word documents using Python libraries",
+                "Defining a strict Pydantic JSON schema for candidate profiles",
+                "Handling missing data gracefully when a candidate's CV is incomplete"
+              ],
+              "lessonBody": "Extracting information from resumes is notoriously difficult because every candidate formats their document differently. Unlike a web form where fields are rigidly defined, a PDF or Word document is essentially a digital piece of paper. The first step in building an HR agent is converting that unstructured layout into clean, machine-readable text.\n\nFor this system, you will use Python libraries like `PyMuPDF` or `pdfplumber` to strip the text out of uploaded CVs. These tools read the underlying document structure rather than just taking a picture, which preserves the reading order better than basic OCR. However, you will immediately notice that the resulting text is often a messy wall of words, stripping away tables and column layouts that the candidate used to organize their experience.\n\nThis is where the Large Language Model comes in. Rather than writing brittle regular expressions to find email addresses or dates, you pass the raw extracted text to a model like Gemini or GPT-4, instructing it to map the chaotic text into a clean structure. The model acts as a highly intelligent parser that can understand context—knowing that \"Jan 2019 - Present\" next to \"Safaricom\" indicates current employment.\n\nTo ensure the AI doesn't just return another messy text block, you will define a strict JSON schema using a library like Pydantic. This schema enforces exactly what data points you need—such as `years_experience` as an integer and `skills` as an array of strings. By locking the LLM to this schema, you guarantee that the next phase of your application receives predictable data, even if a candidate forgot to include their graduation year.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Messy text becomes clean structure in one LLM pass.",
+                  "flow": [
+                    "PDF/Word CV uploaded",
+                    "Text extracted (PyMuPDF/pdfplumber)",
+                    "Raw messy text passed to LLM",
+                    "LLM maps to strict JSON schema"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why use an LLM to parse resumes instead of regular expressions to find dates and job titles?",
+                "options": [
+                  {
+                    "text": "Regex is always faster, so the LLM is only used for formatting",
+                    "feedback": "Speed isn't the reason given - the issue is regex being brittle against varied resume formats.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The LLM understands context, like recognizing 'Jan 2019 - Present' next to a company name means current employment",
+                    "feedback": "Right. This contextual understanding is exactly why an LLM outperforms brittle regex here.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Regex cannot technically process PDF files at all",
+                    "feedback": "Regex works fine on extracted text - it just can't reliably interpret context and meaning.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-2",
+            "number": "02",
+            "title": "Defining the Job Profile",
+            "subtitle": "Translating JD requirements into logic",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Architecture",
+            "summary": "Convert a standard job description into explicit, measurable criteria for the AI to score against.",
+            "isGated": false,
+            "content": {
+              "overview": "To evaluate candidates fairly, the AI needs strict rules. You'll translate an unstructured job description into a clear set of weighted requirements, ensuring the agent evaluates exactly what the SME owner needs.",
+              "keyLearnings": [
+                "Deconstructing a Job Description (JD) into mandatory and nice-to-have skills",
+                "Assigning numerical weights to different qualifications",
+                "Setting up the baseline for bias-free objective ranking"
+              ],
+              "lessonBody": "An AI is only as objective as the rules you give it. If you simply ask an LLM to \"score this candidate based on the job description,\" the model will invent its own subjective criteria. It might unfairly penalize a candidate for a typo or over-value a university degree when the employer only cared about practical skills. To prevent this, you must translate the human-readable job description into a rigid logic matrix.\n\nThe first step is deconstructing the standard job description into explicit boolean criteria. Instead of a vague requirement like \"Strong web development skills,\" you break this down into specific, verifiable traits: \"Has at least 2 years of React experience\" and \"Has deployed an application to AWS.\" This forces the AI to look for concrete evidence in the extracted resume data rather than making holistic, easily biased judgments.\n\nOnce the criteria are explicitly defined, you assign numerical weights to each requirement. A mandatory skill, like a valid nursing license for a clinic role, might carry a weight that acts as an automatic disqualifier if absent. Meanwhile, nice-to-have skills, such as familiarity with a specific internal tool, carry lower weights that simply boost the candidate's rank over others. This weighted matrix becomes the single source of truth for the entire scoring engine.\n\nBy establishing this baseline before looking at a single resume, you strip away the ambiguity that typically introduces human error or AI hallucination into the hiring process. The AI is no longer acting as a hiring manager making holistic decisions; it is acting as a rigorous accountant, tallying up points strictly based on the presence of verified facts mapped against your explicit matrix.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Vague requirements invite subjective, biased scoring.",
+                  "compare": [
+                    {
+                      "label": "Vague requirement",
+                      "text": "'Strong web development skills'",
+                      "good": false
+                    },
+                    {
+                      "label": "Explicit boolean criteria",
+                      "text": "'Has at least 2 years of React experience'",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "If you just ask an LLM to 'score this candidate based on the job description' without a weighted matrix, what's the risk?",
+                "options": [
+                  {
+                    "text": "The model will invent its own subjective criteria, introducing bias",
+                    "feedback": "Right. This is exactly why the lesson insists on an explicit, weighted matrix first.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The model will refuse to score the candidate at all",
+                    "feedback": "The model won't refuse - it'll happily produce a score, which is exactly the problem.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Nothing - LLMs are naturally objective without needing explicit criteria",
+                    "feedback": "This is the opposite of what the lesson argues.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-3",
+            "number": "03",
+            "title": "Kenyan HR Context & Nuance",
+            "subtitle": "Localizing the parsing engine",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Data Processing",
+            "summary": "Train the parser to correctly interpret local job titles, Kenyan university acronyms, and regional experience.",
+            "isGated": false,
+            "content": {
+              "overview": "A generic AI might misunderstand local context. You'll configure the agent to recognize Kenyan institutions (like JKUAT or UoN), local tools (M-Pesa integrations, KRA iTax), and regional slang in job titles so no qualified candidate is skipped.",
+              "keyLearnings": [
+                "Building a custom dictionary of Kenyan universities and common certifications",
+                "Mapping local job titles to standard roles",
+                "Configuring the LLM to understand Nairobi-specific geography for commute considerations"
+              ],
+              "lessonBody": "Off-the-shelf AI models are trained predominantly on Western datasets, which means they often misunderstand local context in emerging markets. If a candidate lists \"JKUAT\" or \"UoN\" on their resume, a generic LLM might not recognize these as top-tier engineering universities in Kenya. Similarly, local high school credentials like the \"KCSE\" might be ignored entirely because the model is looking for an American High School Diploma.\n\nTo make your HR agent actually useful for a Kenyan SME, you have to explicitly teach it local nuances. You will build a custom dictionary into your system prompt that defines common regional acronyms, institutions, and certifications. By explicitly mapping \"KRA iTax\" to \"tax compliance software\" or explaining that \"HELB\" relates to student loans, you ensure the AI accurately parses and values the candidate's actual background.\n\nJob titles also carry local variations. A \"Systems Admin\" in a small Nairobi firm might effectively be a full-stack developer and IT support rolled into one. When configuring the LLM, you instruct it to analyze the bullet points under the job title rather than relying on the title alone. This prevents qualified candidates from being filtered out just because their previous employer used a non-standard naming convention.\n\nGeography plays a crucial role in hiring, especially in cities with heavy traffic like Nairobi. You will configure the model to evaluate the candidate's location against the office location—for instance, understanding that a daily commute from Kitengela to Westlands is significantly more demanding than Kilimani to Westlands. Providing the AI with this explicit geographical awareness allows it to flag potential logistical challenges for the hiring manager, rather than blindly scoring all candidates equally regardless of commute reality.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Local context has to be taught explicitly - it is not built in.",
+                  "compare": [
+                    {
+                      "label": "Generic LLM",
+                      "text": "Doesn't recognize 'JKUAT' or 'KCSE' as legitimate credentials",
+                      "good": false
+                    },
+                    {
+                      "label": "Localized prompt",
+                      "text": "Custom dictionary maps local institutions and acronyms correctly",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A candidate's previous job title was 'Systems Admin' at a small Nairobi firm, but their bullet points describe full-stack development and IT support work. How should the agent evaluate this?",
+                "options": [
+                  {
+                    "text": "Score them only as a Systems Admin since that's the official title listed",
+                    "feedback": "Relying on the title alone misses what the actual bullet points describe.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Analyze the bullet points under the title rather than relying on the title alone",
+                    "feedback": "Right. This is exactly how the lesson prevents qualified candidates from being filtered out.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Discard the resume since the title doesn't match the job requirements",
+                    "feedback": "Discarding based on title alone is exactly the kind of filtering this lesson prevents.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-4",
+            "number": "04",
+            "title": "Bias-Aware Candidate Scoring",
+            "subtitle": "Scoring explicitly, not implicitly",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Flow Design",
+            "summary": "Design prompts that force the LLM to justify its scores based solely on explicit CV evidence.",
+            "isGated": true,
+            "content": {
+              "overview": "AI hiring tools can introduce bias if not carefully constrained. In this lesson, you write system prompts that strictly map CV facts against the rubric and prevent the model from hallucinating or inferring skills based on unrelated factors.",
+              "keyLearnings": [
+                "Writing negative constraints to prevent bias on name, age, or gender",
+                "Forcing the AI to quote the CV snippet that justifies its score",
+                "Creating a multi-tier categorization: Shortlist, Maybe, and Reject"
+              ],
+              "lessonBody": "AI models are pattern-matching engines, and without strict guardrails, they will eagerly replicate the biases present in their training data. If left unchecked, an LLM might subtly alter candidate scores based on inferred gender, age, or ethnicity from their name. To build an ethical and legally compliant HR agent, you must actively architect bias prevention directly into your system prompts.\n\nThe most effective method is using strict negative constraints. You explicitly instruct the model: \"Do not adjust scores based on the candidate's name, inferred gender, marital status, or age.\" More importantly, you require the AI to show its work. For every point awarded on the scoring matrix, the system prompt mandates that the LLM extract and return the exact snippet from the CV that justifies the score.\n\nBy forcing the AI to quote the source text, you eliminate hallucinated qualifications and expose the model's reasoning. If the AI gives a candidate a high score for \"Leadership\" but quotes a snippet about \"attending a management seminar,\" you instantly know the prompt needs tightening. This traceability is critical; if a hiring manager questions why a candidate was ranked highly, the system can point to the exact line in the CV.\n\nFinally, the output of this scoring engine isn't just a raw number, but a categorized bucket: Shortlist, Maybe, and Reject. This multi-tier approach acknowledges the AI's limitations. The \"Maybe\" bucket is particularly important—it catches edge-case candidates whose CVs were ambiguous, ensuring that borderline applications are flagged for a quick human review rather than being automatically discarded by a rigid threshold.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "A mismatched quote reveals when the prompt needs tightening.",
+                  "flow": [
+                    "AI awards points on the scoring matrix",
+                    "Must quote the exact CV snippet that justifies it",
+                    "Snippet mentions 'management seminar' for a 'Leadership' score",
+                    "Mismatch flags that the prompt needs tightening"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the system prompt require the AI to quote the exact CV snippet that justifies each score, rather than just outputting the final number?",
+                "options": [
+                  {
+                    "text": "It makes the JSON response file size larger for storage purposes",
+                    "feedback": "File size isn't the reason - it's about traceability and catching bad reasoning.",
+                    "correct": false
+                  },
+                  {
+                    "text": "It exposes the model's reasoning, so hallucinated qualifications can be caught and traced back to the source",
+                    "feedback": "Right. This traceability is critical for defending a hiring decision.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Quoting text is required by Kenyan employment law",
+                    "feedback": "This isn't a legal requirement - it's a design choice for traceability.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-5",
+            "number": "05",
+            "title": "Respectful Rejection Messaging",
+            "subtitle": "Protecting the employer's brand",
+            "status": "locked",
+            "duration": "25 min",
+            "category": "Content Engine",
+            "summary": "Generate polite, brand-aligned decline emails that provide standard feedback without discouraging candidates.",
+            "isGated": true,
+            "content": {
+              "overview": "Applicant experience matters, even for rejected candidates. You'll build a module that drafts professional, empathetic rejection messages tailored to the missing requirements, maintaining the hiring company's good reputation.",
+              "keyLearnings": [
+                "Calibrating a polite, professional, and empathetic tone",
+                "Using the AI's scoring justification to provide constructive feedback",
+                "Formatting clean, standard emails for bulk dispatch"
+              ],
+              "lessonBody": "A company's employer brand is heavily influenced by how it treats the people it doesn't hire. Ghosting candidates or sending cold, robotic rejection templates damages a small business's reputation. Your HR agent solves this by generating polite, personalized decline messages that provide actual closure without requiring the hiring manager to spend hours writing them.\n\nThe key to a good rejection message is tone calibration. The LLM must be instructed to be professional, warm, and concise. It shouldn't be overly apologetic, nor should it sound like a sterile legal disclaimer. You will design prompts that establish a standard, respectful corporate voice, ensuring that whether rejecting a junior applicant or a senior executive, the brand's reputation is protected.\n\nPersonalization makes the rejection sting less, and your agent has the data to do this properly. Because the scoring engine forces the AI to justify its scores, you can use that data to provide constructive feedback. The prompt can instruct the LLM to mention a specific area where the candidate fell short—for instance, noting that the role required deep AWS experience while their background was mostly on-premise servers. This turns a generic \"no\" into a helpful data point for the applicant's career.\n\nFinally, these generated messages must be formatted cleanly for automated dispatch. You will configure the system to output standard HTML or plain-text email bodies, complete with the correct subject lines and sign-offs. By standardizing the output structure, the messages can be piped directly into a mailer API like SendGrid or an SMTP server, allowing the employer to review and approve a batch of rejections with a single click.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The scoring data doubles as constructive feedback.",
+                  "compare": [
+                    {
+                      "label": "Generic rejection",
+                      "text": "'Unfortunately, we've decided to move forward with other candidates.'",
+                      "good": false
+                    },
+                    {
+                      "label": "Personalized rejection",
+                      "text": "Notes the role needed deep AWS experience, theirs was mostly on-premise",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Where does the personalized feedback in a rejection email actually come from?",
+                "options": [
+                  {
+                    "text": "The hiring manager manually writes a custom note for every rejected candidate",
+                    "feedback": "That is exactly the manual effort this system is designed to remove.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The same scoring justification data the AI already generated while ranking the candidate",
+                    "feedback": "Right. Reusing that data is what makes personalization possible without extra manual work.",
+                    "correct": true
+                  },
+                  {
+                    "text": "A generic template that's identical for every rejected applicant",
+                    "feedback": "A fully generic template is exactly what this lesson moves away from.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-6",
+            "number": "06",
+            "title": "LLM Structured Outputs for Resumes",
+            "subtitle": "Guaranteeing schema adherence",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "API Integrations",
+            "summary": "Use Gemini or OpenAI API structured output features to ensure the extracted candidate data never breaks your app.",
+            "isGated": true,
+            "content": {
+              "overview": "Relying on standard text generation for data extraction often fails. You'll implement API-level structured JSON modes to force the LLM to return exactly the nested schema required for your ranking logic.",
+              "keyLearnings": [
+                "Implementing JSON Schema enforcement via the Gemini/OpenAI API",
+                "Handling API errors and retry logic for unparseable documents",
+                "Validating the extracted payload before passing it to the scoring engine"
+              ],
+              "samplePrompt": "You are an objective HR assistant. Extract the candidate's details from the provided text. Return ONLY valid JSON matching this schema:\n{\n  \"name\": \"string\",\n  \"years_experience\": \"number\",\n  \"skills\": [\"string\"],\n  \"education\": [{\"degree\": \"string\", \"institution\": \"string\"}]\n}\nDo not guess or infer missing data; leave it null.",
+              "codeSnippet": "const completion = await openai.chat.completions.create({\n  model: \"gpt-4o\",\n  messages: [{ role: \"system\", content: prompt }, { role: \"user\", content: cvText }],\n  response_format: { type: \"json_object\" },\n});\nconst candidateData = JSON.parse(completion.choices[0].message.content);",
+              "testCase": {
+                "input": "My name is John Doe. I worked at Safaricom as a DevOps engineer for 4 years, focusing on AWS and Kubernetes. I hold a BSc in Computer Science from Strathmore University.",
+                "expectedOutput": "{\n  \"name\": \"John Doe\",\n  \"years_experience\": 4,\n  \"skills\": [\"AWS\", \"Kubernetes\", \"DevOps\"],\n  \"education\": [{\"degree\": \"BSc Computer Science\", \"institution\": \"Strathmore University\"}]\n}"
+              },
+              "lessonBody": "When building production systems, you cannot rely on an LLM to simply \"promise\" it will return JSON. Standard text generation often wraps JSON in markdown blocks or includes conversational filler like \"Here is the data you requested.\" If this output is passed directly into a JavaScript `JSON.parse()` function, the entire application will crash.\n\nTo guarantee that the extraction pipeline never breaks, you must use the native structured output features of modern APIs. Both Gemini and OpenAI offer modes that force the model to adhere strictly to a JSON schema. By passing your Pydantic or JSON schema directly into the API request, the model's output generation is constrained at the token level, ensuring it mathematically cannot produce a response that violates your defined structure.\n\nHowever, even with structured outputs, documents can be fundamentally unparseable—perhaps a candidate uploaded an image file disguised as a PDF, or a corrupted Word document. Your code must anticipate these failures. You will implement robust error handling that catches API timeouts, context-window limits, and empty extractions, wrapping the LLM call in a retry block that attempts a fallback extraction strategy before gracefully marking the CV as \"Requires Manual Review.\"\n\nOnce the API returns the JSON, you must still validate the payload before passing it to your scoring engine. Just because the structure is correct doesn't mean the data is logical—the AI might have extracted \"200\" years of experience due to a typo in the resume. By running a final validation pass on the extracted values, you ensure the scoring matrix only operates on clean, sensible data, protecting the integrity of the entire ranking process.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Structured output mode makes the response shape unbreakable.",
+                  "compare": [
+                    {
+                      "label": "Standard text generation",
+                      "text": "May wrap JSON in markdown or add filler text - crashes JSON.parse()",
+                      "good": false
+                    },
+                    {
+                      "label": "Structured output mode",
+                      "text": "Model is constrained at the token level to match your exact schema",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "The API returns valid JSON matching your schema: { \"years_experience\": 200, \"skills\": [\"React\"] }.",
+                "workedExample": "The structure passed schema validation - years_experience is a number, skills is an array of strings - so JSON.parse() succeeds without error.",
+                "challenge": "Even though the JSON is structurally valid, why should this specific payload still get rejected before reaching the scoring engine?",
+                "placeholder": "200 years of experience is not ___ - the structure is correct but the ___ itself must still be validated before scoring.",
+                "solution": "200 years of experience is not logically possible - the structure is correct but the data itself must still be validated before scoring.",
+                "explanation": "Structured output guarantees the shape of the data but says nothing about whether the values make sense - a typo-driven '200' years needs a separate sanity-check pass."
+              }
+            }
+          },
+          {
+            "id": "hr-step-7",
+            "number": "07",
+            "title": "Handling High Applicant Volume",
+            "subtitle": "Managing webhooks and queues",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Architecture",
+            "summary": "Process bulk applications securely using webhooks and queueing so your system doesn't crash under load.",
+            "isGated": true,
+            "content": {
+              "overview": "A single job post on BrighterMonday can yield 500+ CVs overnight. You'll build a resilient webhook ingestion pipeline that queues incoming applications and processes them asynchronously to respect API rate limits.",
+              "keyLearnings": [
+                "Setting up a webhook endpoint to receive applications from Google Forms or ATS",
+                "Implementing a simple background queue for processing",
+                "Handling API rate limits and exponential backoff"
+              ],
+              "lessonBody": "A successful job posting on a platform like BrighterMonday or LinkedIn can easily result in hundreds of applications arriving within hours. If your HR agent attempts to process every CV synchronously the moment it arrives, the system will quickly overwhelm your server's memory and trigger rate limits from your LLM provider.\n\nTo handle bulk applications securely, you must decouple the ingestion of resumes from the processing of those resumes. You will build a webhook endpoint—a simple URL designed to receive payloads from application forms or an Applicant Tracking System. When a CV arrives, the webhook's only job is to acknowledge receipt and save the file to cloud storage, completing the request in milliseconds.\n\nOnce saved, the application is pushed onto a background processing queue, such as Redis or a simple database table. Background workers then pull applications from this queue one at a time. This architecture ensures that even if a thousand applications arrive simultaneously, your system remains stable, processing them at a controlled pace determined by the queue workers rather than the incoming traffic spike.\n\nWhen calling external APIs like Gemini or OpenAI in a loop, rate limits are inevitable. Your queue workers must be programmed to handle `429 Too Many Requests` errors gracefully. You will implement an exponential backoff strategy, instructing the worker to pause for a few seconds upon hitting a limit, and gradually increasing the wait time if the error persists. This ensures your system automatically recovers from throttling without dropping any candidate applications.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Ingestion and processing are decoupled so traffic spikes never crash the system.",
+                  "flow": [
+                    "500 CVs arrive overnight",
+                    "Webhook saves each file to storage in milliseconds",
+                    "Applications queued (Redis/DB table)",
+                    "Background workers process one at a time"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "500 CVs arrive overnight from a single job posting. Why shouldn't the webhook try to fully process each one synchronously the moment it arrives?",
+                "options": [
+                  {
+                    "text": "It would quickly overwhelm the server and trigger LLM API rate limits",
+                    "feedback": "Right. This is exactly why ingestion and processing are decoupled with a queue.",
+                    "correct": true
+                  },
+                  {
+                    "text": "WhatsApp blocks more than 10 messages per hour",
+                    "feedback": "This is not about WhatsApp message limits at all.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Synchronous processing is technically impossible for webhooks",
+                    "feedback": "It's technically possible, just a bad architectural choice at this volume.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-8",
+            "number": "08",
+            "title": "Human-in-the-Loop Handoff",
+            "subtitle": "Keeping managers in control",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Operations",
+            "summary": "Notify the hiring manager with a concise summary before any automated rejections or bookings occur.",
+            "isGated": true,
+            "content": {
+              "overview": "AI shouldn't hire or fire in a vacuum. You'll build a Slack or WhatsApp notification flow that sends the hiring manager a summary of scored candidates, allowing them to explicitly approve the shortlist and reject list before the system takes action.",
+              "keyLearnings": [
+                "Formatting an easy-to-read candidate summary card for WhatsApp",
+                "Building interactive approval buttons or keyword replies (e.g., 'APPROVE ALL')",
+                "Ensuring no candidate is permanently rejected without a human sign-off"
+              ],
+              "lessonBody": "Fully autonomous AI hiring is a massive liability. If a model hallucinates a requirement or misreads a highly qualified candidate's CV, a silent auto-rejection means the business loses out on top talent without ever knowing. The AI's job is to screen and summarize, but a human must remain firmly in control of the final decision.\n\nTo keep the hiring manager in the loop, you will build an automated notification flow that pushes summarized candidate profiles directly to where the manager already works—typically Slack or WhatsApp. Instead of sending the full PDF, the agent formats a concise summary card highlighting the candidate's score, matching qualifications, and the specific reasons for any missing criteria, allowing the manager to quickly grasp the candidate's value on their phone.\n\nThis notification isn't just an alert; it's an interactive checkpoint. You will implement actionable responses, such as WhatsApp interactive buttons or specific keyword replies like 'APPROVE' or 'REVIEW'. When the manager taps a button, the webhook receives the command and updates the candidate's state in the system. This creates a seamless workflow where the manager can vet the AI's shortlist while standing in line for coffee.\n\nThe most critical rule of this system is the safeguard against autonomous rejection. Your architecture must enforce a strict policy where the \"Reject\" state is only a proposal by the AI. The system will batch these proposed rejections and require an explicit human sign-off—such as an 'APPROVE ALL' command on the daily digest—before any decline emails are actually dispatched to the candidates.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Nothing gets sent until a human explicitly approves the batch.",
+                  "flow": [
+                    "AI proposes a batch of rejections",
+                    "Manager receives a WhatsApp summary digest",
+                    "Manager replies 'APPROVE ALL'",
+                    "Only then do decline emails actually get sent"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why must the 'Reject' state generated by the AI be treated only as a proposal, never a final action?",
+                "options": [
+                  {
+                    "text": "If the AI misreads a qualified candidate's CV, a silent auto-rejection loses that candidate with no one ever knowing",
+                    "feedback": "Right. This is exactly the liability the human-in-the-loop safeguard prevents.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Rejection emails are more expensive to send than approval emails",
+                    "feedback": "Cost of sending an email is not the concern here.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Kenyan labor law requires a human signature on every rejection",
+                    "feedback": "This isn't framed as a legal requirement - it's a safeguard against AI misjudgment.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-9",
+            "number": "09",
+            "title": "WhatsApp Interview Scheduling",
+            "subtitle": "Automating candidate outreach",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Automation",
+            "summary": "Message shortlisted candidates via the WhatsApp Business API to seamlessly book their interview slots.",
+            "isGated": true,
+            "content": {
+              "overview": "Once the manager approves the shortlist, the agent takes over logistics. You'll integrate the WhatsApp Business API to text approved candidates, offer available calendar slots, and parse their responses to confirm the booking.",
+              "keyLearnings": [
+                "Using WhatsApp message templates for compliant outbound messaging",
+                "Parsing candidate replies to extract preferred dates and times",
+                "Handling edge cases like requests for rescheduling or out-of-office hours"
+              ],
+              "samplePrompt": "You are the scheduling assistant for an HR team. The candidate replied: '{userReply}'. \nAvailable slots: {availableSlots}. \nMatch their preference to the available slots and return the selected time in ISO format. If no match, suggest the next closest time.",
+              "codeSnippet": "export async function sendWhatsAppInvite(phone: string, candidateName: string, link: string) {\n  return await whatsapp.messages.create({\n    to: phone,\n    type: 'template',\n    template: {\n      name: 'interview_invite',\n      language: { code: 'en' },\n      components: [\n        { type: 'body', parameters: [{ type: 'text', text: candidateName }, { type: 'text', text: link }] }\n      ]\n    }\n  });\n}",
+              "lessonBody": "Once the hiring manager approves a candidate for an interview, the friction of scheduling begins. Email chains proposing times often drag on for days. By moving this outreach to WhatsApp—the default communication channel in Kenya—you can reduce the time-to-schedule from days to minutes.\n\nInitiating a conversation with a candidate requires using the WhatsApp Business API's pre-approved message templates. Meta strictly regulates outbound messages to prevent spam, so you will design and register a compliant interview invitation template. This template will dynamically inject the candidate's name and present them with a polite request to reply with their preferred availability based on the manager's open slots.\n\nWhen the candidate replies, you are no longer dealing with structured buttons, but free-text natural language. They might say \"I'm free tomorrow afternoon\" or \"Can we do Tuesday next week around 10?\" You will use a lightweight LLM prompt to parse these conversational replies, translating relative terms like \"tomorrow\" into strict ISO timestamps and matching them against the actual available calendar slots provided in the context window.\n\nConversational scheduling inevitably hits edge cases. A candidate might ask to reschedule a previously agreed time, propose a time outside of standard office hours, or simply ask a clarifying question about the interview format. Your scheduling prompt must be designed to recognize when a request cannot be fulfilled, gracefully informing the candidate of the valid options or escalating complex queries back to the human hiring manager to prevent the bot from getting stuck in an infinite loop.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Free-text replies get parsed into a matched, structured time.",
+                  "chat": [
+                    {
+                      "sender": "agent",
+                      "text": "When works best for your interview this week?"
+                    },
+                    {
+                      "sender": "customer",
+                      "text": "Can we do Tuesday next week around 10?"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "(Parsed: next Tuesday, 10:00 AM)"
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the initial outreach to a candidate require a pre-approved WhatsApp Message Template instead of a free-form text?",
+                "options": [
+                  {
+                    "text": "Meta strictly regulates outbound business-initiated messages to prevent spam",
+                    "feedback": "Right. This is exactly why a compliant, registered template is required.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Free-form messages can't include the candidate's name",
+                    "feedback": "Templates and free-form messages can both include a name - that is not the restriction here.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Templates load faster on the candidate's phone",
+                    "feedback": "Load speed isn't the reason - this is about Meta's anti-spam policy.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-10",
+            "number": "10",
+            "title": "Calendar Sync Integration",
+            "subtitle": "Securing the time slots",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Integrations",
+            "summary": "Connect the confirmed WhatsApp slots to Google Calendar API to finalize the booking and generate meeting links.",
+            "isGated": true,
+            "content": {
+              "overview": "After agreeing on a time over WhatsApp, the agent must officially book the meeting. You'll use the Google Calendar API to lock in the time, invite both the manager and candidate, and auto-generate a Google Meet link.",
+              "keyLearnings": [
+                "Authenticating with the Google Calendar API",
+                "Creating events with attendees and automated reminders",
+                "Sending the final confirmation message with the meeting link back via WhatsApp"
+              ],
+              "lessonBody": "Agreeing on a time over WhatsApp is only half the battle; the time slot isn't secure until it is officially locked in the calendar. If the system fails to create the event, the hiring manager might accidentally double-book that slot, leading to an embarrassing scheduling conflict. This lesson bridges the gap between the chat interface and the core scheduling infrastructure.\n\nYou will integrate the Google Calendar API, which requires setting up proper OAuth2 authentication or using Service Account credentials. This allows your backend server to programmatically read the manager's busy times and write new events directly to their calendar. Understanding how to handle API scopes securely is critical so the agent only has permission to manage specific calendars, not the manager's entire private life.\n\nOnce the time is confirmed by the candidate, your code constructs the calendar event payload. This includes adding both the candidate and the hiring manager as attendees, setting the correct timezone (crucial for remote interviews), and configuring automated email reminders. Most importantly, you will instruct the API to auto-generate a Google Meet conference link, ensuring the virtual interview room is created without any manual clicks.\n\nThe final step in the integration loop is closing out the conversation with the candidate. As soon as the Google Calendar API returns a success response containing the new meeting link, your system immediately triggers a final WhatsApp message. This confirmation texts the candidate the exact time, the meeting link, and any preparation instructions, providing a professional and seamless end-to-end booking experience.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "A chat agreement is not the same as a secured slot.",
+                  "compare": [
+                    {
+                      "label": "Time agreed over WhatsApp only",
+                      "text": "Not actually secured - risk of accidental double-booking",
+                      "good": false
+                    },
+                    {
+                      "label": "Time written to Google Calendar",
+                      "text": "Officially locked in, attendees invited, reminders set",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A candidate agrees to a time over WhatsApp, but the system never writes it to Google Calendar. What real risk does this create?",
+                "options": [
+                  {
+                    "text": "None - agreeing over chat is functionally the same as booking",
+                    "feedback": "That is exactly the false assumption this lesson warns against.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The manager could accidentally double-book that same slot with someone else",
+                    "feedback": "Right. The slot is not secure until it is officially in the calendar.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The candidate would be automatically rejected",
+                    "feedback": "A missed calendar sync does not trigger a rejection - it creates a scheduling conflict risk.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-11",
+            "number": "11",
+            "title": "Hiring Funnel Analytics Dashboard",
+            "subtitle": "Visualizing the pipeline",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Reporting",
+            "summary": "Export pipeline states to Google Sheets so the SME owner can track their entire hiring funnel in real time.",
+            "isGated": true,
+            "content": {
+              "overview": "Business owners need visibility. You'll build an integration that logs every candidate's status (Received, Scored, Shortlisted, Scheduled, Rejected) into a live Google Sheet dashboard, giving the employer a clear view of the hiring progress.",
+              "keyLearnings": [
+                "Writing data sequentially to a Google Sheet using its API",
+                "Updating specific row statuses as candidates move through the funnel",
+                "Generating basic metrics like 'Time to Hire' and 'Pass Rate'"
+              ],
+              "lessonBody": "An automated system running entirely in the background can feel like a black box to a business owner. If they can't easily see how many people applied, who passed the screening, and who was rejected, they won't trust the AI. Building a real-time, transparent dashboard is essential for operational visibility.\n\nInstead of building a complex custom web frontend, you will use the Google Sheets API to create a live, accessible dashboard. Google Sheets is universally understood by SME owners and requires zero training. You will write a module that appends a new row to a specific spreadsheet the moment an application is ingested, logging the candidate's name, applied role, and initial timestamp.\n\nAs the candidate moves through the system—from parsed, to scored, to shortlisted, and finally to scheduled—your application will use the Sheets API to locate their specific row and update their status column. This creates a living document where the hiring manager can literally watch the pipeline update in real-time, providing immediate reassurance that the background workers are functioning correctly.\n\nBeyond just tracking status, this data allows you to generate valuable hiring metrics. By comparing the initial application timestamp with the interview scheduled timestamp, the sheet can calculate the \"Time to Hire.\" By analyzing the ratio of total applicants to shortlisted candidates, it tracks the \"Pass Rate.\" Providing these basic analytics gives the business owner strategic insights into their hiring process that they likely never had when doing it manually.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Every candidate moves through the same visible pipeline.",
+                  "flow": [
+                    "Received",
+                    "Scored",
+                    "Shortlisted",
+                    "Scheduled / Rejected"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the lesson choose Google Sheets over a custom-built web dashboard for this reporting layer?",
+                "options": [
+                  {
+                    "text": "Google Sheets is universally understood by SME owners and requires zero training",
+                    "feedback": "Right. Accessibility and zero training cost is exactly the reasoning given.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Custom web dashboards are technically impossible to connect to a hiring pipeline",
+                    "feedback": "A custom dashboard is entirely possible - this is about owner familiarity, not a technical limitation.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Google Sheets is the only tool that can calculate 'Time to Hire'",
+                    "feedback": "Time to Hire is just a timestamp comparison - it could be calculated anywhere.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "hr-step-12",
+            "number": "12",
+            "title": "Verified Portfolio Deployment",
+            "subtitle": "Ship your live HR Screening Agent",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Deployment",
+            "summary": "Deploy the complete end-to-end system and process a dummy application to earn your verified portfolio link.",
+            "isGated": true,
+            "content": {
+              "overview": "It's time to go live. You'll deploy your HR screening pipeline to a production server, submit a test application with a sample CV, and verify the WhatsApp booking flow. Complete this process to receive your shareable portfolio link proving you built a functional HR agent.",
+              "keyLearnings": [
+                "Deploying the webhook and background workers to a cloud provider",
+                "Running an end-to-end test with a dummy CV and phone number",
+                "Securing your Verified Portfolio link and live demo"
+              ],
+              "lessonBody": "Building the system locally is a great learning exercise, but a locally hosted script cannot receive webhooks from a live job board or send WhatsApp messages reliably. To prove this system works and to build your portfolio, you must deploy the architecture to a production cloud environment where it can run autonomously 24/7.\n\nYou will package your ingestion webhook, background queue workers, and LLM integrations and deploy them to a cloud provider like Render, Heroku, or AWS. This involves managing environment variables securely—ensuring your API keys for Gemini, OpenAI, and WhatsApp are not exposed—and configuring your live domain to securely receive incoming webhook POST requests from your application sources.\n\nOnce the system is live, you will execute a complete end-to-end integration test. You will submit a dummy CV to your live application form, monitor the cloud logs as the queue worker picks it up and scores it, and verify that the human-in-the-loop notification reaches your phone. You will then approve the dummy candidate and complete the automated WhatsApp scheduling flow using a test number.\n\nCompleting this successful test run proves that your HR agent is robust, secure, and ready for real-world traffic. It serves as your final verification. You will capture a brief screen recording of the WhatsApp scheduling interaction and link to your live webhook endpoint, finalizing your verified portfolio project that demonstrates your ability to build production-grade AI automation for real businesses.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The full pipeline gets proven end to end before it ships.",
+                  "flow": [
+                    "Submit a dummy CV to the live application form",
+                    "Queue worker picks it up and scores it",
+                    "Human-in-the-loop notification reaches your phone",
+                    "Approve -> WhatsApp scheduling flow completes"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why can't this system be fully proven by just running it locally on your own machine?",
+                "options": [
+                  {
+                    "text": "A locally hosted script can't reliably receive webhooks from a live job board or send WhatsApp messages",
+                    "feedback": "Right. This is exactly why production deployment is required for the final verification.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Local machines cannot run Python or Node.js code at all",
+                    "feedback": "Local machines run this code fine for development - the issue is receiving live external webhooks.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Local testing is against Afridemy's terms of service",
+                    "feedback": "This is not a policy restriction - it is a real technical limitation of local, non-public servers.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
           }
-        },
-        {
-          "id": "hr-step-2",
-          "number": "02",
-          "title": "Defining the Job Profile",
-          "subtitle": "Translating JD requirements into logic",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Architecture",
-          "summary": "Convert a standard job description into explicit, measurable criteria for the AI to score against.",
-          "isGated": false,
-          "content": {
-            "overview": "To evaluate candidates fairly, the AI needs strict rules. You'll translate an unstructured job description into a clear set of weighted requirements, ensuring the agent evaluates exactly what the SME owner needs.",
-            "keyLearnings": [
-              "Deconstructing a Job Description (JD) into mandatory and nice-to-have skills",
-              "Assigning numerical weights to different qualifications",
-              "Setting up the baseline for bias-free objective ranking"
-            ],
-            "lessonBody": "An AI is only as objective as the rules you give it. If you simply ask an LLM to \"score this candidate based on the job description,\" the model will invent its own subjective criteria. It might unfairly penalize a candidate for a typo or over-value a university degree when the employer only cared about practical skills. To prevent this, you must translate the human-readable job description into a rigid logic matrix.\n\nThe first step is deconstructing the standard job description into explicit boolean criteria. Instead of a vague requirement like \"Strong web development skills,\" you break this down into specific, verifiable traits: \"Has at least 2 years of React experience\" and \"Has deployed an application to AWS.\" This forces the AI to look for concrete evidence in the extracted resume data rather than making holistic, easily biased judgments.\n\nOnce the criteria are explicitly defined, you assign numerical weights to each requirement. A mandatory skill, like a valid nursing license for a clinic role, might carry a weight that acts as an automatic disqualifier if absent. Meanwhile, nice-to-have skills, such as familiarity with a specific internal tool, carry lower weights that simply boost the candidate's rank over others. This weighted matrix becomes the single source of truth for the entire scoring engine.\n\nBy establishing this baseline before looking at a single resume, you strip away the ambiguity that typically introduces human error or AI hallucination into the hiring process. The AI is no longer acting as a hiring manager making holistic decisions; it is acting as a rigorous accountant, tallying up points strictly based on the presence of verified facts mapped against your explicit matrix."
-          }
-        },
-        {
-          "id": "hr-step-3",
-          "number": "03",
-          "title": "Kenyan HR Context & Nuance",
-          "subtitle": "Localizing the parsing engine",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Data Processing",
-          "summary": "Train the parser to correctly interpret local job titles, Kenyan university acronyms, and regional experience.",
-          "isGated": false,
-          "content": {
-            "overview": "A generic AI might misunderstand local context. You'll configure the agent to recognize Kenyan institutions (like JKUAT or UoN), local tools (M-Pesa integrations, KRA iTax), and regional slang in job titles so no qualified candidate is skipped.",
-            "keyLearnings": [
-              "Building a custom dictionary of Kenyan universities and common certifications",
-              "Mapping local job titles to standard roles",
-              "Configuring the LLM to understand Nairobi-specific geography for commute considerations"
-            ],
-            "lessonBody": "Off-the-shelf AI models are trained predominantly on Western datasets, which means they often misunderstand local context in emerging markets. If a candidate lists \"JKUAT\" or \"UoN\" on their resume, a generic LLM might not recognize these as top-tier engineering universities in Kenya. Similarly, local high school credentials like the \"KCSE\" might be ignored entirely because the model is looking for an American High School Diploma.\n\nTo make your HR agent actually useful for a Kenyan SME, you have to explicitly teach it local nuances. You will build a custom dictionary into your system prompt that defines common regional acronyms, institutions, and certifications. By explicitly mapping \"KRA iTax\" to \"tax compliance software\" or explaining that \"HELB\" relates to student loans, you ensure the AI accurately parses and values the candidate's actual background.\n\nJob titles also carry local variations. A \"Systems Admin\" in a small Nairobi firm might effectively be a full-stack developer and IT support rolled into one. When configuring the LLM, you instruct it to analyze the bullet points under the job title rather than relying on the title alone. This prevents qualified candidates from being filtered out just because their previous employer used a non-standard naming convention.\n\nGeography plays a crucial role in hiring, especially in cities with heavy traffic like Nairobi. You will configure the model to evaluate the candidate's location against the office location—for instance, understanding that a daily commute from Kitengela to Westlands is significantly more demanding than Kilimani to Westlands. Providing the AI with this explicit geographical awareness allows it to flag potential logistical challenges for the hiring manager, rather than blindly scoring all candidates equally regardless of commute reality."
-          }
-        },
-        {
-          "id": "hr-step-4",
-          "number": "04",
-          "title": "Bias-Aware Candidate Scoring",
-          "subtitle": "Scoring explicitly, not implicitly",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Flow Design",
-          "summary": "Design prompts that force the LLM to justify its scores based solely on explicit CV evidence.",
-          "isGated": true,
-          "content": {
-            "overview": "AI hiring tools can introduce bias if not carefully constrained. In this lesson, you write system prompts that strictly map CV facts against the rubric and prevent the model from hallucinating or inferring skills based on unrelated factors.",
-            "keyLearnings": [
-              "Writing negative constraints to prevent bias on name, age, or gender",
-              "Forcing the AI to quote the CV snippet that justifies its score",
-              "Creating a multi-tier categorization: Shortlist, Maybe, and Reject"
-            ],
-            "lessonBody": "AI models are pattern-matching engines, and without strict guardrails, they will eagerly replicate the biases present in their training data. If left unchecked, an LLM might subtly alter candidate scores based on inferred gender, age, or ethnicity from their name. To build an ethical and legally compliant HR agent, you must actively architect bias prevention directly into your system prompts.\n\nThe most effective method is using strict negative constraints. You explicitly instruct the model: \"Do not adjust scores based on the candidate's name, inferred gender, marital status, or age.\" More importantly, you require the AI to show its work. For every point awarded on the scoring matrix, the system prompt mandates that the LLM extract and return the exact snippet from the CV that justifies the score.\n\nBy forcing the AI to quote the source text, you eliminate hallucinated qualifications and expose the model's reasoning. If the AI gives a candidate a high score for \"Leadership\" but quotes a snippet about \"attending a management seminar,\" you instantly know the prompt needs tightening. This traceability is critical; if a hiring manager questions why a candidate was ranked highly, the system can point to the exact line in the CV.\n\nFinally, the output of this scoring engine isn't just a raw number, but a categorized bucket: Shortlist, Maybe, and Reject. This multi-tier approach acknowledges the AI's limitations. The \"Maybe\" bucket is particularly important—it catches edge-case candidates whose CVs were ambiguous, ensuring that borderline applications are flagged for a quick human review rather than being automatically discarded by a rigid threshold."
-          }
-        },
-        {
-          "id": "hr-step-5",
-          "number": "05",
-          "title": "Respectful Rejection Messaging",
-          "subtitle": "Protecting the employer's brand",
-          "status": "locked",
-          "duration": "25 min",
-          "category": "Content Engine",
-          "summary": "Generate polite, brand-aligned decline emails that provide standard feedback without discouraging candidates.",
-          "isGated": true,
-          "content": {
-            "overview": "Applicant experience matters, even for rejected candidates. You'll build a module that drafts professional, empathetic rejection messages tailored to the missing requirements, maintaining the hiring company's good reputation.",
-            "keyLearnings": [
-              "Calibrating a polite, professional, and empathetic tone",
-              "Using the AI's scoring justification to provide constructive feedback",
-              "Formatting clean, standard emails for bulk dispatch"
-            ],
-            "lessonBody": "A company's employer brand is heavily influenced by how it treats the people it doesn't hire. Ghosting candidates or sending cold, robotic rejection templates damages a small business's reputation. Your HR agent solves this by generating polite, personalized decline messages that provide actual closure without requiring the hiring manager to spend hours writing them.\n\nThe key to a good rejection message is tone calibration. The LLM must be instructed to be professional, warm, and concise. It shouldn't be overly apologetic, nor should it sound like a sterile legal disclaimer. You will design prompts that establish a standard, respectful corporate voice, ensuring that whether rejecting a junior applicant or a senior executive, the brand's reputation is protected.\n\nPersonalization makes the rejection sting less, and your agent has the data to do this properly. Because the scoring engine forces the AI to justify its scores, you can use that data to provide constructive feedback. The prompt can instruct the LLM to mention a specific area where the candidate fell short—for instance, noting that the role required deep AWS experience while their background was mostly on-premise servers. This turns a generic \"no\" into a helpful data point for the applicant's career.\n\nFinally, these generated messages must be formatted cleanly for automated dispatch. You will configure the system to output standard HTML or plain-text email bodies, complete with the correct subject lines and sign-offs. By standardizing the output structure, the messages can be piped directly into a mailer API like SendGrid or an SMTP server, allowing the employer to review and approve a batch of rejections with a single click."
-          }
-        },
-        {
-          "id": "hr-step-6",
-          "number": "06",
-          "title": "LLM Structured Outputs for Resumes",
-          "subtitle": "Guaranteeing schema adherence",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "API Integrations",
-          "summary": "Use Gemini or OpenAI API structured output features to ensure the extracted candidate data never breaks your app.",
-          "isGated": true,
-          "content": {
-            "overview": "Relying on standard text generation for data extraction often fails. You'll implement API-level structured JSON modes to force the LLM to return exactly the nested schema required for your ranking logic.",
-            "keyLearnings": [
-              "Implementing JSON Schema enforcement via the Gemini/OpenAI API",
-              "Handling API errors and retry logic for unparseable documents",
-              "Validating the extracted payload before passing it to the scoring engine"
-            ],
-            "samplePrompt": "You are an objective HR assistant. Extract the candidate's details from the provided text. Return ONLY valid JSON matching this schema:\n{\n  \"name\": \"string\",\n  \"years_experience\": \"number\",\n  \"skills\": [\"string\"],\n  \"education\": [{\"degree\": \"string\", \"institution\": \"string\"}]\n}\nDo not guess or infer missing data; leave it null.",
-            "codeSnippet": "const completion = await openai.chat.completions.create({\n  model: \"gpt-4o\",\n  messages: [{ role: \"system\", content: prompt }, { role: \"user\", content: cvText }],\n  response_format: { type: \"json_object\" },\n});\nconst candidateData = JSON.parse(completion.choices[0].message.content);",
-            "testCase": {
-              "input": "My name is John Doe. I worked at Safaricom as a DevOps engineer for 4 years, focusing on AWS and Kubernetes. I hold a BSc in Computer Science from Strathmore University.",
-              "expectedOutput": "{\n  \"name\": \"John Doe\",\n  \"years_experience\": 4,\n  \"skills\": [\"AWS\", \"Kubernetes\", \"DevOps\"],\n  \"education\": [{\"degree\": \"BSc Computer Science\", \"institution\": \"Strathmore University\"}]\n}"
-            },
-            "lessonBody": "When building production systems, you cannot rely on an LLM to simply \"promise\" it will return JSON. Standard text generation often wraps JSON in markdown blocks or includes conversational filler like \"Here is the data you requested.\" If this output is passed directly into a JavaScript `JSON.parse()` function, the entire application will crash.\n\nTo guarantee that the extraction pipeline never breaks, you must use the native structured output features of modern APIs. Both Gemini and OpenAI offer modes that force the model to adhere strictly to a JSON schema. By passing your Pydantic or JSON schema directly into the API request, the model's output generation is constrained at the token level, ensuring it mathematically cannot produce a response that violates your defined structure.\n\nHowever, even with structured outputs, documents can be fundamentally unparseable—perhaps a candidate uploaded an image file disguised as a PDF, or a corrupted Word document. Your code must anticipate these failures. You will implement robust error handling that catches API timeouts, context-window limits, and empty extractions, wrapping the LLM call in a retry block that attempts a fallback extraction strategy before gracefully marking the CV as \"Requires Manual Review.\"\n\nOnce the API returns the JSON, you must still validate the payload before passing it to your scoring engine. Just because the structure is correct doesn't mean the data is logical—the AI might have extracted \"200\" years of experience due to a typo in the resume. By running a final validation pass on the extracted values, you ensure the scoring matrix only operates on clean, sensible data, protecting the integrity of the entire ranking process."
-          }
-        },
-        {
-          "id": "hr-step-7",
-          "number": "07",
-          "title": "Handling High Applicant Volume",
-          "subtitle": "Managing webhooks and queues",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Architecture",
-          "summary": "Process bulk applications securely using webhooks and queueing so your system doesn't crash under load.",
-          "isGated": true,
-          "content": {
-            "overview": "A single job post on BrighterMonday can yield 500+ CVs overnight. You'll build a resilient webhook ingestion pipeline that queues incoming applications and processes them asynchronously to respect API rate limits.",
-            "keyLearnings": [
-              "Setting up a webhook endpoint to receive applications from Google Forms or ATS",
-              "Implementing a simple background queue for processing",
-              "Handling API rate limits and exponential backoff"
-            ],
-            "lessonBody": "A successful job posting on a platform like BrighterMonday or LinkedIn can easily result in hundreds of applications arriving within hours. If your HR agent attempts to process every CV synchronously the moment it arrives, the system will quickly overwhelm your server's memory and trigger rate limits from your LLM provider.\n\nTo handle bulk applications securely, you must decouple the ingestion of resumes from the processing of those resumes. You will build a webhook endpoint—a simple URL designed to receive payloads from application forms or an Applicant Tracking System. When a CV arrives, the webhook's only job is to acknowledge receipt and save the file to cloud storage, completing the request in milliseconds.\n\nOnce saved, the application is pushed onto a background processing queue, such as Redis or a simple database table. Background workers then pull applications from this queue one at a time. This architecture ensures that even if a thousand applications arrive simultaneously, your system remains stable, processing them at a controlled pace determined by the queue workers rather than the incoming traffic spike.\n\nWhen calling external APIs like Gemini or OpenAI in a loop, rate limits are inevitable. Your queue workers must be programmed to handle `429 Too Many Requests` errors gracefully. You will implement an exponential backoff strategy, instructing the worker to pause for a few seconds upon hitting a limit, and gradually increasing the wait time if the error persists. This ensures your system automatically recovers from throttling without dropping any candidate applications."
-          }
-        },
-        {
-          "id": "hr-step-8",
-          "number": "08",
-          "title": "Human-in-the-Loop Handoff",
-          "subtitle": "Keeping managers in control",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Operations",
-          "summary": "Notify the hiring manager with a concise summary before any automated rejections or bookings occur.",
-          "isGated": true,
-          "content": {
-            "overview": "AI shouldn't hire or fire in a vacuum. You'll build a Slack or WhatsApp notification flow that sends the hiring manager a summary of scored candidates, allowing them to explicitly approve the shortlist and reject list before the system takes action.",
-            "keyLearnings": [
-              "Formatting an easy-to-read candidate summary card for WhatsApp",
-              "Building interactive approval buttons or keyword replies (e.g., 'APPROVE ALL')",
-              "Ensuring no candidate is permanently rejected without a human sign-off"
-            ],
-            "lessonBody": "Fully autonomous AI hiring is a massive liability. If a model hallucinates a requirement or misreads a highly qualified candidate's CV, a silent auto-rejection means the business loses out on top talent without ever knowing. The AI's job is to screen and summarize, but a human must remain firmly in control of the final decision.\n\nTo keep the hiring manager in the loop, you will build an automated notification flow that pushes summarized candidate profiles directly to where the manager already works—typically Slack or WhatsApp. Instead of sending the full PDF, the agent formats a concise summary card highlighting the candidate's score, matching qualifications, and the specific reasons for any missing criteria, allowing the manager to quickly grasp the candidate's value on their phone.\n\nThis notification isn't just an alert; it's an interactive checkpoint. You will implement actionable responses, such as WhatsApp interactive buttons or specific keyword replies like 'APPROVE' or 'REVIEW'. When the manager taps a button, the webhook receives the command and updates the candidate's state in the system. This creates a seamless workflow where the manager can vet the AI's shortlist while standing in line for coffee.\n\nThe most critical rule of this system is the safeguard against autonomous rejection. Your architecture must enforce a strict policy where the \"Reject\" state is only a proposal by the AI. The system will batch these proposed rejections and require an explicit human sign-off—such as an 'APPROVE ALL' command on the daily digest—before any decline emails are actually dispatched to the candidates."
-          }
-        },
-        {
-          "id": "hr-step-9",
-          "number": "09",
-          "title": "WhatsApp Interview Scheduling",
-          "subtitle": "Automating candidate outreach",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Automation",
-          "summary": "Message shortlisted candidates via the WhatsApp Business API to seamlessly book their interview slots.",
-          "isGated": true,
-          "content": {
-            "overview": "Once the manager approves the shortlist, the agent takes over logistics. You'll integrate the WhatsApp Business API to text approved candidates, offer available calendar slots, and parse their responses to confirm the booking.",
-            "keyLearnings": [
-              "Using WhatsApp message templates for compliant outbound messaging",
-              "Parsing candidate replies to extract preferred dates and times",
-              "Handling edge cases like requests for rescheduling or out-of-office hours"
-            ],
-            "samplePrompt": "You are the scheduling assistant for an HR team. The candidate replied: '{userReply}'. \nAvailable slots: {availableSlots}. \nMatch their preference to the available slots and return the selected time in ISO format. If no match, suggest the next closest time.",
-            "codeSnippet": "export async function sendWhatsAppInvite(phone: string, candidateName: string, link: string) {\n  return await whatsapp.messages.create({\n    to: phone,\n    type: 'template',\n    template: {\n      name: 'interview_invite',\n      language: { code: 'en' },\n      components: [\n        { type: 'body', parameters: [{ type: 'text', text: candidateName }, { type: 'text', text: link }] }\n      ]\n    }\n  });\n}",
-            "lessonBody": "Once the hiring manager approves a candidate for an interview, the friction of scheduling begins. Email chains proposing times often drag on for days. By moving this outreach to WhatsApp—the default communication channel in Kenya—you can reduce the time-to-schedule from days to minutes.\n\nInitiating a conversation with a candidate requires using the WhatsApp Business API's pre-approved message templates. Meta strictly regulates outbound messages to prevent spam, so you will design and register a compliant interview invitation template. This template will dynamically inject the candidate's name and present them with a polite request to reply with their preferred availability based on the manager's open slots.\n\nWhen the candidate replies, you are no longer dealing with structured buttons, but free-text natural language. They might say \"I'm free tomorrow afternoon\" or \"Can we do Tuesday next week around 10?\" You will use a lightweight LLM prompt to parse these conversational replies, translating relative terms like \"tomorrow\" into strict ISO timestamps and matching them against the actual available calendar slots provided in the context window.\n\nConversational scheduling inevitably hits edge cases. A candidate might ask to reschedule a previously agreed time, propose a time outside of standard office hours, or simply ask a clarifying question about the interview format. Your scheduling prompt must be designed to recognize when a request cannot be fulfilled, gracefully informing the candidate of the valid options or escalating complex queries back to the human hiring manager to prevent the bot from getting stuck in an infinite loop."
-          }
-        },
-        {
-          "id": "hr-step-10",
-          "number": "10",
-          "title": "Calendar Sync Integration",
-          "subtitle": "Securing the time slots",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Integrations",
-          "summary": "Connect the confirmed WhatsApp slots to Google Calendar API to finalize the booking and generate meeting links.",
-          "isGated": true,
-          "content": {
-            "overview": "After agreeing on a time over WhatsApp, the agent must officially book the meeting. You'll use the Google Calendar API to lock in the time, invite both the manager and candidate, and auto-generate a Google Meet link.",
-            "keyLearnings": [
-              "Authenticating with the Google Calendar API",
-              "Creating events with attendees and automated reminders",
-              "Sending the final confirmation message with the meeting link back via WhatsApp"
-            ],
-            "lessonBody": "Agreeing on a time over WhatsApp is only half the battle; the time slot isn't secure until it is officially locked in the calendar. If the system fails to create the event, the hiring manager might accidentally double-book that slot, leading to an embarrassing scheduling conflict. This lesson bridges the gap between the chat interface and the core scheduling infrastructure.\n\nYou will integrate the Google Calendar API, which requires setting up proper OAuth2 authentication or using Service Account credentials. This allows your backend server to programmatically read the manager's busy times and write new events directly to their calendar. Understanding how to handle API scopes securely is critical so the agent only has permission to manage specific calendars, not the manager's entire private life.\n\nOnce the time is confirmed by the candidate, your code constructs the calendar event payload. This includes adding both the candidate and the hiring manager as attendees, setting the correct timezone (crucial for remote interviews), and configuring automated email reminders. Most importantly, you will instruct the API to auto-generate a Google Meet conference link, ensuring the virtual interview room is created without any manual clicks.\n\nThe final step in the integration loop is closing out the conversation with the candidate. As soon as the Google Calendar API returns a success response containing the new meeting link, your system immediately triggers a final WhatsApp message. This confirmation texts the candidate the exact time, the meeting link, and any preparation instructions, providing a professional and seamless end-to-end booking experience."
-          }
-        },
-        {
-          "id": "hr-step-11",
-          "number": "11",
-          "title": "Hiring Funnel Analytics Dashboard",
-          "subtitle": "Visualizing the pipeline",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Reporting",
-          "summary": "Export pipeline states to Google Sheets so the SME owner can track their entire hiring funnel in real time.",
-          "isGated": true,
-          "content": {
-            "overview": "Business owners need visibility. You'll build an integration that logs every candidate's status (Received, Scored, Shortlisted, Scheduled, Rejected) into a live Google Sheet dashboard, giving the employer a clear view of the hiring progress.",
-            "keyLearnings": [
-              "Writing data sequentially to a Google Sheet using its API",
-              "Updating specific row statuses as candidates move through the funnel",
-              "Generating basic metrics like 'Time to Hire' and 'Pass Rate'"
-            ],
-            "lessonBody": "An automated system running entirely in the background can feel like a black box to a business owner. If they can't easily see how many people applied, who passed the screening, and who was rejected, they won't trust the AI. Building a real-time, transparent dashboard is essential for operational visibility.\n\nInstead of building a complex custom web frontend, you will use the Google Sheets API to create a live, accessible dashboard. Google Sheets is universally understood by SME owners and requires zero training. You will write a module that appends a new row to a specific spreadsheet the moment an application is ingested, logging the candidate's name, applied role, and initial timestamp.\n\nAs the candidate moves through the system—from parsed, to scored, to shortlisted, and finally to scheduled—your application will use the Sheets API to locate their specific row and update their status column. This creates a living document where the hiring manager can literally watch the pipeline update in real-time, providing immediate reassurance that the background workers are functioning correctly.\n\nBeyond just tracking status, this data allows you to generate valuable hiring metrics. By comparing the initial application timestamp with the interview scheduled timestamp, the sheet can calculate the \"Time to Hire.\" By analyzing the ratio of total applicants to shortlisted candidates, it tracks the \"Pass Rate.\" Providing these basic analytics gives the business owner strategic insights into their hiring process that they likely never had when doing it manually."
-          }
-        },
-        {
-          "id": "hr-step-12",
-          "number": "12",
-          "title": "Verified Portfolio Deployment",
-          "subtitle": "Ship your live HR Screening Agent",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Deployment",
-          "summary": "Deploy the complete end-to-end system and process a dummy application to earn your verified portfolio link.",
-          "isGated": true,
-          "content": {
-            "overview": "It's time to go live. You'll deploy your HR screening pipeline to a production server, submit a test application with a sample CV, and verify the WhatsApp booking flow. Complete this process to receive your shareable portfolio link proving you built a functional HR agent.",
-            "keyLearnings": [
-              "Deploying the webhook and background workers to a cloud provider",
-              "Running an end-to-end test with a dummy CV and phone number",
-              "Securing your Verified Portfolio link and live demo"
-            ],
-            "lessonBody": "Building the system locally is a great learning exercise, but a locally hosted script cannot receive webhooks from a live job board or send WhatsApp messages reliably. To prove this system works and to build your portfolio, you must deploy the architecture to a production cloud environment where it can run autonomously 24/7.\n\nYou will package your ingestion webhook, background queue workers, and LLM integrations and deploy them to a cloud provider like Render, Heroku, or AWS. This involves managing environment variables securely—ensuring your API keys for Gemini, OpenAI, and WhatsApp are not exposed—and configuring your live domain to securely receive incoming webhook POST requests from your application sources.\n\nOnce the system is live, you will execute a complete end-to-end integration test. You will submit a dummy CV to your live application form, monitor the cloud logs as the queue worker picks it up and scores it, and verify that the human-in-the-loop notification reaches your phone. You will then approve the dummy candidate and complete the automated WhatsApp scheduling flow using a test number.\n\nCompleting this successful test run proves that your HR agent is robust, secure, and ready for real-world traffic. It serves as your final verification. You will capture a brief screen recording of the WhatsApp scheduling interaction and link to your live webhook endpoint, finalizing your verified portfolio project that demonstrates your ability to build production-grade AI automation for real businesses."
-          }
-        }
-      ]
+        ]
   },
   {
     id: 'payment-collections-agent',
