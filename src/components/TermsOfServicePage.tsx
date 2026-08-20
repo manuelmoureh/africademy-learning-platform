@@ -26,11 +26,9 @@ export const TermsOfServicePage: React.FC<{ onBack: () => void }> = ({ onBack })
     </p>
     <h2>Purchases and refunds</h2>
     <p>
-      Most systems are a one-time payment that unlocks the remaining lessons for that system permanently - the
-      first few lessons of every system are free, so you can try it before paying. Afridemy Pro, where offered, is
-      billed monthly and you can cancel anytime; cancellation stops future billing but doesn't retroactively refund
-      the current period unless required by law. If something's genuinely broken on our end, either kind of
-      purchase, contact us and we'll sort it out directly rather than hide behind a policy.
+      Systems are a one-time payment that unlocks the remaining lessons for that system permanently - the first few
+      lessons of every system are free, so you can try it before paying. If something's genuinely broken on our
+      end, contact us and we'll sort it out directly rather than hide behind a policy.
     </p>
     <h2>Acceptable use</h2>
     <p>

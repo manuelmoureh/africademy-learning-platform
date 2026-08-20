@@ -21,7 +21,7 @@ export const PrivacyPolicyPage: React.FC<{ onBack: () => void }> = ({ onBack }) 
       <li>To create and run your account, and remember your progress between visits</li>
       <li>To verify submitted work against the published rubric</li>
       <li>To generate your public verified-portfolio page, only with your consent</li>
-      <li>To process payment when you unlock a system or the Pro plan, handled by our payment processor, not stored by us directly</li>
+      <li>To process payment when you unlock a system, handled by our payment processor, not stored by us directly</li>
       <li>To understand which pages and systems people actually use, so we know what to build next</li>
     </ul>
     <h2>Who we share it with</h2>
