@@ -74,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           type="button"
           onClick={onBrowseAll}
-          className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-[#12102A]/50 hover:text-[#12102A] cursor-pointer transition-colors"
+          className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-[#12102A]/50 hover:text-[#12102A] cursor-pointer transition-colors"
         >
           <ArrowLeft className="w-3 h-3" />
           Browse other systems
