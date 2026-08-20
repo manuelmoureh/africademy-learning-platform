@@ -1794,254 +1794,680 @@ export const INITIAL_TRACKS: Track[] = [
     impactStat: 'AI-driven support automation cuts ticket backlog by up to 40%',
     featuredOnHomepage: true,
     steps: [
-        {
-          "id": "sup-step-1",
-          "number": "01",
-          "title": "Architecture of a Unified Support Agent",
-          "subtitle": "Bringing WhatsApp and email into a single AI brain",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Architecture",
-          "summary": "Map out how customer messages flow from WhatsApp Cloud API and support email inboxes into a central processing engine.",
-          "isGated": false,
-          "content": {
-            "overview": "Before writing code, you need to understand the data flow. This lesson covers how to unify disjointed support channels—like a business's WhatsApp number and their support email domain—into a single webhook endpoint that our AI agent can monitor and respond to.",
-            "lessonBody": "Customer support for small Kenyan businesses is often a chaotic mix of disjointed channels. A shop might have a Safaricom WhatsApp Business number managed on one phone, while support emails go to a separate info@ domain checked on a laptop. This fragmentation leads to duplicate replies, lost context, and frustrated customers who have to repeat their issue across different platforms.\n\nTo solve this, our architecture begins by centralizing these incoming streams. We need a single, unified 'brain'—a central webhook endpoint built in Node.js or Python that receives payloads from both the Meta Graph API (for WhatsApp) and an email parsing service like SendGrid Inbound Parse. This endpoint normalizes the incoming data into a standard schema regardless of its source.\n\nOnce the data is normalized, we must map the data flow into our database. Every incoming message is tagged with its source channel, timestamp, and a unified customer ID. By routing everything into a PostgreSQL or similar database first, we create a single source of truth before the AI even sees the message. This ensures the AI has the full context of a customer's history.\n\nA critical architectural constraint to plan for is the WhatsApp 24-hour service window. Meta enforces a strict rule: a business can only send free-form replies within 24 hours of the last user message. If a ticket takes 36 hours to resolve, the AI or human cannot simply reply via WhatsApp; they must send an approved template message. Your architecture must track this 24-hour timer and route delayed responses to email if the WhatsApp window has closed.",
-            "keyLearnings": [
-              "Designing a unified payload schema for WhatsApp and email messages",
-              "Mapping the data flow from webhook trigger to agent response",
-              "Understanding the constraints of the WhatsApp 24-hour service window"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-2",
-          "number": "02",
-          "title": "Document Ingestion for Kenyan SMEs",
-          "subtitle": "Prepping refund policies and FAQs for the AI",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Data Pipeline",
-          "summary": "Extract text from actual business documents, pricing PDFs, and return policies to serve as the agent's source of truth.",
-          "isGated": false,
-          "content": {
-            "overview": "A support agent must never invent answers. In this lesson, we build a pipeline that reads standard business documents (like a Nairobi shop's return policy or delivery fee schedule) and splits them into clean, indexable chunks.",
-            "lessonBody": "A reliable AI support agent is only as good as the documents it reads. It must never invent answers. In a real-world Kenyan SME, the source of truth is rarely a clean API; it is usually a messy collection of PDFs, scanned return policies, and Word documents detailing pricing and delivery zones.\n\nThe first step in our data pipeline is extracting text from these unstructured formats. We use lightweight parsing libraries, such as `pdf2json` or Python's `PyPDF2`, to read digital PDFs. For scanned, handwritten policies or product catalogs photographed via phone, we introduce an OCR (Optical Character Recognition) layer like Tesseract to pull out the usable text.\n\nHowever, dumping a 20-page document straight into an LLM's context window is inefficient and error-prone. The core of document ingestion is 'chunking'. We must split the extracted text into manageable, 500-token blocks. This ensures that when the AI searches for an answer, it retrieves only the relevant paragraph, rather than processing the entire employee handbook.\n\nChunking requires careful strategy to preserve context boundaries. If a table listing delivery fees to Kilimani, Westlands, and Karen is split arbitrarily down the middle, the AI might lose the connection between the location and the price. We implement overlapping chunks—where the last 50 tokens of one chunk become the first 50 of the next—to ensure no context is lost at the seams.\n\nFinally, the pipeline must clean the extracted text. This involves stripping out irrelevant headers, footers, and page numbers, and normalizing formatting. A clean, well-chunked dataset is the foundation that prevents the AI from hallucinating when a customer asks a highly specific policy question.",
-            "keyLearnings": [
-              "Extracting text from PDF and Word documents using simple parsing libraries",
-              "Chunking text to preserve context boundaries for accurate AI retrieval",
-              "Handling common formatting issues in handwritten or scanned policies"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-3",
-          "number": "03",
-          "title": "Building the Knowledge Base (RAG)",
-          "subtitle": "Storing policies in a vector database",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Database",
-          "summary": "Convert your document chunks into vector embeddings and store them for rapid, similarity-based search when a customer asks a question.",
-          "isGated": false,
-          "content": {
-            "overview": "To answer a customer query about delivery fees, the agent needs to instantly find the delivery fee policy. We use an embedding model to convert text chunks into numbers, and store them in a vector database to enable fast retrieval.",
-            "lessonBody": "With our documents cleanly chunked, we now build the Knowledge Base using Retrieval-Augmented Generation (RAG). RAG is the architecture that prevents our AI from guessing. Instead of relying on its pre-trained knowledge, the AI first searches our specific business documents for the exact answer, ensuring it quotes the real delivery fees and return policies.\n\nTo make these text chunks searchable, we convert them into vector embeddings. Using an embedding model like OpenAI's `text-embedding-3-small` or Gemini's equivalent, we translate each paragraph of text into a high-dimensional array of numbers. This mathematical representation captures the semantic meaning of the text, not just the raw keywords.\n\nThese embeddings are then stored in a vector database, such as Pinecone, Qdrant, or pgvector. A traditional SQL database searches for exact keyword matches, but a vector database performs similarity searches. This is crucial for support: if a customer asks, \"How much to ship to Kileleshwa?\", the vector database understands this is semantically similar to a document chunk discussing \"Delivery fees for Nairobi zones.\"\n\nWhen a customer sends a message, the system instantly embeds their query and runs a similarity search against the vector database. It retrieves the top 3 or 4 most relevant chunks. This happens in milliseconds, acting as a highly intelligent search engine that pulls the exact policy snippets needed to answer the question.\n\nTesting this retrieval mechanism is a critical part of the build. We must ensure the vector search accurately maps local nuances. For example, queries containing Kenyan slang (Sheng) or shorthand must successfully retrieve the formal policy documents. If the retrieval step fails, the AI will fail, making robust vector search the most important technical hurdle in a support agent.",
-            "keyLearnings": [
-              "Generating text embeddings from chunked policy documents",
-              "Setting up a basic vector store for fast similarity search",
-              "Testing retrieval accuracy against common customer queries"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-4",
-          "number": "04",
-          "title": "Retrieval & Fact Grounding",
-          "subtitle": "Ensuring the agent only uses real business data",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Prompt Design",
-          "summary": "Draft the foundational prompt that forces the LLM to rely strictly on the retrieved knowledge base context and politely decline unknown queries.",
-          "isGated": true,
-          "content": {
-            "overview": "The biggest risk in AI support is hallucination. You will write a system prompt that explicitly restricts the agent to the provided context. If a customer asks about a product not mentioned in the retrieved FAQs, the agent must smoothly admit it doesn't know.",
-            "lessonBody": "Retrieving the right document chunk is only half the battle; the other half is forcing the LLM to use it correctly. The biggest risk in deploying an AI support agent is hallucination—the AI confidently offering a free refund when the retrieved policy clearly states all sales are final. To prevent this, we must master fact grounding through prompt engineering.\n\nOur system prompt acts as the absolute law for the AI. We inject the retrieved vector chunks directly into the LLM's context window, alongside a strict directive: \"Answer the user's question using ONLY the context provided below.\" This boundary ensures the AI acts as a summarizer of the provided facts, rather than a creative writer inventing new policies.\n\nHandling negative cases is just as important as answering successfully. We must explicitly instruct the AI on what to do if the retrieval step returns irrelevant chunks. The prompt must dictate a graceful failure mode: \"If the provided context does not contain the answer, do not guess. Reply exactly with: 'I don't have that information, let me connect you to a human agent.'\"\n\nTone calibration is the final layer of the prompt. A support agent should reflect the business's brand—warm, polite, and professional. We instruct the LLM to keep answers concise, under three sentences, as long paragraphs perform poorly on mobile WhatsApp screens. We also enforce Kenyan localization, requiring the AI to quote prices consistently in KES and use appropriate greetings like 'Karibu' or 'Pole sana' when dealing with complaints.\n\nTo ensure consistency, we lock the LLM's 'Temperature' parameter to 0 or 0.1. A high temperature makes the AI creative and unpredictable, which is great for writing poetry but disastrous for customer support. A low temperature guarantees deterministic, factual answers that strictly adhere to the retrieved business data.",
-            "keyLearnings": [
-              "Injecting retrieved vector chunks into the LLM context window",
-              "Writing strict constraints to prevent the AI from guessing answers",
-              "Calibrating the tone for polite, concise Kenyan business communication"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-5",
-          "number": "05",
-          "title": "Sentiment Detection & Triage",
-          "subtitle": "Identifying angry customers and urgent issues",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Analysis",
-          "summary": "Use the LLM to evaluate the emotional tone of incoming messages to tag high-priority tickets or frustrated customers.",
-          "isGated": true,
-          "content": {
-            "overview": "Not all tickets are equal. A customer asking for operating hours can wait, but someone complaining about a missing M-Pesa payment needs immediate attention. We'll use sentiment analysis to automatically tag and escalate urgent or angry messages.",
-            "lessonBody": "Not all support tickets are created equal. A customer casually asking for your Sunday operating hours can wait, but a frustrated client complaining about a missing M-Pesa payment or a broken product needs immediate attention. To handle this, we integrate automated sentiment detection to triage incoming messages before the agent even replies.\n\nWe achieve this by adding a lightweight analysis step to our message pipeline. We can use a dedicated API like AWS Comprehend or a fast, low-cost LLM call to evaluate the emotional tone of the incoming text. The goal is to classify the sentiment on a spectrum—such as positive, neutral, or negative—and identify the core intent behind the message.\n\nRelying on simple keyword matching is rarely enough. A customer might say, \"I've been waiting for three days, this is unacceptable,\" without using explicit curse words. Semantic sentiment analysis understands the frustration in the context, accurately flagging it as a negative interaction even when the language is formally polite.\n\nBased on this analysis, the system automatically assigns priority tags in the database. A standard inquiry gets a `P3_Normal` tag, while a detected complaint or a message containing urgency keywords (like 'stuck', 'failed', or 'refund') gets immediately tagged as `P1_Urgent`. This tagging happens in milliseconds, categorizing the queue automatically.\n\nThis automated triage directly impacts the business's Service Level Agreement (SLA). By identifying high-priority tickets instantly, the system can route angry customers to the front of the human manager's queue, or trigger specialized AI workflows that prioritize de-escalation over standard FAQ responses. It transforms a chaotic inbox into an organized, prioritized workflow.",
-            "keyLearnings": [
-              "Prompting the LLM to score sentiment as positive, neutral, or negative",
-              "Detecting urgency keywords (e.g., 'stuck', 'failed', 'refund')",
-              "Assigning priority tags based on combined sentiment and intent"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-6",
-          "number": "06",
-          "title": "Prompt Engineering for Support Resolutions",
-          "subtitle": "Generating accurate, multi-turn answers",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Prompt Engineering",
-          "summary": "Construct dynamic prompts that combine conversation history, retrieved knowledge, and priority tags to generate final customer replies.",
-          "isGated": true,
-          "content": {
-            "overview": "This is the core logic of the support agent. You will build a comprehensive prompt that feeds the LLM the customer's exact question, the past few messages for context, and the exact policy snippets retrieved from the vector database.",
-            "lessonBody": "This lesson brings the entire architecture together into the core logic of the support agent. You will construct a dynamic, comprehensive prompt that acts as the final assembly line for the LLM. This prompt must combine the customer's exact question, the priority tags we just generated, and the specific policy snippets retrieved from our vector database.\n\nManaging conversational memory is a critical challenge here. Customers rarely ask their entire question in one message. They might say, \"I bought a blender,\" followed by, \"Where is it?\" If the AI only sees the second message, it has no context. We solve this by passing the last 3-4 interactions from the database into the prompt as `CONVERSATION HISTORY`, allowing the AI to seamlessly resolve pronouns and follow-up queries.\n\nFormatting the output correctly for the delivery channel is essential. WhatsApp supports basic markdown, but it looks terrible if overused. We instruct the LLM to format prices cleanly using asterisks for bolding (e.g., *KES 2,500*) and to avoid outputting long, complex tables that break on narrow mobile screens. The reply must be optimized for readability at a glance.\n\nBeyond the text reply, we leverage the LLM for internal state management. We instruct the AI to output structured JSON alongside its message. This JSON payload might include fields like `ticketStatus: \"resolved\"` or `category: \"shipping\"`. This allows the AI to not only talk to the customer but simultaneously update the ticket's status in our backend database.\n\nFinally, we must design the prompt to handle multi-intent queries gracefully. If a customer asks, \"Where is my order and how do I return it?\", the AI must synthesize the retrieved tracking info and the return policy chunk into a single, cohesive response. Mastering this multi-turn, multi-intent prompt is what separates a basic chatbot from a true AI support agent.",
-            "keyLearnings": [
-              "Managing conversational memory to handle follow-up questions",
-              "Formatting complex policies into simple, readable WhatsApp replies",
-              "Instructing the LLM to output structured JSON for internal ticket tracking"
-            ],
-            "samplePrompt": "You are a customer support agent for a Nairobi electronics shop. Answer the customer using ONLY the context provided below.\n\nCONTEXT:\n{retrieved_chunks}\n\nCONVERSATION HISTORY:\n{history}\n\nRULES:\n- Keep answers under 3 sentences.\n- Use KES for all prices.\n- If the answer is not in the context, say: 'I don't have that information, let me connect you to a human agent.'",
-            "testCase": {
-              "input": "My order arrived damaged. What is your return policy?",
-              "expectedOutput": "Pole sana for the damaged order. Our policy allows returns within 7 days of delivery for defective items. Please share a photo of the damage and we will process a replacement or a full refund via M-Pesa."
+          {
+            "id": "sup-step-1",
+            "number": "01",
+            "title": "Architecture of a Unified Support Agent",
+            "subtitle": "Bringing WhatsApp and email into a single AI brain",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Architecture",
+            "summary": "Map out how customer messages flow from WhatsApp Cloud API and support email inboxes into a central processing engine.",
+            "isGated": false,
+            "content": {
+              "overview": "Before writing code, you need to understand the data flow. This lesson covers how to unify disjointed support channels—like a business's WhatsApp number and their support email domain—into a single webhook endpoint that our AI agent can monitor and respond to.",
+              "lessonBody": "Customer support for small Kenyan businesses is often a chaotic mix of disjointed channels. A shop might have a Safaricom WhatsApp Business number managed on one phone, while support emails go to a separate info@ domain checked on a laptop. This fragmentation leads to duplicate replies, lost context, and frustrated customers who have to repeat their issue across different platforms.\n\nTo solve this, our architecture begins by centralizing these incoming streams. We need a single, unified 'brain'—a central webhook endpoint built in Node.js or Python that receives payloads from both the Meta Graph API (for WhatsApp) and an email parsing service like SendGrid Inbound Parse. This endpoint normalizes the incoming data into a standard schema regardless of its source.\n\nOnce the data is normalized, we must map the data flow into our database. Every incoming message is tagged with its source channel, timestamp, and a unified customer ID. By routing everything into a PostgreSQL or similar database first, we create a single source of truth before the AI even sees the message. This ensures the AI has the full context of a customer's history.\n\nA critical architectural constraint to plan for is the WhatsApp 24-hour service window. Meta enforces a strict rule: a business can only send free-form replies within 24 hours of the last user message. If a ticket takes 36 hours to resolve, the AI or human cannot simply reply via WhatsApp; they must send an approved template message. Your architecture must track this 24-hour timer and route delayed responses to email if the WhatsApp window has closed.",
+              "keyLearnings": [
+                "Designing a unified payload schema for WhatsApp and email messages",
+                "Mapping the data flow from webhook trigger to agent response",
+                "Understanding the constraints of the WhatsApp 24-hour service window"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Two channels, one brain.",
+                  "flow": [
+                    "WhatsApp message arrives via Meta Graph API",
+                    "Email arrives via SendGrid Inbound Parse",
+                    "Both normalized into one schema",
+                    "Single webhook, single source of truth"
+                  ]
+                },
+                {
+                  "afterParagraph": 3,
+                  "caption": "The 24-hour window decides which channel can reply.",
+                  "compare": [
+                    {
+                      "label": "Within 24 hours of last message",
+                      "text": "Free-form WhatsApp reply allowed",
+                      "good": true
+                    },
+                    {
+                      "label": "After 24 hours",
+                      "text": "Must use an approved template, or fall back to email",
+                      "good": false
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A ticket has sat open for 36 hours and now needs a WhatsApp reply. What should happen?",
+                "options": [
+                  {
+                    "text": "Send a normal free-form WhatsApp message like usual",
+                    "feedback": "The 24-hour window has closed - Meta will reject a free-form message at this point.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Send an approved template message, or fall back to email",
+                    "feedback": "Right. Once the window closes, this is the only way to reliably reach the customer.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Wait for the customer to message again before replying",
+                    "feedback": "That leaves the ticket stalled indefinitely - a real system falls back instead of waiting.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-2",
+            "number": "02",
+            "title": "Document Ingestion for Kenyan SMEs",
+            "subtitle": "Prepping refund policies and FAQs for the AI",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Data Pipeline",
+            "summary": "Extract text from actual business documents, pricing PDFs, and return policies to serve as the agent's source of truth.",
+            "isGated": false,
+            "content": {
+              "overview": "A support agent must never invent answers. In this lesson, we build a pipeline that reads standard business documents (like a Nairobi shop's return policy or delivery fee schedule) and splits them into clean, indexable chunks.",
+              "lessonBody": "A reliable AI support agent is only as good as the documents it reads. It must never invent answers. In a real-world Kenyan SME, the source of truth is rarely a clean API; it is usually a messy collection of PDFs, scanned return policies, and Word documents detailing pricing and delivery zones.\n\nThe first step in our data pipeline is extracting text from these unstructured formats. We use lightweight parsing libraries, such as `pdf2json` or Python's `PyPDF2`, to read digital PDFs. For scanned, handwritten policies or product catalogs photographed via phone, we introduce an OCR (Optical Character Recognition) layer like Tesseract to pull out the usable text.\n\nHowever, dumping a 20-page document straight into an LLM's context window is inefficient and error-prone. The core of document ingestion is 'chunking'. We must split the extracted text into manageable, 500-token blocks. This ensures that when the AI searches for an answer, it retrieves only the relevant paragraph, rather than processing the entire employee handbook.\n\nChunking requires careful strategy to preserve context boundaries. If a table listing delivery fees to Kilimani, Westlands, and Karen is split arbitrarily down the middle, the AI might lose the connection between the location and the price. We implement overlapping chunks—where the last 50 tokens of one chunk become the first 50 of the next—to ensure no context is lost at the seams.\n\nFinally, the pipeline must clean the extracted text. This involves stripping out irrelevant headers, footers, and page numbers, and normalizing formatting. A clean, well-chunked dataset is the foundation that prevents the AI from hallucinating when a customer asks a highly specific policy question.",
+              "keyLearnings": [
+                "Extracting text from PDF and Word documents using simple parsing libraries",
+                "Chunking text to preserve context boundaries for accurate AI retrieval",
+                "Handling common formatting issues in handwritten or scanned policies"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Chunking turns one huge document into search-sized pieces.",
+                  "flow": [
+                    "20-page PDF policy document",
+                    "Split into ~500-token chunks",
+                    "Each chunk stored separately",
+                    "AI retrieves only the relevant chunk"
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "A delivery-fee table lists Kilimani: KES 200, Westlands: KES 250, Karen: KES 350. You are about to split this document into 500-token chunks.",
+                "workedExample": "Splitting mid-table without overlap: Chunk A ends with '...Kilimani: KES' and Chunk B starts with '200, Westlands...'. The AI retrieving Chunk B alone now has a price with no location attached to it.",
+                "challenge": "Rewrite the chunking rule so the same table never loses its location-to-price pairing, even if the table falls across a chunk boundary.",
+                "placeholder": "Chunk boundaries should never split a ___, and each chunk should include an overlap of the last ___ tokens from the previous chunk.",
+                "solution": "Chunk boundaries should never split a table row, and each chunk should include an overlap of the last 50 tokens from the previous chunk.",
+                "explanation": "Overlapping chunks - repeating the last ~50 tokens of one chunk as the first ~50 of the next - is exactly the fix from the lesson. A row or sentence straddling a boundary still appears whole in at least one chunk."
+              }
+            }
+          },
+          {
+            "id": "sup-step-3",
+            "number": "03",
+            "title": "Building the Knowledge Base (RAG)",
+            "subtitle": "Storing policies in a vector database",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Database",
+            "summary": "Convert your document chunks into vector embeddings and store them for rapid, similarity-based search when a customer asks a question.",
+            "isGated": false,
+            "content": {
+              "overview": "To answer a customer query about delivery fees, the agent needs to instantly find the delivery fee policy. We use an embedding model to convert text chunks into numbers, and store them in a vector database to enable fast retrieval.",
+              "lessonBody": "With our documents cleanly chunked, we now build the Knowledge Base using Retrieval-Augmented Generation (RAG). RAG is the architecture that prevents our AI from guessing. Instead of relying on its pre-trained knowledge, the AI first searches our specific business documents for the exact answer, ensuring it quotes the real delivery fees and return policies.\n\nTo make these text chunks searchable, we convert them into vector embeddings. Using an embedding model like OpenAI's `text-embedding-3-small` or Gemini's equivalent, we translate each paragraph of text into a high-dimensional array of numbers. This mathematical representation captures the semantic meaning of the text, not just the raw keywords.\n\nThese embeddings are then stored in a vector database, such as Pinecone, Qdrant, or pgvector. A traditional SQL database searches for exact keyword matches, but a vector database performs similarity searches. This is crucial for support: if a customer asks, \"How much to ship to Kileleshwa?\", the vector database understands this is semantically similar to a document chunk discussing \"Delivery fees for Nairobi zones.\"\n\nWhen a customer sends a message, the system instantly embeds their query and runs a similarity search against the vector database. It retrieves the top 3 or 4 most relevant chunks. This happens in milliseconds, acting as a highly intelligent search engine that pulls the exact policy snippets needed to answer the question.\n\nTesting this retrieval mechanism is a critical part of the build. We must ensure the vector search accurately maps local nuances. For example, queries containing Kenyan slang (Sheng) or shorthand must successfully retrieve the formal policy documents. If the retrieval step fails, the AI will fail, making robust vector search the most important technical hurdle in a support agent.",
+              "keyLearnings": [
+                "Generating text embeddings from chunked policy documents",
+                "Setting up a basic vector store for fast similarity search",
+                "Testing retrieval accuracy against common customer queries"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 3,
+                  "caption": "A similarity search happens in milliseconds.",
+                  "flow": [
+                    "Customer message arrives",
+                    "Query gets embedded into a vector",
+                    "Vector DB finds the 3-4 closest chunks",
+                    "Those chunks get passed to the LLM"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer asks 'How much to ship to Kileleshwa?' but your policy document only says 'Delivery fees for Nairobi zones' - it never uses the word Kileleshwa. Will vector search still find it?",
+                "options": [
+                  {
+                    "text": "No, vector search only matches exact keywords, so it needs the word 'Kileleshwa' in the document",
+                    "feedback": "That's how traditional keyword search works, not vector search - vector search matches on meaning, not exact text.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Yes, because vector search matches on semantic meaning, and 'Kileleshwa' is understood as a Nairobi delivery zone",
+                    "feedback": "Right. The embedding captures meaning, so a specific zone name still matches a general zone-pricing chunk.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Only if you manually add 'Kileleshwa' as a tag to that document chunk",
+                    "feedback": "Manual tagging isn't how embeddings work - the model already understands the relationship without you hardcoding it.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-4",
+            "number": "04",
+            "title": "Retrieval & Fact Grounding",
+            "subtitle": "Ensuring the agent only uses real business data",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Prompt Design",
+            "summary": "Draft the foundational prompt that forces the LLM to rely strictly on the retrieved knowledge base context and politely decline unknown queries.",
+            "isGated": true,
+            "content": {
+              "overview": "The biggest risk in AI support is hallucination. You will write a system prompt that explicitly restricts the agent to the provided context. If a customer asks about a product not mentioned in the retrieved FAQs, the agent must smoothly admit it doesn't know.",
+              "lessonBody": "Retrieving the right document chunk is only half the battle; the other half is forcing the LLM to use it correctly. The biggest risk in deploying an AI support agent is hallucination—the AI confidently offering a free refund when the retrieved policy clearly states all sales are final. To prevent this, we must master fact grounding through prompt engineering.\n\nOur system prompt acts as the absolute law for the AI. We inject the retrieved vector chunks directly into the LLM's context window, alongside a strict directive: \"Answer the user's question using ONLY the context provided below.\" This boundary ensures the AI acts as a summarizer of the provided facts, rather than a creative writer inventing new policies.\n\nHandling negative cases is just as important as answering successfully. We must explicitly instruct the AI on what to do if the retrieval step returns irrelevant chunks. The prompt must dictate a graceful failure mode: \"If the provided context does not contain the answer, do not guess. Reply exactly with: 'I don't have that information, let me connect you to a human agent.'\"\n\nTone calibration is the final layer of the prompt. A support agent should reflect the business's brand—warm, polite, and professional. We instruct the LLM to keep answers concise, under three sentences, as long paragraphs perform poorly on mobile WhatsApp screens. We also enforce Kenyan localization, requiring the AI to quote prices consistently in KES and use appropriate greetings like 'Karibu' or 'Pole sana' when dealing with complaints.\n\nTo ensure consistency, we lock the LLM's 'Temperature' parameter to 0 or 0.1. A high temperature makes the AI creative and unpredictable, which is great for writing poetry but disastrous for customer support. A low temperature guarantees deterministic, factual answers that strictly adhere to the retrieved business data.",
+              "keyLearnings": [
+                "Injecting retrieved vector chunks into the LLM context window",
+                "Writing strict constraints to prevent the AI from guessing answers",
+                "Calibrating the tone for polite, concise Kenyan business communication"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "The context window becomes the AI’s only source of truth.",
+                  "compare": [
+                    {
+                      "label": "Without grounding",
+                      "text": "AI invents a friendly-sounding refund policy",
+                      "good": false
+                    },
+                    {
+                      "label": "With grounding",
+                      "text": "AI quotes only what the retrieved policy actually says",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Vector search returns no relevant chunks for a customer's question about a product the business doesn't sell. What should the AI do?",
+                "options": [
+                  {
+                    "text": "Give its best guess based on general knowledge",
+                    "feedback": "That's the exact hallucination risk this lesson is about - a confident guess with no source is worse than admitting it doesn't know.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Say it doesn't have that information and offer to connect them to a human",
+                    "feedback": "Right. This is exactly the graceful-failure behavior the system prompt is designed to enforce.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Repeat the closest-matching chunk even though it doesn't actually answer the question",
+                    "feedback": "Forcing an unrelated chunk to look like an answer is just a subtler form of the same hallucination problem.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-5",
+            "number": "05",
+            "title": "Sentiment Detection & Triage",
+            "subtitle": "Identifying angry customers and urgent issues",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Analysis",
+            "summary": "Use the LLM to evaluate the emotional tone of incoming messages to tag high-priority tickets or frustrated customers.",
+            "isGated": true,
+            "content": {
+              "overview": "Not all tickets are equal. A customer asking for operating hours can wait, but someone complaining about a missing M-Pesa payment needs immediate attention. We'll use sentiment analysis to automatically tag and escalate urgent or angry messages.",
+              "lessonBody": "Not all support tickets are created equal. A customer casually asking for your Sunday operating hours can wait, but a frustrated client complaining about a missing M-Pesa payment or a broken product needs immediate attention. To handle this, we integrate automated sentiment detection to triage incoming messages before the agent even replies.\n\nWe achieve this by adding a lightweight analysis step to our message pipeline. We can use a dedicated API like AWS Comprehend or a fast, low-cost LLM call to evaluate the emotional tone of the incoming text. The goal is to classify the sentiment on a spectrum—such as positive, neutral, or negative—and identify the core intent behind the message.\n\nRelying on simple keyword matching is rarely enough. A customer might say, \"I've been waiting for three days, this is unacceptable,\" without using explicit curse words. Semantic sentiment analysis understands the frustration in the context, accurately flagging it as a negative interaction even when the language is formally polite.\n\nBased on this analysis, the system automatically assigns priority tags in the database. A standard inquiry gets a `P3_Normal` tag, while a detected complaint or a message containing urgency keywords (like 'stuck', 'failed', or 'refund') gets immediately tagged as `P1_Urgent`. This tagging happens in milliseconds, categorizing the queue automatically.\n\nThis automated triage directly impacts the business's Service Level Agreement (SLA). By identifying high-priority tickets instantly, the system can route angry customers to the front of the human manager's queue, or trigger specialized AI workflows that prioritize de-escalation over standard FAQ responses. It transforms a chaotic inbox into an organized, prioritized workflow.",
+              "keyLearnings": [
+                "Prompting the LLM to score sentiment as positive, neutral, or negative",
+                "Detecting urgency keywords (e.g., 'stuck', 'failed', 'refund')",
+                "Assigning priority tags based on combined sentiment and intent"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Two very different tickets, two very different urgencies.",
+                  "chat": [
+                    {
+                      "sender": "customer",
+                      "text": "What time do you close on Sundays?"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "(Tagged P3 - Normal)"
+                    },
+                    {
+                      "sender": "customer",
+                      "text": "I paid via M-Pesa and never got my order!"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "(Tagged P1 - Urgent)"
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer messages: 'I've been waiting for three days, this is unacceptable.' No curse words, fully polite grammar. Should this be flagged as urgent?",
+                "options": [
+                  {
+                    "text": "No, since there is no explicit anger or profanity, keyword matching would mark it neutral",
+                    "feedback": "That's exactly the trap - keyword matching alone misses frustration expressed politely.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Yes, semantic sentiment analysis reads the frustration in context even without angry keywords",
+                    "feedback": "Right. The model understands the frustration in context, not just the literal words used.",
+                    "correct": true
+                  },
+                  {
+                    "text": "It depends on whether the customer used an exclamation mark",
+                    "feedback": "Punctuation isn't a reliable urgency signal - the actual content ('three days', 'unacceptable') is what should drive the tag.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-6",
+            "number": "06",
+            "title": "Prompt Engineering for Support Resolutions",
+            "subtitle": "Generating accurate, multi-turn answers",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Prompt Engineering",
+            "summary": "Construct dynamic prompts that combine conversation history, retrieved knowledge, and priority tags to generate final customer replies.",
+            "isGated": true,
+            "content": {
+              "overview": "This is the core logic of the support agent. You will build a comprehensive prompt that feeds the LLM the customer's exact question, the past few messages for context, and the exact policy snippets retrieved from the vector database.",
+              "lessonBody": "This lesson brings the entire architecture together into the core logic of the support agent. You will construct a dynamic, comprehensive prompt that acts as the final assembly line for the LLM. This prompt must combine the customer's exact question, the priority tags we just generated, and the specific policy snippets retrieved from our vector database.\n\nManaging conversational memory is a critical challenge here. Customers rarely ask their entire question in one message. They might say, \"I bought a blender,\" followed by, \"Where is it?\" If the AI only sees the second message, it has no context. We solve this by passing the last 3-4 interactions from the database into the prompt as `CONVERSATION HISTORY`, allowing the AI to seamlessly resolve pronouns and follow-up queries.\n\nFormatting the output correctly for the delivery channel is essential. WhatsApp supports basic markdown, but it looks terrible if overused. We instruct the LLM to format prices cleanly using asterisks for bolding (e.g., *KES 2,500*) and to avoid outputting long, complex tables that break on narrow mobile screens. The reply must be optimized for readability at a glance.\n\nBeyond the text reply, we leverage the LLM for internal state management. We instruct the AI to output structured JSON alongside its message. This JSON payload might include fields like `ticketStatus: \"resolved\"` or `category: \"shipping\"`. This allows the AI to not only talk to the customer but simultaneously update the ticket's status in our backend database.\n\nFinally, we must design the prompt to handle multi-intent queries gracefully. If a customer asks, \"Where is my order and how do I return it?\", the AI must synthesize the retrieved tracking info and the return policy chunk into a single, cohesive response. Mastering this multi-turn, multi-intent prompt is what separates a basic chatbot from a true AI support agent.",
+              "keyLearnings": [
+                "Managing conversational memory to handle follow-up questions",
+                "Formatting complex policies into simple, readable WhatsApp replies",
+                "Instructing the LLM to output structured JSON for internal ticket tracking"
+              ],
+              "samplePrompt": "You are a customer support agent for a Nairobi electronics shop. Answer the customer using ONLY the context provided below.\n\nCONTEXT:\n{retrieved_chunks}\n\nCONVERSATION HISTORY:\n{history}\n\nRULES:\n- Keep answers under 3 sentences.\n- Use KES for all prices.\n- If the answer is not in the context, say: 'I don't have that information, let me connect you to a human agent.'",
+              "testCase": {
+                "input": "My order arrived damaged. What is your return policy?",
+                "expectedOutput": "Pole sana for the damaged order. Our policy allows returns within 7 days of delivery for defective items. Please share a photo of the damage and we will process a replacement or a full refund via M-Pesa."
+              },
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Without history, the second message makes no sense on its own.",
+                  "chat": [
+                    {
+                      "sender": "customer",
+                      "text": "I bought a blender."
+                    },
+                    {
+                      "sender": "customer",
+                      "text": "Where is it?"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "Your blender order (KES 4,500) shipped yesterday and should arrive by Thursday."
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer asks 'Where is my order and how do I return it?' in one message. What should the prompt be designed to do?",
+                "options": [
+                  {
+                    "text": "Answer only the first question and wait for them to ask the second separately",
+                    "feedback": "That forces the customer to repeat themselves - the prompt should handle both intents in one reply.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Synthesize both the tracking info and the return policy chunk into a single, cohesive reply",
+                    "feedback": "Right. Mastering this multi-intent synthesis is what separates a real support agent from a basic chatbot.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Pick whichever question seems more urgent and ignore the other",
+                    "feedback": "Dropping half the customer's question is exactly the kind of gap that pushes them to escalate out of frustration.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-7",
+            "number": "07",
+            "title": "Ticket Escalation & Human Handoff",
+            "subtitle": "Knowing when to step back for a human manager",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Flow Design",
+            "summary": "Design the fail-safes that automatically pause the AI and alert a human team member when a complex or sensitive issue arises.",
+            "isGated": true,
+            "content": {
+              "overview": "AI shouldn't handle everything. When the agent detects negative sentiment, an SLA breach, or an unanswerable question, it must gracefully hand off the conversation. We'll build the logic to pause the bot's auto-replies and notify a human manager via an internal alert.",
+              "lessonBody": "AI should never handle everything. The hallmark of a well-designed automation system is knowing exactly when to stop. When the agent detects severe negative sentiment, breaches an SLA timer, or faces a question completely absent from its knowledge base, it must gracefully step back and execute a human handoff.\n\nWe implement this fail-safe using a state machine within our database. Every customer conversation has a flag, typically `ai_paused: false`. When our escalation logic triggers—for example, if the AI fails to resolve the issue after two attempts—we toggle this flag to `true`. Once paused, our webhook will safely ignore future messages from this user, preventing the bot from frustrating the customer with repeated \"I don't know\" responses.\n\nOnce the AI is paused, the system must immediately alert the human support team. We build internal notification triggers that ping a dedicated Slack channel, send an email, or even dispatch an automated internal WhatsApp message to the manager on duty. The alert includes the ticket ID, a summary of the issue, and the customer's contact info for rapid response.\n\nManaging the customer's expectations during this handoff is critical. The AI's final action before pausing must be a polite, transparent message acknowledging the escalation. A response like, \"I'm connecting you to our support manager, who will review this and assist you shortly,\" reassures the customer that they aren't stuck in an endless bot loop.\n\nFinally, we build the recovery mechanism. Once the human manager logs in, resolves the complex issue, and closes the ticket, they click a button in the dashboard that toggles `ai_paused` back to `false`. The AI resumes monitoring the channel, ready to handle the next routine query, keeping the human in control at all times.",
+              "keyLearnings": [
+                "Implementing an 'AI paused' state in the conversation database",
+                "Triggering internal notifications for human intervention",
+                "Writing a polite handoff message to manage the customer's expectations"
+              ],
+              "codeSnippet": "function checkEscalation(sentimentScore, failureCount) {\n  if (sentimentScore < 0.3 || failureCount >= 2) {\n    db.updateTicket(ticketId, { status: 'escalated', ai_paused: true });\n    notifyHumanAgent(`URGENT: Ticket ${ticketId} requires manual review.`);\n    return \"I'm escalating this to our support manager who will assist you shortly.\";\n  }\n  return null;\n}",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Once paused, the bot goes quiet - on purpose.",
+                  "flow": [
+                    "AI fails to resolve after 2 attempts",
+                    "ai_paused flag flips to true",
+                    "Bot ignores further messages from this user",
+                    "Human manager notified"
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "Using the checkEscalation function from this lesson, a ticket has sentimentScore: 0.5 and failureCount: 2.",
+                "workedExample": "checkEscalation(0.2, 0) is called. Since sentimentScore (0.2) is less than 0.3, the condition is true, so the ticket gets escalated and paused even though failureCount is 0.",
+                "challenge": "Will checkEscalation(0.5, 2) escalate the ticket? Walk through which condition triggers it.",
+                "placeholder": "The ticket ___ escalate, because failureCount (2) meets the '>= 2' threshold, even though sentimentScore (0.5) is above the 0.3 cutoff.",
+                "solution": "The ticket WILL escalate, because failureCount (2) meets the '>= 2' threshold, even though sentimentScore (0.5) is above the 0.3 cutoff.",
+                "explanation": "The condition uses OR (||), not AND - either a low sentiment score OR two failed attempts is enough on its own. A calm-sounding customer can still get escalated if the AI has already failed twice."
+              }
+            }
+          },
+          {
+            "id": "sup-step-8",
+            "number": "08",
+            "title": "SLA Tracking Logic",
+            "subtitle": "Monitoring response and resolution times",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Logic Rules",
+            "summary": "Build background trackers that ensure no customer waits longer than the business's promised service level agreement.",
+            "isGated": true,
+            "content": {
+              "overview": "Timely responses define good customer service. In this lesson, we implement timers that track how long a ticket has been open or waiting on a human. If a ticket approaches its SLA limit, the system escalates its priority automatically.",
+              "lessonBody": "Timely responses are the foundation of good customer service, and in enterprise environments, this is governed by Service Level Agreements (SLAs). An SLA is a promise—for example, guaranteeing that all WhatsApp messages will be addressed within 30 minutes. In this lesson, we build the automated trackers that enforce these promises behind the scenes.\n\nWe implement this tracking using background cron jobs or task queues, such as Redis with BullMQ. These background processes constantly monitor the database for open tickets that are waiting on a human. If a ticket was escalated but hasn't been touched in 25 minutes, the timer detects it is approaching the 30-minute SLA threshold.\n\nA crucial complication is calculating elapsed time against business hours. If a customer messages at 11:00 PM, the SLA timer shouldn't expire at 11:30 PM if the shop is closed. We must write logic that pauses the SLA clock outside of the designated operating hours (e.g., 6 PM to 8 AM EAT), ensuring the support team isn't bombarded with false breach alerts overnight.\n\nWhen a ticket does approach its limit, we implement progressive escalation steps. A warning might trigger at the 75% mark (e.g., 45 minutes into a 1-hour SLA), sending a soft notification to the team. If the timer fully breaches, a critical alert is sent directly to the business owner, ensuring that dropped tickets are visible at the highest level.\n\nSimultaneously, the background job dynamically updates the ticket's priority in the database. An aging `P3_Normal` ticket automatically gets bumped to `P1_Urgent` as its wait time increases. This ensures that the human team's dashboard naturally bubbles the longest-waiting customers to the top, preventing anyone from slipping through the cracks.",
+              "keyLearnings": [
+                "Calculating elapsed time during business hours only",
+                "Setting threshold triggers for 1-hour and 4-hour SLA warnings",
+                "Updating ticket priority tags dynamically based on wait time"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The SLA clock only runs during business hours.",
+                  "compare": [
+                    {
+                      "label": "Message at 11 PM (shop closed)",
+                      "text": "SLA clock paused until 8 AM",
+                      "good": true
+                    },
+                    {
+                      "label": "Naive timer",
+                      "text": "Clock keeps running, breaches by midnight",
+                      "good": false
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer messages at 11:00 PM, and the shop's hours are 8 AM - 6 PM EAT. If the SLA is 30 minutes, when should the timer actually breach?",
+                "options": [
+                  {
+                    "text": "11:30 PM, exactly 30 minutes after the message",
+                    "feedback": "That ignores business hours entirely - a naive timer like this would fire false alerts every night.",
+                    "correct": false
+                  },
+                  {
+                    "text": "8:30 AM the next day, 30 minutes after the shop reopens",
+                    "feedback": "Right. The clock pauses outside business hours and resumes counting when the shop opens.",
+                    "correct": true
+                  },
+                  {
+                    "text": "It never breaches since the message came in outside business hours",
+                    "feedback": "The ticket still needs a response once the shop opens - the clock pauses overnight, it does not disappear.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-9",
+            "number": "09",
+            "title": "Integrating with Ticketing Systems",
+            "subtitle": "Syncing with Zendesk or Freshdesk",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Backend Dev",
+            "summary": "Connect your custom agent to standard helpdesk software using REST APIs to keep all customer records unified.",
+            "isGated": true,
+            "content": {
+              "overview": "Many businesses already use tools like Zendesk or Freshdesk. Instead of replacing them, we'll configure our AI agent to act as the first line of defense, creating structured tickets via API and only leaving them open if a human needs to step in.",
+              "lessonBody": "Many established SMEs already use dedicated helpdesk software like Zendesk, Freshdesk, or HubSpot to manage their support. Instead of forcing them to abandon these expensive tools for our custom dashboard, we will configure our AI agent to act as the automated first line of defense, seamlessly syncing its actions into their existing systems via REST APIs.\n\nWe begin by authenticating our custom Node.js/Python backend with the helpdesk's API using secure OAuth tokens or API keys. Every time a new WhatsApp message arrives, our system makes a POST request to the helpdesk's `/tickets` endpoint. We map our internal data—like `user_name`, `phone_number`, and the detected `issue`—into the exact payload schema required by Zendesk or Freshdesk.\n\nThe power of this integration is the two-way sync. If the AI fully resolves the customer's question using the knowledge base, it updates the external ticket status to 'Closed' automatically, saving the human team from manual cleanup. If the AI escalates the issue, it leaves the ticket 'Open' and sets the priority flag to high, queuing it perfectly for the human agents.\n\nWe also format how the AI's conversation history appears in the helpdesk. Instead of creating a messy chain of emails, we package the AI's back-and-forth with the customer and push it as an 'Internal Note' or private comment. This gives the human agent the complete context of what the bot already tried, without cluttering the public-facing ticket thread.\n\nManaging external API rate limits and network failures is essential. We implement retry logic and error handling so that if Zendesk's API temporarily goes down, our database queues the ticket creation and retries it later. This ensures our AI agent remains fast and responsive to the customer on WhatsApp, regardless of the external helpdesk's uptime.",
+              "keyLearnings": [
+                "Authenticating with helpdesk REST APIs using secure tokens",
+                "Mapping our internal ticket schema to Zendesk/Freshdesk fields",
+                "Updating external ticket statuses when the AI resolves an issue automatically"
+              ],
+              "codeSnippet": "async function createZendeskTicket(user, issue, priority) {\n  const payload = {\n    ticket: {\n      requester: { name: user.name, email: user.email },\n      subject: 'WhatsApp Support Query',\n      comment: { body: issue },\n      priority: priority\n    }\n  };\n  return await axios.post('https://yourdomain.zendesk.com/api/v2/tickets', payload, { headers });\n}",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The AI closes what it resolves, and leaves the rest open for a human.",
+                  "flow": [
+                    "AI fully resolves the question via knowledge base",
+                    "Ticket status pushed to Zendesk as Closed",
+                    "AI cannot answer confidently",
+                    "Ticket stays Open, priority set high"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "The AI successfully answers a customer's delivery-fee question using the knowledge base. What should happen to the corresponding Zendesk ticket?",
+                "options": [
+                  {
+                    "text": "Leave it open so a human can double-check the AI's answer",
+                    "feedback": "That defeats the point of automation - a confidently-resolved, source-grounded answer does not need a review queue.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Automatically update its status to Closed",
+                    "feedback": "Right. This is exactly the two-way sync that saves the human team from manual cleanup.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Delete the ticket since it never needed a human",
+                    "feedback": "Deleting loses the record entirely - the business still wants that interaction logged, just marked resolved.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-10",
+            "number": "10",
+            "title": "Multi-channel Unification",
+            "subtitle": "Merging email and WhatsApp histories",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Integrations",
+            "summary": "Ensure that if a customer emails you on Monday and WhatsApps you on Tuesday, the AI sees the full unified history.",
+            "isGated": true,
+            "content": {
+              "overview": "Fragmented support frustrates customers. We will build a contact resolution function that links a user's phone number to their email address in the database, allowing the AI to reference past emails when answering a WhatsApp query.",
+              "lessonBody": "Fragmented support histories frustrate customers immensely. If a client emails an invoice query on Monday and follows up via WhatsApp on Tuesday, they expect the business to know who they are. In this lesson, we build a multi-channel unification engine that stitches these disjointed interactions into a single, cohesive identity.\n\nThe core challenge is database normalization. We must create a robust contact resolution function that ties a WhatsApp phone number (e.g., `+254...`) and an email address to a single, unified `customerId`. When a message arrives, the system queries the database to see if this identifier already exists; if not, it creates a new master profile, linking future channels to it.\n\nOnce the identity is unified, we can stitch the interaction history together. When preparing the `CONVERSATION HISTORY` for the LLM prompt, we query both the email logs and the WhatsApp message tables for that specific `customerId`, ordering all interactions chronologically by timestamp. This creates a seamless timeline of the customer's relationship with the business.\n\nWe then inject this multi-channel context directly into the AI's prompt. When the AI processes the Tuesday WhatsApp message asking, \"Did you get my document?\", it can successfully reference the Monday email record and reply, \"Yes, we received your invoice email yesterday and it's being processed.\" This level of context awareness feels like magic to the end user.\n\nFinally, we must account for edge cases in identity resolution. For example, what happens if a receptionist uses a shared company WhatsApp number, but employees use individual emails? We write logic to handle shared identifiers gracefully, ensuring we don't accidentally leak private ticket histories to the wrong employee under a shared corporate account.",
+              "keyLearnings": [
+                "Normalizing phone numbers and email addresses for database lookups",
+                "Querying cross-channel interaction histories",
+                "Injecting multi-channel context into the LLM prompt"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "One customerId, two channels, one timeline.",
+                  "chat": [
+                    {
+                      "sender": "customer",
+                      "text": "(Monday, email) Attached is my invoice, please confirm."
+                    },
+                    {
+                      "sender": "customer",
+                      "text": "(Tuesday, WhatsApp) Did you get my document?"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "Yes, we received your invoice email yesterday and it's being processed."
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer emails on Monday from jane@gmail.com and WhatsApps on Tuesday from +254712345678. How does the system know these are the same person?",
+                "options": [
+                  {
+                    "text": "It does not - each channel is tracked completely separately",
+                    "feedback": "That is exactly the fragmented experience this lesson is fixing - the whole point is linking them.",
+                    "correct": false
+                  },
+                  {
+                    "text": "A contact resolution function links both identifiers to one shared customerId",
+                    "feedback": "Right. That unified customerId is what lets the AI reference the Monday email while replying on WhatsApp.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The customer has to type their email address into WhatsApp to confirm it is them",
+                    "feedback": "That adds friction for the customer - real systems resolve identity in the background.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-11",
+            "number": "11",
+            "title": "Support Analytics Dashboard",
+            "subtitle": "Giving the owner visibility into common complaints",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Reporting",
+            "summary": "Aggregate ticket tags to build a simple view showing the business owner the most frequent support issues.",
+            "isGated": true,
+            "content": {
+              "overview": "Support data is a goldmine for business improvement. If a significant percentage of tickets are about delayed deliveries, the owner needs to know. We'll write an aggregation script that counts ticket categories over the last 30 days and outputs a clear summary report.",
+              "lessonBody": "Customer support data is a goldmine for operational improvement. If 40% of a week's tickets are complaints about delayed deliveries, the business owner doesn't just have a support problem—they have a logistics problem. In this lesson, we aggregate our ticket tags and sentiment scores to build a simple, high-visibility analytics dashboard for the owner.\n\nWe start by writing SQL aggregation queries against our unified database. We extract key metrics: `SELECT category, COUNT(*) GROUP BY category` over a rolling 30-day window, calculate average SLA resolution times, and tally the ratio of AI-resolved tickets versus human-escalated tickets. These queries distill thousands of messages into a few critical data points.\n\nThe goal is to identify actionable trends. By cross-referencing category tags with sentiment scores, we can highlight not just what people ask about most, but what makes them angriest. A spike in the \"missing delivery\" category paired with high negative sentiment flags an immediate operational bottleneck that the owner needs to address outside the support queue.\n\nRather than building a complex web frontend that the owner might forget to check, we push the insights directly to them. We build a script that formats these metrics into a clean, automated summary payload (JSON). This payload is then rendered into a readable weekly report and sent to the owner every Friday afternoon via an automated email or a direct WhatsApp summary message.\n\nThis reporting layer is crucial for your portfolio. It shifts the AI agent from being just a 'cool chatbot' to a strategic business tool. Showing a potential client how the system tracks SLA performance and categorizes customer pain points directly justifies the cost of the automation, proving the system's ROI in hard numbers.",
+              "keyLearnings": [
+                "Querying the database for category frequencies and SLA breaches",
+                "Generating a daily or weekly summary payload",
+                "Sending the analytics report to the owner via automated email or WhatsApp"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Support data becomes a weekly business signal, not just a ticket log.",
+                  "flow": [
+                    "Aggregate ticket categories over 30 days",
+                    "Cross-reference with sentiment scores",
+                    "Spot a spike + negative sentiment together",
+                    "Flag it as an operational bottleneck, not just a support issue"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "40% of this week's tickets are 'delayed delivery' complaints with strongly negative sentiment. What does this data actually tell the business owner?",
+                "options": [
+                  {
+                    "text": "The support team needs to reply faster to delivery complaints",
+                    "feedback": "That treats the symptom - if 40% of tickets are about the same issue, replying faster does not fix why it keeps happening.",
+                    "correct": false
+                  },
+                  {
+                    "text": "There is likely an underlying logistics problem, not just a support problem",
+                    "feedback": "Right. This is exactly the kind of operational signal the dashboard is meant to surface.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Nothing actionable - support tickets are too noisy to draw conclusions from",
+                    "feedback": "A 40% concentration on one category with negative sentiment is a strong, specific signal, not noise.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "sup-step-12",
+            "number": "12",
+            "title": "Deploying the Support Engine",
+            "subtitle": "Going live with a verified business portfolio",
+            "status": "locked",
+            "duration": "60 min",
+            "category": "Deployment",
+            "summary": "Connect your unified support agent to a real business's knowledge base and WhatsApp number, delivering a live, verified portfolio piece.",
+            "isGated": true,
+            "content": {
+              "overview": "This is where you prove you can build. You will deploy the fully configured AI support agent for a real client, ingesting their actual FAQs and handling live inquiries. Your final deliverable is a live link, a video demo of the escalation flow, and a verified quote from the business owner.",
+              "lessonBody": "This final step is where you prove you can build. It is time to move your unified support agent out of local development and deploy it into a production environment. You will host your webhook, database, and background workers on reliable cloud infrastructure like Render, Heroku, or AWS, ensuring the system stays online 24/7 to handle live inquiries.\n\nDeployment requires carefully managing production credentials. You will set up the permanent Meta Graph API webhook, verify your payload URL, and switch your environment variables to use live, production API keys for OpenAI, Zendesk, and your vector database. Security is paramount; you must ensure no API keys are hardcoded in your deployed repository.\n\nOnce live, you will conduct rigorous testing using a real business's knowledge base. You will ingest their actual FAQs and policies, and have the business owner try to break the bot with real-world edge cases. This testing phase verifies that your retrieval logic holds up under pressure, and that the human handoff triggers exactly when the SLA or sentiment thresholds are breached.\n\nYou must also ensure the human support team knows how to operate alongside the AI. You will run a brief training session demonstrating how to read the internal dashboard, how to un-pause the AI after resolving a complex ticket, and how to interpret the weekly analytics report. The system is only as good as the team's ability to use it.\n\nYour final deliverable is a Verified Portfolio piece. You will capture a live link to the WhatsApp bot, record a short video demo showcasing the seamless escalation flow from AI to a human Zendesk ticket, and secure a verified quote from the client about the time saved. This tangible proof of capability is the ultimate goal of the course.",
+              "keyLearnings": [
+                "Deploying the webhook and vector store to a production server",
+                "Conducting live tests on knowledge retrieval and human handoff limits",
+                "Securing the final verification from the client to complete your portfolio"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Moving from local development to production changes what is live.",
+                  "flow": [
+                    "Host webhook + database on production infrastructure",
+                    "Switch to live API keys, verify webhook URL",
+                    "Ingest the real client's actual FAQs and policies",
+                    "Business owner tries to break the bot with real edge cases"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Before deploying, why is it important to double-check that no API keys are hardcoded in the repository?",
+                "options": [
+                  {
+                    "text": "It makes the code run faster in production",
+                    "feedback": "Hardcoded keys do not affect performance - the issue is security, not speed.",
+                    "correct": false
+                  },
+                  {
+                    "text": "A hardcoded key gets exposed if the repository is ever made public or shared, giving anyone access to your paid API accounts",
+                    "feedback": "Right. This is exactly the kind of credential leak that must be caught before going live.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Hardcoded keys are only a problem if the business asks about it",
+                    "feedback": "This is a security risk regardless of whether anyone asks - fix it before deployment, not reactively.",
+                    "correct": false
+                  }
+                ]
+              }
             }
           }
-        },
-        {
-          "id": "sup-step-7",
-          "number": "07",
-          "title": "Ticket Escalation & Human Handoff",
-          "subtitle": "Knowing when to step back for a human manager",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Flow Design",
-          "summary": "Design the fail-safes that automatically pause the AI and alert a human team member when a complex or sensitive issue arises.",
-          "isGated": true,
-          "content": {
-            "overview": "AI shouldn't handle everything. When the agent detects negative sentiment, an SLA breach, or an unanswerable question, it must gracefully hand off the conversation. We'll build the logic to pause the bot's auto-replies and notify a human manager via an internal alert.",
-            "lessonBody": "AI should never handle everything. The hallmark of a well-designed automation system is knowing exactly when to stop. When the agent detects severe negative sentiment, breaches an SLA timer, or faces a question completely absent from its knowledge base, it must gracefully step back and execute a human handoff.\n\nWe implement this fail-safe using a state machine within our database. Every customer conversation has a flag, typically `ai_paused: false`. When our escalation logic triggers—for example, if the AI fails to resolve the issue after two attempts—we toggle this flag to `true`. Once paused, our webhook will safely ignore future messages from this user, preventing the bot from frustrating the customer with repeated \"I don't know\" responses.\n\nOnce the AI is paused, the system must immediately alert the human support team. We build internal notification triggers that ping a dedicated Slack channel, send an email, or even dispatch an automated internal WhatsApp message to the manager on duty. The alert includes the ticket ID, a summary of the issue, and the customer's contact info for rapid response.\n\nManaging the customer's expectations during this handoff is critical. The AI's final action before pausing must be a polite, transparent message acknowledging the escalation. A response like, \"I'm connecting you to our support manager, who will review this and assist you shortly,\" reassures the customer that they aren't stuck in an endless bot loop.\n\nFinally, we build the recovery mechanism. Once the human manager logs in, resolves the complex issue, and closes the ticket, they click a button in the dashboard that toggles `ai_paused` back to `false`. The AI resumes monitoring the channel, ready to handle the next routine query, keeping the human in control at all times.",
-            "keyLearnings": [
-              "Implementing an 'AI paused' state in the conversation database",
-              "Triggering internal notifications for human intervention",
-              "Writing a polite handoff message to manage the customer's expectations"
-            ],
-            "codeSnippet": "function checkEscalation(sentimentScore, failureCount) {\n  if (sentimentScore < 0.3 || failureCount >= 2) {\n    db.updateTicket(ticketId, { status: 'escalated', ai_paused: true });\n    notifyHumanAgent(`URGENT: Ticket ${ticketId} requires manual review.`);\n    return \"I'm escalating this to our support manager who will assist you shortly.\";\n  }\n  return null;\n}"
-          }
-        },
-        {
-          "id": "sup-step-8",
-          "number": "08",
-          "title": "SLA Tracking Logic",
-          "subtitle": "Monitoring response and resolution times",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Logic Rules",
-          "summary": "Build background trackers that ensure no customer waits longer than the business's promised service level agreement.",
-          "isGated": true,
-          "content": {
-            "overview": "Timely responses define good customer service. In this lesson, we implement timers that track how long a ticket has been open or waiting on a human. If a ticket approaches its SLA limit, the system escalates its priority automatically.",
-            "lessonBody": "Timely responses are the foundation of good customer service, and in enterprise environments, this is governed by Service Level Agreements (SLAs). An SLA is a promise—for example, guaranteeing that all WhatsApp messages will be addressed within 30 minutes. In this lesson, we build the automated trackers that enforce these promises behind the scenes.\n\nWe implement this tracking using background cron jobs or task queues, such as Redis with BullMQ. These background processes constantly monitor the database for open tickets that are waiting on a human. If a ticket was escalated but hasn't been touched in 25 minutes, the timer detects it is approaching the 30-minute SLA threshold.\n\nA crucial complication is calculating elapsed time against business hours. If a customer messages at 11:00 PM, the SLA timer shouldn't expire at 11:30 PM if the shop is closed. We must write logic that pauses the SLA clock outside of the designated operating hours (e.g., 6 PM to 8 AM EAT), ensuring the support team isn't bombarded with false breach alerts overnight.\n\nWhen a ticket does approach its limit, we implement progressive escalation steps. A warning might trigger at the 75% mark (e.g., 45 minutes into a 1-hour SLA), sending a soft notification to the team. If the timer fully breaches, a critical alert is sent directly to the business owner, ensuring that dropped tickets are visible at the highest level.\n\nSimultaneously, the background job dynamically updates the ticket's priority in the database. An aging `P3_Normal` ticket automatically gets bumped to `P1_Urgent` as its wait time increases. This ensures that the human team's dashboard naturally bubbles the longest-waiting customers to the top, preventing anyone from slipping through the cracks.",
-            "keyLearnings": [
-              "Calculating elapsed time during business hours only",
-              "Setting threshold triggers for 1-hour and 4-hour SLA warnings",
-              "Updating ticket priority tags dynamically based on wait time"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-9",
-          "number": "09",
-          "title": "Integrating with Ticketing Systems",
-          "subtitle": "Syncing with Zendesk or Freshdesk",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Backend Dev",
-          "summary": "Connect your custom agent to standard helpdesk software using REST APIs to keep all customer records unified.",
-          "isGated": true,
-          "content": {
-            "overview": "Many businesses already use tools like Zendesk or Freshdesk. Instead of replacing them, we'll configure our AI agent to act as the first line of defense, creating structured tickets via API and only leaving them open if a human needs to step in.",
-            "lessonBody": "Many established SMEs already use dedicated helpdesk software like Zendesk, Freshdesk, or HubSpot to manage their support. Instead of forcing them to abandon these expensive tools for our custom dashboard, we will configure our AI agent to act as the automated first line of defense, seamlessly syncing its actions into their existing systems via REST APIs.\n\nWe begin by authenticating our custom Node.js/Python backend with the helpdesk's API using secure OAuth tokens or API keys. Every time a new WhatsApp message arrives, our system makes a POST request to the helpdesk's `/tickets` endpoint. We map our internal data—like `user_name`, `phone_number`, and the detected `issue`—into the exact payload schema required by Zendesk or Freshdesk.\n\nThe power of this integration is the two-way sync. If the AI fully resolves the customer's question using the knowledge base, it updates the external ticket status to 'Closed' automatically, saving the human team from manual cleanup. If the AI escalates the issue, it leaves the ticket 'Open' and sets the priority flag to high, queuing it perfectly for the human agents.\n\nWe also format how the AI's conversation history appears in the helpdesk. Instead of creating a messy chain of emails, we package the AI's back-and-forth with the customer and push it as an 'Internal Note' or private comment. This gives the human agent the complete context of what the bot already tried, without cluttering the public-facing ticket thread.\n\nManaging external API rate limits and network failures is essential. We implement retry logic and error handling so that if Zendesk's API temporarily goes down, our database queues the ticket creation and retries it later. This ensures our AI agent remains fast and responsive to the customer on WhatsApp, regardless of the external helpdesk's uptime.",
-            "keyLearnings": [
-              "Authenticating with helpdesk REST APIs using secure tokens",
-              "Mapping our internal ticket schema to Zendesk/Freshdesk fields",
-              "Updating external ticket statuses when the AI resolves an issue automatically"
-            ],
-            "codeSnippet": "async function createZendeskTicket(user, issue, priority) {\n  const payload = {\n    ticket: {\n      requester: { name: user.name, email: user.email },\n      subject: 'WhatsApp Support Query',\n      comment: { body: issue },\n      priority: priority\n    }\n  };\n  return await axios.post('https://yourdomain.zendesk.com/api/v2/tickets', payload, { headers });\n}"
-          }
-        },
-        {
-          "id": "sup-step-10",
-          "number": "10",
-          "title": "Multi-channel Unification",
-          "subtitle": "Merging email and WhatsApp histories",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Integrations",
-          "summary": "Ensure that if a customer emails you on Monday and WhatsApps you on Tuesday, the AI sees the full unified history.",
-          "isGated": true,
-          "content": {
-            "overview": "Fragmented support frustrates customers. We will build a contact resolution function that links a user's phone number to their email address in the database, allowing the AI to reference past emails when answering a WhatsApp query.",
-            "lessonBody": "Fragmented support histories frustrate customers immensely. If a client emails an invoice query on Monday and follows up via WhatsApp on Tuesday, they expect the business to know who they are. In this lesson, we build a multi-channel unification engine that stitches these disjointed interactions into a single, cohesive identity.\n\nThe core challenge is database normalization. We must create a robust contact resolution function that ties a WhatsApp phone number (e.g., `+254...`) and an email address to a single, unified `customerId`. When a message arrives, the system queries the database to see if this identifier already exists; if not, it creates a new master profile, linking future channels to it.\n\nOnce the identity is unified, we can stitch the interaction history together. When preparing the `CONVERSATION HISTORY` for the LLM prompt, we query both the email logs and the WhatsApp message tables for that specific `customerId`, ordering all interactions chronologically by timestamp. This creates a seamless timeline of the customer's relationship with the business.\n\nWe then inject this multi-channel context directly into the AI's prompt. When the AI processes the Tuesday WhatsApp message asking, \"Did you get my document?\", it can successfully reference the Monday email record and reply, \"Yes, we received your invoice email yesterday and it's being processed.\" This level of context awareness feels like magic to the end user.\n\nFinally, we must account for edge cases in identity resolution. For example, what happens if a receptionist uses a shared company WhatsApp number, but employees use individual emails? We write logic to handle shared identifiers gracefully, ensuring we don't accidentally leak private ticket histories to the wrong employee under a shared corporate account.",
-            "keyLearnings": [
-              "Normalizing phone numbers and email addresses for database lookups",
-              "Querying cross-channel interaction histories",
-              "Injecting multi-channel context into the LLM prompt"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-11",
-          "number": "11",
-          "title": "Support Analytics Dashboard",
-          "subtitle": "Giving the owner visibility into common complaints",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Reporting",
-          "summary": "Aggregate ticket tags to build a simple view showing the business owner the most frequent support issues.",
-          "isGated": true,
-          "content": {
-            "overview": "Support data is a goldmine for business improvement. If a significant percentage of tickets are about delayed deliveries, the owner needs to know. We'll write an aggregation script that counts ticket categories over the last 30 days and outputs a clear summary report.",
-            "lessonBody": "Customer support data is a goldmine for operational improvement. If 40% of a week's tickets are complaints about delayed deliveries, the business owner doesn't just have a support problem—they have a logistics problem. In this lesson, we aggregate our ticket tags and sentiment scores to build a simple, high-visibility analytics dashboard for the owner.\n\nWe start by writing SQL aggregation queries against our unified database. We extract key metrics: `SELECT category, COUNT(*) GROUP BY category` over a rolling 30-day window, calculate average SLA resolution times, and tally the ratio of AI-resolved tickets versus human-escalated tickets. These queries distill thousands of messages into a few critical data points.\n\nThe goal is to identify actionable trends. By cross-referencing category tags with sentiment scores, we can highlight not just what people ask about most, but what makes them angriest. A spike in the \"missing delivery\" category paired with high negative sentiment flags an immediate operational bottleneck that the owner needs to address outside the support queue.\n\nRather than building a complex web frontend that the owner might forget to check, we push the insights directly to them. We build a script that formats these metrics into a clean, automated summary payload (JSON). This payload is then rendered into a readable weekly report and sent to the owner every Friday afternoon via an automated email or a direct WhatsApp summary message.\n\nThis reporting layer is crucial for your portfolio. It shifts the AI agent from being just a 'cool chatbot' to a strategic business tool. Showing a potential client how the system tracks SLA performance and categorizes customer pain points directly justifies the cost of the automation, proving the system's ROI in hard numbers.",
-            "keyLearnings": [
-              "Querying the database for category frequencies and SLA breaches",
-              "Generating a daily or weekly summary payload",
-              "Sending the analytics report to the owner via automated email or WhatsApp"
-            ]
-          }
-        },
-        {
-          "id": "sup-step-12",
-          "number": "12",
-          "title": "Deploying the Support Engine",
-          "subtitle": "Going live with a verified business portfolio",
-          "status": "locked",
-          "duration": "60 min",
-          "category": "Deployment",
-          "summary": "Connect your unified support agent to a real business's knowledge base and WhatsApp number, delivering a live, verified portfolio piece.",
-          "isGated": true,
-          "content": {
-            "overview": "This is where you prove you can build. You will deploy the fully configured AI support agent for a real client, ingesting their actual FAQs and handling live inquiries. Your final deliverable is a live link, a video demo of the escalation flow, and a verified quote from the business owner.",
-            "lessonBody": "This final step is where you prove you can build. It is time to move your unified support agent out of local development and deploy it into a production environment. You will host your webhook, database, and background workers on reliable cloud infrastructure like Render, Heroku, or AWS, ensuring the system stays online 24/7 to handle live inquiries.\n\nDeployment requires carefully managing production credentials. You will set up the permanent Meta Graph API webhook, verify your payload URL, and switch your environment variables to use live, production API keys for OpenAI, Zendesk, and your vector database. Security is paramount; you must ensure no API keys are hardcoded in your deployed repository.\n\nOnce live, you will conduct rigorous testing using a real business's knowledge base. You will ingest their actual FAQs and policies, and have the business owner try to break the bot with real-world edge cases. This testing phase verifies that your retrieval logic holds up under pressure, and that the human handoff triggers exactly when the SLA or sentiment thresholds are breached.\n\nYou must also ensure the human support team knows how to operate alongside the AI. You will run a brief training session demonstrating how to read the internal dashboard, how to un-pause the AI after resolving a complex ticket, and how to interpret the weekly analytics report. The system is only as good as the team's ability to use it.\n\nYour final deliverable is a Verified Portfolio piece. You will capture a live link to the WhatsApp bot, record a short video demo showcasing the seamless escalation flow from AI to a human Zendesk ticket, and secure a verified quote from the client about the time saved. This tangible proof of capability is the ultimate goal of the course.",
-            "keyLearnings": [
-              "Deploying the webhook and vector store to a production server",
-              "Conducting live tests on knowledge retrieval and human handoff limits",
-              "Securing the final verification from the client to complete your portfolio"
-            ]
-          }
-        }
-      ]
+        ]
   },
   {
     id: 'booking-scheduler-agent',
