@@ -26,7 +26,6 @@ interface LessonPageProps {
   onEnterApp: () => void;
   onSelectCourse: (trackId: string) => void;
   onOpenVerifiedWork: () => void;
-  onOpenPricing: () => void;
   onOpenAbout: () => void;
   onOpenAuth: () => void;
   onBack: () => void;
@@ -50,7 +49,6 @@ export const LessonPage: React.FC<LessonPageProps> = ({
   onEnterApp,
   onSelectCourse,
   onOpenVerifiedWork,
-  onOpenPricing,
   onOpenAbout,
   onOpenAuth,
   onBack,
@@ -115,7 +113,6 @@ export const LessonPage: React.FC<LessonPageProps> = ({
         onEnterApp={onEnterApp}
         onSelectCourse={onSelectCourse}
         onOpenVerifiedWork={onOpenVerifiedWork}
-        onOpenPricing={onOpenPricing}
         onOpenAbout={onOpenAbout}
         onOpenAuth={onOpenAuth}
       />

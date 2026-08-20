@@ -12,7 +12,6 @@ import { PortfolioStatus } from './components/PortfolioStatus';
 import { BuildWorkspaceCard } from './components/BuildWorkspaceCard';
 import { LessonDetailModal } from './components/LessonDetailModal';
 import { LessonPage } from './components/LessonPage';
-import { PricingModal } from './components/PricingModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { AuthModal } from './components/AuthModal';
 import { VerifiedPortfolioModal } from './components/VerifiedPortfolioModal';
@@ -182,12 +181,9 @@ export default function App() {
 
   // Modals
   const [selectedStep, setSelectedStep] = useState<Step | null>(null);
-  const [isPricingOpen, setIsPricingOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
-  const [showUpgradeToast, setShowUpgradeToast] = useState(false);
   const [isTrackCheckoutOpen, setIsTrackCheckoutOpen] = useState(false);
 
   // Per-system one-time purchase, stubbed client-side for now: this array should
@@ -200,7 +196,6 @@ export default function App() {
   };
 
   const activeTrack = tracks.find(t => t.id === selectedTrackId) || tracks[0];
-  const isProUser = user.plan === 'pro';
 
   // "Start Building" always resumes at the first lesson that isn't done yet, or lesson 1
   // if nothing's been started.
@@ -264,26 +259,6 @@ export default function App() {
     }
   };
 
-  const handleUpgradeSuccess = () => {
-    setUser(prev => ({
-      ...prev,
-      plan: 'pro',
-      role: 'Pro Member'
-    }));
-
-    // Unlock all steps on active track
-    setTracks(prevTracks => prevTracks.map(track => ({
-      ...track,
-      steps: track.steps.map(s => ({
-        ...s,
-        status: s.status === 'locked' ? 'current' : s.status
-      }))
-    })));
-
-    setShowUpgradeToast(true);
-    setTimeout(() => setShowUpgradeToast(false), 5000);
-  };
-
   if (viewMode === 'lesson') {
     const lessonTrack = tracks.find(t => t.id === routeTrackId) || activeTrack;
     const lessonStep = lessonTrack.steps.find(s => s.id === routeStepId);
@@ -308,7 +283,6 @@ export default function App() {
           onEnterApp={() => navigate('/systems')}
           onSelectCourse={(id) => navigate(`/systems/${id}`)}
           onOpenVerifiedWork={() => navigate('/verified')}
-          onOpenPricing={() => setIsPricingOpen(true)}
           onOpenAbout={() => navigate('/about')}
           onOpenAuth={() => setIsAuthOpen(true)}
           onBack={() => navigate(`/systems/${lessonTrack.id}/learn`)}
@@ -356,7 +330,6 @@ export default function App() {
         onEnterApp={() => navigate('/systems')}
         onSelectCourse={(id) => navigate(`/systems/${id}`)}
         onOpenVerifiedWork={() => navigate('/verified')}
-        onOpenPricing={() => setIsPricingOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
       />
     );
@@ -383,7 +356,6 @@ export default function App() {
         onGoHome={() => navigate('/')}
         onEnterApp={() => navigate('/systems')}
         onSelectCourse={(id) => navigate(`/systems/${id}`)}
-        onOpenPricing={() => setIsPricingOpen(true)}
         onOpenAbout={() => navigate('/about')}
         onOpenAuth={() => setIsAuthOpen(true)}
       />
@@ -407,7 +379,6 @@ export default function App() {
           onEnterApp={() => navigate('/systems')}
           onSelectCourse={(id) => navigate(`/systems/${id}`)}
           onOpenVerifiedWork={() => navigate('/verified')}
-          onOpenPricing={() => setIsPricingOpen(true)}
           onOpenAbout={() => navigate('/about')}
           onOpenAuth={() => setIsAuthOpen(true)}
         />
@@ -428,22 +399,6 @@ export default function App() {
         />
 
         {/* Global Modals on Landing Page */}
-        <PricingModal
-          isOpen={isPricingOpen}
-          onClose={() => setIsPricingOpen(false)}
-          onOpenCheckout={() => {
-            setIsPricingOpen(false);
-            setIsCheckoutOpen(true);
-          }}
-          isProUser={isProUser}
-        />
-
-        <CheckoutModal
-          isOpen={isCheckoutOpen}
-          onClose={() => setIsCheckoutOpen(false)}
-          onSuccess={handleUpgradeSuccess}
-        />
-
         <AuthModal
           isOpen={isAuthOpen}
           onClose={() => setIsAuthOpen(false)}
@@ -475,22 +430,6 @@ export default function App() {
       className="flex flex-col min-h-screen w-full overflow-x-hidden bg-[#F0EEF6] text-[#12102A]"
       style={{ fontFamily: "'Satoshi', sans-serif" }}
     >
-      {/* Upgrade Toast Notification */}
-      {showUpgradeToast && (
-        <div className="bg-[#10B981] text-white px-6 py-2.5 text-xs font-bold font-mono flex items-center justify-between shadow-md sticky top-0 z-50 animate-in slide-in-from-top duration-300">
-          <div className="flex items-center gap-2">
-            <Check className="w-4 h-4" />
-            <span>Afridemy Pro is now Active! All 12 production steps & Safaricom Daraja webhooks unlocked.</span>
-          </div>
-          <button 
-            onClick={() => setShowUpgradeToast(false)}
-            className="text-white/80 hover:text-white underline cursor-pointer"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
       {/* Top Header Navigation */}
       <Header
         tracks={tracks}
@@ -505,7 +444,6 @@ export default function App() {
         onEnterApp={() => navigate('/systems')}
         onSelectCourse={(id) => navigate(`/systems/${id}`)}
         onOpenVerifiedWork={() => navigate('/verified')}
-        onOpenPricing={() => setIsPricingOpen(true)}
         onOpenAbout={() => navigate('/about')}
         onOpenAuth={() => setIsAuthOpen(true)}
       />
@@ -630,22 +568,6 @@ export default function App() {
         isUnlocked={isTrackUnlocked(activeTrack.id)}
         trackTitle={activeTrack.title}
         trackPrice={activeTrack.price}
-      />
-
-      <PricingModal
-        isOpen={isPricingOpen}
-        onClose={() => setIsPricingOpen(false)}
-        onOpenCheckout={() => {
-          setIsPricingOpen(false);
-          setIsCheckoutOpen(true);
-        }}
-        isProUser={isProUser}
-      />
-
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        onSuccess={handleUpgradeSuccess}
       />
 
       <CheckoutModal

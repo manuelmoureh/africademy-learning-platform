@@ -21,7 +21,6 @@ interface AboutPageProps {
   onEnterApp: () => void;
   onSelectCourse: (trackId: string) => void;
   onOpenVerifiedWork: () => void;
-  onOpenPricing: () => void;
   onOpenAuth: () => void;
 }
 
@@ -37,7 +36,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({
   onEnterApp,
   onSelectCourse,
   onOpenVerifiedWork,
-  onOpenPricing,
   onOpenAuth,
 }) => (
   <div className="min-h-screen bg-[#F0EEF6] text-[#12102A]">
@@ -54,7 +52,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({
       onEnterApp={onEnterApp}
       onSelectCourse={onSelectCourse}
       onOpenVerifiedWork={onOpenVerifiedWork}
-      onOpenPricing={onOpenPricing}
       onOpenAbout={() => {}}
       onOpenAuth={onOpenAuth}
     />

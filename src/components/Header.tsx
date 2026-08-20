@@ -27,7 +27,6 @@ interface HeaderProps {
   onEnterApp: () => void;
   onSelectCourse: (trackId: string) => void;
   onOpenVerifiedWork: () => void;
-  onOpenPricing: () => void;
   onOpenAbout: () => void;
   onOpenAuth: () => void;
 }
@@ -45,7 +44,6 @@ export const Header: React.FC<HeaderProps> = ({
   onEnterApp,
   onSelectCourse,
   onOpenVerifiedWork,
-  onOpenPricing,
   onOpenAbout,
   onOpenAuth,
 }) => {
@@ -162,16 +160,6 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           ) : isAuthenticated ? (
             <>
-              <button
-                onClick={onOpenPricing}
-                className={`hidden md:block px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer active:scale-[0.97] ${
-                  user.plan === 'pro'
-                    ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30'
-                    : 'bg-[#12102A] text-white hover:bg-[#1c1940]'
-                }`}
-              >
-                {user.plan === 'pro' ? 'Pro Active' : 'Upgrade'}
-              </button>
               <button
                 type="button"
                 onClick={onOpenAuth}

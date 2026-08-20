@@ -27,7 +27,6 @@ interface VerifiedWorkPageProps {
   onGoHome: () => void;
   onEnterApp: () => void;
   onSelectCourse: (trackId: string) => void;
-  onOpenPricing: () => void;
   onOpenAbout: () => void;
   onOpenAuth: () => void;
 }
@@ -43,7 +42,6 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({
   onGoHome,
   onEnterApp,
   onSelectCourse,
-  onOpenPricing,
   onOpenAbout,
   onOpenAuth,
 }) => {
@@ -64,7 +62,6 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({
         onEnterApp={onEnterApp}
         onSelectCourse={onSelectCourse}
         onOpenVerifiedWork={() => {}}
-        onOpenPricing={onOpenPricing}
         onOpenAbout={onOpenAbout}
         onOpenAuth={onOpenAuth}
       />
