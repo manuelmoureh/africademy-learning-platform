@@ -5721,259 +5721,657 @@ export const INITIAL_TRACKS: Track[] = [
     whoBuysThis: 'Restaurants, cafes, and food vendors',
     impactStat: 'Direct WhatsApp ordering can save up to 30% in margin lost to delivery apps',
     steps: [
-        {
-          "id": "food-step-1",
-          "number": "01",
-          "title": "Introduction & Menu Data Architecture",
-          "subtitle": "Structuring restaurant offerings for AI context",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Architecture",
-          "summary": "Learn how to structure a restaurant menu into a clean, LLM-readable format, converting complex PDFs into parseable JSON.",
-          "isGated": false,
-          "content": {
-            "overview": "Learn how to structure a restaurant menu into a clean, LLM-readable format. We cover converting complex PDF menus into JSON structures that the AI can easily parse for items, prices in KES, and available modifications.",
-            "keyLearnings": [
-              "Structuring menu categories, SKUs, and pricing",
-              "Handling dietary tags and customization options",
-              "Optimizing data payload size for context windows"
-            ],
-            "lessonBody": "Before an AI agent can take a food order, it must understand what is actually on the menu. Most restaurants in Nairobi currently manage their menus as PDFs, Canva images, or simple text lists shared via WhatsApp. While humans can read these easily, feeding raw, unstructured images directly into a Large Language Model for every customer interaction introduces high latency, burns through token limits, and often leads to hallucinations regarding prices or availability.\n\nTo build a reliable system, you must first translate the restaurant's offerings into a structured JSON architecture. This acts as the unshakeable \"ground truth\" for the AI. You will break down the menu into logical categories (e.g., Mains, Sides, Drinks), individual SKUs, and exact prices in Kenyan Shillings (KES).\n\nEqually important is structuring the allowed modifications. A customer ordering a burger might ask for \"no onions\" or \"extra cheese.\" If these dietary tags and customization options are not explicitly defined in the data structure, the bot might accept a modification the kitchen cannot fulfill, or fail to charge for a premium add-on.\n\nFinally, you must optimize this data payload. A massive JSON file for a 200-item menu can overwhelm the LLM's context window. You will learn techniques to compress this data—sending only the relevant menu sections to the active prompt or using retrieval-augmented generation (RAG) to ensure the bot responds quickly and accurately without context bloat."
+          {
+            "id": "food-step-1",
+            "number": "01",
+            "title": "Introduction & Menu Data Architecture",
+            "subtitle": "Structuring restaurant offerings for AI context",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Architecture",
+            "summary": "Learn how to structure a restaurant menu into a clean, LLM-readable format, converting complex PDFs into parseable JSON.",
+            "isGated": false,
+            "content": {
+              "overview": "Learn how to structure a restaurant menu into a clean, LLM-readable format. We cover converting complex PDF menus into JSON structures that the AI can easily parse for items, prices in KES, and available modifications.",
+              "keyLearnings": [
+                "Structuring menu categories, SKUs, and pricing",
+                "Handling dietary tags and customization options",
+                "Optimizing data payload size for context windows"
+              ],
+              "lessonBody": "Before an AI agent can take a food order, it must understand what is actually on the menu. Most restaurants in Nairobi currently manage their menus as PDFs, Canva images, or simple text lists shared via WhatsApp. While humans can read these easily, feeding raw, unstructured images directly into a Large Language Model for every customer interaction introduces high latency, burns through token limits, and often leads to hallucinations regarding prices or availability.\n\nTo build a reliable system, you must first translate the restaurant's offerings into a structured JSON architecture. This acts as the unshakeable \"ground truth\" for the AI. You will break down the menu into logical categories (e.g., Mains, Sides, Drinks), individual SKUs, and exact prices in Kenyan Shillings (KES).\n\nEqually important is structuring the allowed modifications. A customer ordering a burger might ask for \"no onions\" or \"extra cheese.\" If these dietary tags and customization options are not explicitly defined in the data structure, the bot might accept a modification the kitchen cannot fulfill, or fail to charge for a premium add-on.\n\nFinally, you must optimize this data payload. A massive JSON file for a 200-item menu can overwhelm the LLM's context window. You will learn techniques to compress this data—sending only the relevant menu sections to the active prompt or using retrieval-augmented generation (RAG) to ensure the bot responds quickly and accurately without context bloat.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Structured data becomes the AI's unshakeable ground truth.",
+                  "flow": [
+                    "Restaurant menu (PDF/image/text)",
+                    "Structured into categories, SKUs, KES prices",
+                    "Becomes the AI's 'ground truth'",
+                    "No more hallucinated prices"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why not just feed the raw PDF or image of the menu directly to the LLM for every customer interaction?",
+                "options": [
+                  {
+                    "text": "It introduces high latency, burns tokens, and risks hallucinated prices or availability",
+                    "feedback": "Right. This is exactly why the menu is converted into structured JSON first.",
+                    "correct": true
+                  },
+                  {
+                    "text": "PDFs are technically impossible for LLMs to read at all",
+                    "feedback": "LLMs can technically process PDFs/images - the problem described is reliability and cost, not raw capability.",
+                    "correct": false
+                  },
+                  {
+                    "text": "It violates WhatsApp's terms of service",
+                    "feedback": "This isn't a policy violation - it's a reliability and performance concern.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-2",
+            "number": "02",
+            "title": "Chatbot Personas & Conversational Ordering",
+            "subtitle": "Building a friendly Kenyan waiter persona",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Flow Design",
+            "summary": "Train the bot to recognize intent, extract specific menu requests from natural language, and handle custom modifications.",
+            "isGated": false,
+            "content": {
+              "overview": "Build an engaging AI persona that mimics a friendly Kenyan waiter. Train the bot to recognize intent, extract specific menu requests from natural language, and handle custom modifications like 'no onions' or 'extra pilipili'.",
+              "keyLearnings": [
+                "Crafting a warm, locally-relevant persona",
+                "Using structured LLM outputs to extract food items",
+                "Handling edge cases in customer requests"
+              ],
+              "samplePrompt": "Extract food items and modifications from the user's message. Ignore general chatter. Output strict JSON matching this schema: { items: [{ name: string, qty: number, mods: string[] }] }.",
+              "testCase": {
+                "input": "I want 2 chips masala, but no pilipili on one.",
+                "expectedOutput": "{\"items\": [{\"name\": \"Chips Masala\", \"qty\": 1, \"mods\": [\"no pilipili\"]}, {\"name\": \"Chips Masala\", \"qty\": 1, \"mods\": []}]}"
+              },
+              "lessonBody": "In Kenyan hospitality, tone and persona are critical. A robotic, highly transactional bot feels alien to customers used to the warmth of a local cafe. Conversely, a bot that greets users with a friendly \"Karibu!\" or \"Habari,\" and understands common local slang (Sheng) like \"chipo\" for chips/fries, immediately builds trust and reduces cart abandonment.\n\nYou will use Gemini or another capable LLM with a strict system prompt to govern this persona. The agent's primary task is to parse natural language, often messy or conversational, and extract structured order data. When a customer types, \"I want 2 chips masala, but no pilipili on one,\" the AI must recognize the intent and split this single sentence into two distinct line items in the cart JSON.\n\nHandling these edge cases is where conversational design shines. The bot must know the difference between a minor modification it can accept (\"no tomatoes\") and an unreasonable request (\"make the pizza entirely out of chicken\"). You will train the agent to ask clarifying questions when ambiguous requests are made, rather than guessing and sending incorrect instructions to the kitchen.\n\nUltimately, the bot must translate its internal JSON extraction back into a clear, polite WhatsApp message. It should confirm the requested items and modifications seamlessly, ensuring the customer feels heard and understood before they commit to paying.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "One sentence, two structured cart items.",
+                  "chat": [
+                    {
+                      "sender": "customer",
+                      "text": "I want 2 chips masala, but no pilipili on one."
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "(Split into 2 line items: 1 with 'no pilipili', 1 with no mods)"
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer asks to 'make the pizza entirely out of chicken' - an unreasonable request the kitchen can't fulfill as a simple modification. What should the bot do?",
+                "options": [
+                  {
+                    "text": "Silently accept it and pass it to the kitchen as-is",
+                    "feedback": "Silently accepting an unreasonable request risks sending instructions the kitchen genuinely cannot fulfill.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Ask a clarifying question rather than guessing and sending incorrect instructions",
+                    "feedback": "Right. This is exactly how the lesson handles ambiguous or unreasonable requests.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Reject the entire order immediately",
+                    "feedback": "Rejecting the whole order over one modification is an overreaction.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-3",
+            "number": "03",
+            "title": "Real-Time Inventory & 86'd Items Handling",
+            "subtitle": "Preventing orders for out-of-stock items",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Operations",
+            "summary": "Connect the bot to a live inventory system to implement '86' logic and gracefully decline requests for finished items.",
+            "isGated": false,
+            "content": {
+              "overview": "Connect the bot to a live inventory system to prevent ordering out-of-stock items. Learn how to implement '86' logic—gracefully declining requests for finished items and suggesting in-stock alternatives.",
+              "keyLearnings": [
+                "Integrating real-time stock checks before confirming additions",
+                "Designing polite fallback responses for 86'd items",
+                "Suggesting up-sells and available alternatives"
+              ],
+              "lessonBody": "In a busy restaurant environment, ingredients run out and popular dishes get \"86'd\" (removed from the menu) mid-service. An AI bot that blindly accepts orders for finished food creates severe operational nightmares for the kitchen and guarantees angry customers demanding refunds.\n\nTo prevent this, you will connect your conversational agent to a live inventory backend. This could be a lightweight database or even a Google Sheet that the kitchen staff can update instantly from a tablet. The architectural flow changes: before the bot confirms an item can be added to the cart, it must first query this inventory state in real-time.\n\nWhen a requested item is out of stock, the bot must intercept the request and trigger a polite fallback response. Instead of returning a cold \"Error: Item unavailable,\" the agent should be programmed to say, \"I'm so sorry, the Pilau just finished! We have fresh Biryani available though—would you like that instead?\"\n\nHandling concurrent orders adds another layer of complexity. If two customers try to order the last remaining slice of cake at the exact same moment, your stock check needs to happen with a secure lock mechanism. You will implement robust inventory checks that verify availability both during the conversational flow and right before the final checkout.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A cold error loses a customer; a fallback keeps the sale.",
+                  "compare": [
+                    {
+                      "label": "Cold error",
+                      "text": "'Error: Item unavailable'",
+                      "good": false
+                    },
+                    {
+                      "label": "Polite fallback",
+                      "text": "'The Pilau just finished! We have fresh Biryani - would you like that instead?'",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Two customers try to order the last remaining slice of cake at the exact same moment. What does the lesson say this requires?",
+                "options": [
+                  {
+                    "text": "A secure lock mechanism so the stock check happens safely under concurrency",
+                    "feedback": "Right. This prevents both customers from being confirmed for the same last item.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The bot should just let both orders through and sort it out later",
+                    "feedback": "Letting both through is exactly the operational nightmare this lesson is trying to prevent.",
+                    "correct": false
+                  },
+                  {
+                    "text": "This scenario is impossible on WhatsApp",
+                    "feedback": "Concurrent orders are entirely possible and are explicitly addressed by this lesson.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-4",
+            "number": "04",
+            "title": "Cart Management & Order Modification",
+            "subtitle": "Maintaining user session and order state",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Data & State",
+            "summary": "Maintain user session state to manage an active shopping cart over WhatsApp, allowing customers to add or remove items.",
+            "isGated": true,
+            "content": {
+              "overview": "Maintain user session state to manage an active shopping cart over WhatsApp. Enable customers to add, remove, or modify items, and generate clear, structured order summaries with KES subtotals.",
+              "keyLearnings": [
+                "Managing state and memory across multiple messages",
+                "Calculating subtotals and applying discounts",
+                "Generating clean WhatsApp markdown receipts"
+              ],
+              "lessonBody": "WhatsApp is inherently a stateless messaging platform—it treats every message as an isolated event. However, the act of food ordering requires maintaining a continuous state. The system needs a \"cart\" tied to a specific phone number that remembers what was ordered five minutes ago.\n\nYou will build a session management system to solve this, using a fast key-value store (like Redis) or an in-memory database. This state engine will track the user's active session, linking their WhatsApp ID to an array of selected menu items, quantities, and specific modifications.\n\nCustomers frequently change their minds during the ordering process. A user might say, \"Actually, make that 3 instead of 2,\" or \"Remove the soda.\" Your agent must be capable of translating these natural language revisions into precise CRUD (Create, Read, Update, Delete) operations on the specific items within the session state, without losing the rest of the cart.\n\nAs the cart evolves, the system must accurately calculate running subtotals in KES. This includes applying any active combo discounts or bulk pricing correctly. Finally, the bot will generate a clean, markdown-formatted receipt (using WhatsApp's bolding and lists) so the customer can clearly review their complete order and subtotal before proceeding to logistics.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "A session tied to a phone number is what makes the cart possible.",
+                  "flow": [
+                    "Session tied to phone number",
+                    "Tracks items, quantities, modifications",
+                    "'Actually, make that 3 instead of 2'",
+                    "Precise CRUD update on that one item"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why can't WhatsApp itself remember that a customer ordered 2 chips masala five minutes ago?",
+                "options": [
+                  {
+                    "text": "WhatsApp treats every message as an isolated, stateless event - your own system has to track the cart",
+                    "feedback": "Right. This is exactly why a session management layer is required.",
+                    "correct": true
+                  },
+                  {
+                    "text": "WhatsApp automatically remembers orders for exactly 24 hours",
+                    "feedback": "There's no such built-in order memory in WhatsApp.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Customers have to manually resend their entire order each time",
+                    "feedback": "That's not how it should work from the customer's side - the system is responsible for holding state.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-5",
+            "number": "05",
+            "title": "Location Capture & Estate-Based Zones",
+            "subtitle": "Mapping Nairobi addresses to delivery costs",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Logistics",
+            "summary": "Design a conversational flow to capture delivery details accurately and map Nairobi estate names to specific delivery zones.",
+            "isGated": true,
+            "content": {
+              "overview": "Design a conversational flow to capture delivery details accurately. Learn techniques to standardize Nairobi estate names (e.g., Kilimani, South B, Ruaka) to map them to specific delivery zones.",
+              "keyLearnings": [
+                "Extracting standardized location data from free-text",
+                "Mapping user locations to predefined delivery zones",
+                "Handling ambiguous or out-of-bounds addresses"
+              ],
+              "lessonBody": "Nairobi does not rely on a rigid, universal zip code system for food delivery. Instead, logistics depend on estate names, prominent landmarks, and apartment buildings (e.g., \"Kilimani near Yaya Centre,\" \"South B,\" or \"Ruaka\"). A delivery bot must capture this nuanced information accurately without frustrating the hungry customer.\n\nYou will design a conversational flow specifically optimized for capturing delivery logistics. The agent will prompt the user for their general estate first, followed by specific building or landmark details. By structuring the conversation this way, you reduce errors and prevent the user from typing a chaotic, unparseable paragraph of directions.\n\nOnce the free-text location is provided, the AI must standardize it. You will map various colloquial spellings or abbreviations (like understanding that \"Kile\" refers to Kileleshwa) to predefined delivery zones. This standardization is critical for the next step: accurate delivery fee calculation based on fixed zones rather than just straight-line distance.\n\nThe system must also politely handle out-of-bounds requests. If a user in Syokimau attempts to order a hot meal from a vendor in Westlands, the bot must recognize the address is outside the delivery radius. It should gracefully explain the limitation, ensuring the kitchen isn't burdened with orders that will arrive cold or cost too much to dispatch.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Colloquial shorthand gets mapped to one standard zone.",
+                  "compare": [
+                    {
+                      "label": "Customer types",
+                      "text": "'Kile'",
+                      "good": false
+                    },
+                    {
+                      "label": "Standardized zone",
+                      "text": "Kileleshwa",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer in Syokimau tries to order from a vendor in Westlands, far outside the delivery radius. What should the bot do?",
+                "options": [
+                  {
+                    "text": "Accept the order anyway and let the rider figure it out",
+                    "feedback": "Accepting an out-of-radius order risks food arriving cold or costing too much to dispatch.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Gracefully explain that the address is outside the delivery limitation",
+                    "feedback": "Right. This protects the kitchen from orders that were never viable to dispatch.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Silently cancel the order without telling the customer why",
+                    "feedback": "Silently cancelling with no explanation leaves the customer confused.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-6",
+            "number": "06",
+            "title": "Dynamic Delivery Fee Calculation Prompt",
+            "subtitle": "Injecting zonal logic for final checkout",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Prompt Engineering",
+            "summary": "Construct a robust prompt that injects delivery zone logic and cart total to calculate final costs.",
+            "isGated": true,
+            "content": {
+              "overview": "In this core lesson, construct a robust prompt that injects the delivery zone logic and cart total to calculate final costs. Ensure the LLM correctly applies flat rates for nearby estates and distance-based fees for outer suburbs.",
+              "keyLearnings": [
+                "Injecting pricing matrix data into system prompts",
+                "Calculating total costs (Cart + Delivery Fee)",
+                "Preventing hallucinated discounts or incorrect delivery rates"
+              ],
+              "samplePrompt": "You are the dispatcher for Nairobi Eats. The customer's cart total is KES 1500. They are in 'Kilimani'. \n\nDELIVERY FEE RULES:\n- CBD, Kilimani, Kileleshwa: KES 150\n- Westlands, Lavington: KES 200\n- Karen, Ruaka: KES 350\n\nCalculate the final total. Summarize the order with [CHECKOUT_READY: {\"subtotal\": 1500, \"delivery\": 150, \"total\": 1650}].",
+              "codeSnippet": "export function calculateDelivery(estate: string, total: number) {\n  const zones: Record<string, number> = {\n    'Kilimani': 150, 'Kileleshwa': 150, 'Westlands': 200, 'Karen': 350\n  };\n  const fee = zones[estate] || 300;\n  return { subtotal: total, deliveryFee: fee, finalTotal: total + fee };\n}",
+              "testCase": {
+                "input": "I'm in Karen. How much is delivery?",
+                "expectedOutput": "Delivery to Karen is KES 350. Your new total is KES 1,850. Would you like to proceed to payment?"
+              },
+              "lessonBody": "With the delivery zone identified, the system must precisely calculate the final cost. Most local restaurants use a tiered delivery pricing matrix: flat rates for nearby estates (e.g., KES 150 for CBD and Kilimani) and higher distance-based fees for outer suburbs (e.g., KES 350 for Karen).\n\nIn this core engineering lesson, you will construct a robust prompt that injects this delivery pricing matrix dynamically into the LLM's context during the checkout phase. The AI must cross-reference the user's standardized location with the matrix to retrieve the correct fee.\n\nCrucially, Large Language Models are prone to hallucinating arithmetic. To prevent the bot from inventing a non-existent discount or miscalculating the total, you will offload the actual math (Cart Subtotal + Delivery Fee = Final Total) to your Node.js codebase. The backend performs the calculation and passes the verified total back into the prompt for formatting.\n\nThe final output must present the costs transparently. The agent will respond with a clear breakdown: \"Delivery to Karen is KES 350. Your final total is KES 1,850. Would you like to proceed to payment?\" You will also implement strict negative constraints to prevent the AI from negotiating these delivery fees if a customer attempts to haggle.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The LLM formats the total - it never invents it.",
+                  "compare": [
+                    {
+                      "label": "LLM does the math",
+                      "text": "Risk of hallucinated totals or invented discounts",
+                      "good": false
+                    },
+                    {
+                      "label": "Backend code does the math",
+                      "text": "Verified total passed back to the prompt for formatting only",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "Using calculateDelivery from this lesson, a customer's cart total is KES 1,500 and their estate is 'Westlands'.",
+                "workedExample": "calculateDelivery('Kilimani', 1500) looks up zones['Kilimani'] = 150, returning { subtotal: 1500, deliveryFee: 150, finalTotal: 1650 }.",
+                "challenge": "What does calculateDelivery('Westlands', 1500) return, and why doesn't the LLM calculate this total itself?",
+                "placeholder": "It returns deliveryFee: ___ and finalTotal: ___ - the backend does this math, not the LLM, because LLMs are prone to ___ arithmetic.",
+                "solution": "It returns deliveryFee: 200 and finalTotal: 1700 - the backend does this math, not the LLM, because LLMs are prone to hallucinating arithmetic.",
+                "explanation": "Offloading the actual calculation to Node.js code and only using the LLM to format the verified result is exactly how the lesson prevents invented discounts or miscalculated totals."
+              }
+            }
+          },
+          {
+            "id": "food-step-7",
+            "number": "07",
+            "title": "Order Confirmation & M-Pesa STK Push",
+            "subtitle": "Triggering instant mobile money payments",
+            "status": "locked",
+            "duration": "55 min",
+            "category": "Payments",
+            "summary": "Automate the checkout process using Safaricom's Daraja API to trigger an M-Pesa STK push for the order amount.",
+            "isGated": true,
+            "content": {
+              "overview": "Automate the checkout process using Safaricom's Daraja API. Learn how to trigger an M-Pesa STK push directly to the customer's phone once they confirm the final order amount.",
+              "keyLearnings": [
+                "Authenticating with the Safaricom Daraja API",
+                "Generating secure passwords and timestamps",
+                "Triggering the Lipa Na M-Pesa Online prompt"
+              ],
+              "lessonBody": "Cash on delivery creates immense friction and financial risk for restaurants, from cancelled orders to rider security concerns. Pre-payment via Safaricom M-Pesa is the gold standard for automated WhatsApp commerce in Kenya, ensuring the kitchen only fires up for committed orders.\n\nYou will automate the checkout process by integrating the Safaricom Daraja API. This requires registering for developer credentials, authenticating via OAuth to receive a time-bound access token, and securely managing these secrets within your application backend.\n\nOnce authenticated, your system will generate the base64-encoded password and precise timestamp required to initiate an M-Pesa STK Push (Lipa Na M-Pesa Online). When the customer confirms their total, the backend triggers this API call, instantly popping up a PIN prompt directly on the user's phone for the exact calculated amount.\n\nYou will also design flows for common edge cases. Often, a customer's WhatsApp number is different from the number registered with their M-Pesa account. The bot must proactively ask, \"Will you be paying with this WhatsApp number, or a different M-Pesa number?\" and gracefully handle the input of alternative phone numbers before triggering the push.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Pre-payment protects both the kitchen and the rider.",
+                  "compare": [
+                    {
+                      "label": "Cash on delivery",
+                      "text": "Cancelled orders, rider security risk, kitchen fires up on unconfirmed orders",
+                      "good": false
+                    },
+                    {
+                      "label": "M-Pesa pre-payment",
+                      "text": "Kitchen only fires up for committed, paid orders",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer's WhatsApp number is different from their M-Pesa registered number. What should the bot do before triggering the STK push?",
+                "options": [
+                  {
+                    "text": "Assume they're the same and send the push to the WhatsApp number",
+                    "feedback": "Assuming they match risks sending the PIN prompt to the wrong phone entirely.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Proactively ask whether they're paying with this WhatsApp number or a different M-Pesa number",
+                    "feedback": "Right. This confirms the correct number before triggering the push.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Refuse to process the order until they update their WhatsApp number",
+                    "feedback": "Forcing a WhatsApp number change is unnecessary friction.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-8",
+            "number": "08",
+            "title": "Payment Reconciliation & Callback Parsing",
+            "subtitle": "Verifying transaction success automatically",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Backend Dev",
+            "summary": "Build a webhook to receive and parse M-Pesa payment callbacks to automatically mark orders as Paid.",
+            "isGated": true,
+            "content": {
+              "overview": "Build a webhook to receive and parse M-Pesa payment callbacks. Automatically reconcile the transaction with the active order and update the status from 'Pending' to 'Paid'.",
+              "keyLearnings": [
+                "Setting up secure, HTTPS-enabled webhook endpoints",
+                "Parsing Safaricom callback JSON payloads",
+                "Handling failed or cancelled transactions gracefully"
+              ],
+              "codeSnippet": "app.post('/mpesa-callback', (req, res) => {\n  const result = req.body.Body.stkCallback;\n  if (result.ResultCode === 0) {\n    const receipt = result.CallbackMetadata.Item.find(i => i.Name === 'MpesaReceiptNumber').Value;\n    markOrderPaid(receipt);\n  }\n  res.sendStatus(200);\n});",
+              "lessonBody": "An STK push is an asynchronous operation. When you trigger the payment prompt, your application must wait for Safaricom to process the user's PIN entry and ping your servers with the final result. Without this automated confirmation, the system halts.\n\nYou will build a secure, public-facing Express webhook over HTTPS to receive Safaricom's payment callbacks. This endpoint listens for incoming JSON payloads from Daraja, which contain the critical data confirming whether the transaction succeeded, failed due to insufficient funds, or was cancelled by the user.\n\nYour code must parse this payload carefully, checking the `ResultCode`. A code of 0 indicates success. For successful transactions, you will extract the `MpesaReceiptNumber` and match the unique transaction identifier back to the pending cart session in your database.\n\nUpon successful reconciliation, the system automatically updates the order state from 'Pending' to 'Paid'. If the transaction fails, the webhook must update the state to 'Failed' and trigger the bot to message the user, politely informing them of the issue and offering a chance to retry the payment, ensuring no revenue is lost to simple timeouts.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "The push firing and the payment confirming are two separate events.",
+                  "flow": [
+                    "STK push triggered",
+                    "Customer enters M-Pesa PIN",
+                    "Safaricom processes the result",
+                    "Callback POSTs the outcome to your webhook"
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "Using the /mpesa-callback handler from this lesson, Safaricom POSTs a callback with stkCallback.ResultCode: 1 (a failure code, not 0).",
+                "workedExample": "When ResultCode is 0, the handler extracts the MpesaReceiptNumber and calls markOrderPaid(receipt) to update the order.",
+                "challenge": "What should happen to the order when ResultCode is 1 instead of 0?",
+                "placeholder": "The order status should update to ___, and the bot should message the customer, ___ them of the issue and offering a chance to retry.",
+                "solution": "The order status should update to Failed, and the bot should message the customer, politely informing them of the issue and offering a chance to retry.",
+                "explanation": "A non-zero ResultCode means the transaction failed or was cancelled - the webhook must handle that branch too, or the order silently stalls."
+              }
+            }
+          },
+          {
+            "id": "food-step-9",
+            "number": "09",
+            "title": "Kitchen Handoff & POS Integration",
+            "subtitle": "Routing orders to the preparation team",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Operations",
+            "summary": "Translate the completed WhatsApp order into a structured format and route it to a kitchen display system or POS.",
+            "isGated": true,
+            "content": {
+              "overview": "Translate the completed WhatsApp order into a structured format for the kitchen. Send automated tickets to a kitchen display system or POS terminal with clear modification notes.",
+              "keyLearnings": [
+                "Formatting JSON payloads for external POS APIs",
+                "Ensuring critical dietary notes are highlighted",
+                "Handling peak-hour queue management and throttling"
+              ],
+              "lessonBody": "A fully paid order sitting silently in a database is useless; the kitchen must be alerted immediately. The handoff from the digital agent to the physical preparation team is a critical operational juncture where speed and clarity are paramount.\n\nYou will build the logic to translate the finalized, paid WhatsApp order into a clean, structured JSON payload. This payload will be routed directly to the restaurant's existing infrastructure, whether that is a modern Kitchen Display System (KDS), a Point of Sale (POS) API, or a dedicated receipt printer.\n\nFor smaller vendors lacking complex POS systems, you will implement a lightweight alternative: routing automated, beautifully formatted text tickets to a dedicated \"Kitchen\" WhatsApp group or Telegram channel. This ensures the chefs see the incoming ticket on a designated tablet or phone without needing expensive hardware.\n\nCrucially, the handoff must heavily emphasize dietary notes and custom modifications. A missed \"allergy: peanuts\" flag can be disastrous. You will format these payloads so that crucial modifications are visually highlighted, ensuring the prep team catches every detail while managing peak-hour volumes.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "A paid order only matters once the kitchen actually sees it.",
+                  "flow": [
+                    "Order paid and finalized",
+                    "Translated into structured JSON ticket",
+                    "Routed to KDS / POS / WhatsApp kitchen group",
+                    "Chef sees the ticket immediately"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "An order includes the note 'allergy: peanuts.' Why does the lesson insist this be visually highlighted in the kitchen ticket, not just listed as plain text?",
+                "options": [
+                  {
+                    "text": "A missed allergy flag buried in plain text can be disastrous for the customer's safety",
+                    "feedback": "Right. This is exactly why critical notes get visual emphasis.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Highlighted text prints faster on thermal printers",
+                    "feedback": "Print speed isn't the reason given - this is about not missing a critical safety detail.",
+                    "correct": false
+                  },
+                  {
+                    "text": "POS systems technically require all text to be highlighted",
+                    "feedback": "This isn't a technical requirement - it's a deliberate design choice for safety-critical information.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-10",
+            "number": "10",
+            "title": "Order Status Updates & Queue Management",
+            "subtitle": "Keeping the customer informed",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Automation",
+            "summary": "Implement automated WhatsApp updates as the order moves through states like Received, Preparing, and Out for Delivery.",
+            "isGated": true,
+            "content": {
+              "overview": "Keep the customer informed to reduce follow-up messages. Implement automated WhatsApp updates as the order moves through states: Received, Preparing, and Out for Delivery.",
+              "keyLearnings": [
+                "Triggering outbound template messages based on state changes",
+                "Providing realistic ETA estimations based on queue length",
+                "Sharing rider contact details for the last mile"
+              ],
+              "lessonBody": "Customer anxiety peaks the moment payment is deducted. If there is silence from the restaurant, customers will repeatedly message the bot asking, \"Where is my food?\" which defeats the purpose of automation. Proactive communication is essential for a good user experience.\n\nYou will implement automated state-change notifications to keep the customer informed. As the kitchen and logistics team update the order status in their system, your backend will trigger outbound WhatsApp template messages, moving the order visibly from 'Received' to 'Preparing', and finally to 'Out for Delivery'.\n\nThese updates should provide realistic ETA estimations. By analyzing the current kitchen queue length and the delivery distance calculated earlier, the system can provide a dynamic, accurate delivery window rather than a generic guess, managing customer expectations effectively.\n\nFor the final step of the journey, you will automate the rider handoff. The bot will send a WhatsApp message containing the delivery rider's name, phone number, and a tracking link if available. This cleanly transitions the last-mile coordination away from the AI agent and directly to the rider, completing the automated flow.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "The order stays visible through every stage, not just at checkout.",
+                  "flow": [
+                    "Received",
+                    "Preparing",
+                    "Out for Delivery",
+                    "Rider contact shared for last mile"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "If the system stays silent after payment is deducted, what does the lesson say customers will do?",
+                "options": [
+                  {
+                    "text": "Wait patiently without any issue",
+                    "feedback": "Silence after payment is exactly what causes anxiety and repeated follow-ups.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Repeatedly message the bot asking 'Where is my food?', defeating the purpose of automation",
+                    "feedback": "Right. This is exactly why proactive status updates matter.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Automatically cancel their order",
+                    "feedback": "The lesson describes anxious follow-up messages, not automatic cancellation.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-11",
+            "number": "11",
+            "title": "Daily Sales Analytics & Owner Reporting",
+            "subtitle": "Automating end-of-day restaurant metrics",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Reporting",
+            "summary": "Build an automated dashboard for the owner by syncing daily WhatsApp orders and revenue to Google Sheets.",
+            "isGated": true,
+            "content": {
+              "overview": "Build a simple, automated dashboard for the restaurant owner. Sync daily WhatsApp orders, revenue, and popular items to a Google Sheet using API webhooks.",
+              "keyLearnings": [
+                "Integrating with the Google Sheets API",
+                "Summarizing daily M-Pesa collections",
+                "Identifying top-selling and frequently 86'd items"
+              ],
+              "lessonBody": "Restaurant owners rarely have the time to read through raw database logs or chat transcripts to understand how their business is doing. They need clear, actionable metrics delivered automatically to make informed decisions about inventory and staffing.\n\nYou will build an automated analytics pipeline using API webhooks to sync finalized orders, M-Pesa receipt numbers, and total daily revenue to a Google Sheet. This provides a familiar, accessible database format that the owner can easily view and manipulate without technical skills.\n\nThe dashboard will highlight critical daily metrics: total revenue in KES, total number of orders processed, and the average order value. By aggregating this data, the owner can quickly assess the day's performance and track growth trends over time.\n\nAdditionally, the system will identify operational bottlenecks. It will track the top-selling items to inform prep for the next day, and highlight items that were frequently 86'd, indicating a supply chain issue. You will set up a scheduled cron job to send a summarized mini-report directly to the owner's WhatsApp every night at closing.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Raw order logs become a few numbers the owner can actually use.",
+                  "flow": [
+                    "Total revenue (KES)",
+                    "Total orders processed",
+                    "Average order value",
+                    "Top-selling & frequently 86'd items"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the lesson track which items were frequently '86'd' (ran out) as part of the daily report, not just total revenue?",
+                "options": [
+                  {
+                    "text": "It indicates a supply chain issue the owner needs to address",
+                    "feedback": "Right. This is exactly the operational bottleneck signal the report is meant to surface.",
+                    "correct": true
+                  },
+                  {
+                    "text": "86'd items should be permanently removed from the menu automatically",
+                    "feedback": "The report flags the pattern for the owner to review - it does not auto-remove menu items.",
+                    "correct": false
+                  },
+                  {
+                    "text": "It has no operational value, it's just a fun statistic",
+                    "feedback": "The lesson frames this explicitly as an operational bottleneck signal, not a trivia stat.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "food-step-12",
+            "number": "12",
+            "title": "Verified Portfolio Deployment: Live Restaurant Bot",
+            "subtitle": "Launching your AI food agent in the real world",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Deployment",
+            "summary": "Deploy your completed system for a real food vendor and secure a verified portfolio quote.",
+            "isGated": true,
+            "content": {
+              "overview": "Deploy your completed system for a real restaurant or food vendor. You'll generate a live WhatsApp link, a demo video of a successful order, and gather a quote from the vendor to verify your portfolio.",
+              "keyLearnings": [
+                "Pushing the final agent codebase to a production server",
+                "Conducting end-to-end testing from ordering to kitchen handoff",
+                "Securing vendor verification and launching your portfolio"
+              ],
+              "lessonBody": "Building the system in a local development environment is only the first half of the journey. To create a verified portfolio piece that you can sell to clients, you must move the project from localhost to a robust production server (like Render, Railway, or AWS) that runs reliably 24/7.\n\nYou will conduct rigorous end-to-end testing of your deployed application. This involves placing test orders, pushing extreme modifications, simulating failed and successful M-Pesa payments, and verifying that the correct tickets print in the kitchen—all ensuring the system won't crash during a busy Friday night service.\n\nTo finalize your portfolio, you will partner with a real local restaurant, cafe, or food vendor to pilot the system. Transitioning from a tutorial exercise to a live business asset proves your capability as a high-value automation engineer.\n\nYour final deliverable is not a grade, but proof of impact. You will generate a live WhatsApp link to the bot, record a short demo video of a successful end-to-end order cycle, and secure a written quote from the business owner detailing how the agent improved their operations. This forms a compelling, verified case study for your future clients.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 3,
+                  "caption": "Three things combine into the final verified case study.",
+                  "flow": [
+                    "Live WhatsApp link to the bot",
+                    "Demo video of a full order cycle",
+                    "Written quote from the business owner",
+                    "= your verified case study"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "According to this lesson, what actually proves you can build this system at a professional level?",
+                "options": [
+                  {
+                    "text": "An automated grade or certificate",
+                    "feedback": "The lesson is explicit: your final deliverable is not a grade.",
+                    "correct": false
+                  },
+                  {
+                    "text": "A live WhatsApp link, a demo video, and a written quote from a real business owner",
+                    "feedback": "Right. That combination is the actual proof of capability.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Passing a written exam about the Daraja API",
+                    "feedback": "There's no exam described here - the proof is a real deployment with a real business.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
           }
-        },
-        {
-          "id": "food-step-2",
-          "number": "02",
-          "title": "Chatbot Personas & Conversational Ordering",
-          "subtitle": "Building a friendly Kenyan waiter persona",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Flow Design",
-          "summary": "Train the bot to recognize intent, extract specific menu requests from natural language, and handle custom modifications.",
-          "isGated": false,
-          "content": {
-            "overview": "Build an engaging AI persona that mimics a friendly Kenyan waiter. Train the bot to recognize intent, extract specific menu requests from natural language, and handle custom modifications like 'no onions' or 'extra pilipili'.",
-            "keyLearnings": [
-              "Crafting a warm, locally-relevant persona",
-              "Using structured LLM outputs to extract food items",
-              "Handling edge cases in customer requests"
-            ],
-            "samplePrompt": "Extract food items and modifications from the user's message. Ignore general chatter. Output strict JSON matching this schema: { items: [{ name: string, qty: number, mods: string[] }] }.",
-            "testCase": {
-              "input": "I want 2 chips masala, but no pilipili on one.",
-              "expectedOutput": "{\"items\": [{\"name\": \"Chips Masala\", \"qty\": 1, \"mods\": [\"no pilipili\"]}, {\"name\": \"Chips Masala\", \"qty\": 1, \"mods\": []}]}"
-            },
-            "lessonBody": "In Kenyan hospitality, tone and persona are critical. A robotic, highly transactional bot feels alien to customers used to the warmth of a local cafe. Conversely, a bot that greets users with a friendly \"Karibu!\" or \"Habari,\" and understands common local slang (Sheng) like \"chipo\" for chips/fries, immediately builds trust and reduces cart abandonment.\n\nYou will use Gemini or another capable LLM with a strict system prompt to govern this persona. The agent's primary task is to parse natural language, often messy or conversational, and extract structured order data. When a customer types, \"I want 2 chips masala, but no pilipili on one,\" the AI must recognize the intent and split this single sentence into two distinct line items in the cart JSON.\n\nHandling these edge cases is where conversational design shines. The bot must know the difference between a minor modification it can accept (\"no tomatoes\") and an unreasonable request (\"make the pizza entirely out of chicken\"). You will train the agent to ask clarifying questions when ambiguous requests are made, rather than guessing and sending incorrect instructions to the kitchen.\n\nUltimately, the bot must translate its internal JSON extraction back into a clear, polite WhatsApp message. It should confirm the requested items and modifications seamlessly, ensuring the customer feels heard and understood before they commit to paying."
-          }
-        },
-        {
-          "id": "food-step-3",
-          "number": "03",
-          "title": "Real-Time Inventory & 86'd Items Handling",
-          "subtitle": "Preventing orders for out-of-stock items",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Operations",
-          "summary": "Connect the bot to a live inventory system to implement '86' logic and gracefully decline requests for finished items.",
-          "isGated": false,
-          "content": {
-            "overview": "Connect the bot to a live inventory system to prevent ordering out-of-stock items. Learn how to implement '86' logic—gracefully declining requests for finished items and suggesting in-stock alternatives.",
-            "keyLearnings": [
-              "Integrating real-time stock checks before confirming additions",
-              "Designing polite fallback responses for 86'd items",
-              "Suggesting up-sells and available alternatives"
-            ],
-            "lessonBody": "In a busy restaurant environment, ingredients run out and popular dishes get \"86'd\" (removed from the menu) mid-service. An AI bot that blindly accepts orders for finished food creates severe operational nightmares for the kitchen and guarantees angry customers demanding refunds.\n\nTo prevent this, you will connect your conversational agent to a live inventory backend. This could be a lightweight database or even a Google Sheet that the kitchen staff can update instantly from a tablet. The architectural flow changes: before the bot confirms an item can be added to the cart, it must first query this inventory state in real-time.\n\nWhen a requested item is out of stock, the bot must intercept the request and trigger a polite fallback response. Instead of returning a cold \"Error: Item unavailable,\" the agent should be programmed to say, \"I'm so sorry, the Pilau just finished! We have fresh Biryani available though—would you like that instead?\"\n\nHandling concurrent orders adds another layer of complexity. If two customers try to order the last remaining slice of cake at the exact same moment, your stock check needs to happen with a secure lock mechanism. You will implement robust inventory checks that verify availability both during the conversational flow and right before the final checkout."
-          }
-        },
-        {
-          "id": "food-step-4",
-          "number": "04",
-          "title": "Cart Management & Order Modification",
-          "subtitle": "Maintaining user session and order state",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Data & State",
-          "summary": "Maintain user session state to manage an active shopping cart over WhatsApp, allowing customers to add or remove items.",
-          "isGated": true,
-          "content": {
-            "overview": "Maintain user session state to manage an active shopping cart over WhatsApp. Enable customers to add, remove, or modify items, and generate clear, structured order summaries with KES subtotals.",
-            "keyLearnings": [
-              "Managing state and memory across multiple messages",
-              "Calculating subtotals and applying discounts",
-              "Generating clean WhatsApp markdown receipts"
-            ],
-            "lessonBody": "WhatsApp is inherently a stateless messaging platform—it treats every message as an isolated event. However, the act of food ordering requires maintaining a continuous state. The system needs a \"cart\" tied to a specific phone number that remembers what was ordered five minutes ago.\n\nYou will build a session management system to solve this, using a fast key-value store (like Redis) or an in-memory database. This state engine will track the user's active session, linking their WhatsApp ID to an array of selected menu items, quantities, and specific modifications.\n\nCustomers frequently change their minds during the ordering process. A user might say, \"Actually, make that 3 instead of 2,\" or \"Remove the soda.\" Your agent must be capable of translating these natural language revisions into precise CRUD (Create, Read, Update, Delete) operations on the specific items within the session state, without losing the rest of the cart.\n\nAs the cart evolves, the system must accurately calculate running subtotals in KES. This includes applying any active combo discounts or bulk pricing correctly. Finally, the bot will generate a clean, markdown-formatted receipt (using WhatsApp's bolding and lists) so the customer can clearly review their complete order and subtotal before proceeding to logistics."
-          }
-        },
-        {
-          "id": "food-step-5",
-          "number": "05",
-          "title": "Location Capture & Estate-Based Zones",
-          "subtitle": "Mapping Nairobi addresses to delivery costs",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Logistics",
-          "summary": "Design a conversational flow to capture delivery details accurately and map Nairobi estate names to specific delivery zones.",
-          "isGated": true,
-          "content": {
-            "overview": "Design a conversational flow to capture delivery details accurately. Learn techniques to standardize Nairobi estate names (e.g., Kilimani, South B, Ruaka) to map them to specific delivery zones.",
-            "keyLearnings": [
-              "Extracting standardized location data from free-text",
-              "Mapping user locations to predefined delivery zones",
-              "Handling ambiguous or out-of-bounds addresses"
-            ],
-            "lessonBody": "Nairobi does not rely on a rigid, universal zip code system for food delivery. Instead, logistics depend on estate names, prominent landmarks, and apartment buildings (e.g., \"Kilimani near Yaya Centre,\" \"South B,\" or \"Ruaka\"). A delivery bot must capture this nuanced information accurately without frustrating the hungry customer.\n\nYou will design a conversational flow specifically optimized for capturing delivery logistics. The agent will prompt the user for their general estate first, followed by specific building or landmark details. By structuring the conversation this way, you reduce errors and prevent the user from typing a chaotic, unparseable paragraph of directions.\n\nOnce the free-text location is provided, the AI must standardize it. You will map various colloquial spellings or abbreviations (like understanding that \"Kile\" refers to Kileleshwa) to predefined delivery zones. This standardization is critical for the next step: accurate delivery fee calculation based on fixed zones rather than just straight-line distance.\n\nThe system must also politely handle out-of-bounds requests. If a user in Syokimau attempts to order a hot meal from a vendor in Westlands, the bot must recognize the address is outside the delivery radius. It should gracefully explain the limitation, ensuring the kitchen isn't burdened with orders that will arrive cold or cost too much to dispatch."
-          }
-        },
-        {
-          "id": "food-step-6",
-          "number": "06",
-          "title": "Dynamic Delivery Fee Calculation Prompt",
-          "subtitle": "Injecting zonal logic for final checkout",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Prompt Engineering",
-          "summary": "Construct a robust prompt that injects delivery zone logic and cart total to calculate final costs.",
-          "isGated": true,
-          "content": {
-            "overview": "In this core lesson, construct a robust prompt that injects the delivery zone logic and cart total to calculate final costs. Ensure the LLM correctly applies flat rates for nearby estates and distance-based fees for outer suburbs.",
-            "keyLearnings": [
-              "Injecting pricing matrix data into system prompts",
-              "Calculating total costs (Cart + Delivery Fee)",
-              "Preventing hallucinated discounts or incorrect delivery rates"
-            ],
-            "samplePrompt": "You are the dispatcher for Nairobi Eats. The customer's cart total is KES 1500. They are in 'Kilimani'. \n\nDELIVERY FEE RULES:\n- CBD, Kilimani, Kileleshwa: KES 150\n- Westlands, Lavington: KES 200\n- Karen, Ruaka: KES 350\n\nCalculate the final total. Summarize the order with [CHECKOUT_READY: {\"subtotal\": 1500, \"delivery\": 150, \"total\": 1650}].",
-            "codeSnippet": "export function calculateDelivery(estate: string, total: number) {\n  const zones: Record<string, number> = {\n    'Kilimani': 150, 'Kileleshwa': 150, 'Westlands': 200, 'Karen': 350\n  };\n  const fee = zones[estate] || 300;\n  return { subtotal: total, deliveryFee: fee, finalTotal: total + fee };\n}",
-            "testCase": {
-              "input": "I'm in Karen. How much is delivery?",
-              "expectedOutput": "Delivery to Karen is KES 350. Your new total is KES 1,850. Would you like to proceed to payment?"
-            },
-            "lessonBody": "With the delivery zone identified, the system must precisely calculate the final cost. Most local restaurants use a tiered delivery pricing matrix: flat rates for nearby estates (e.g., KES 150 for CBD and Kilimani) and higher distance-based fees for outer suburbs (e.g., KES 350 for Karen).\n\nIn this core engineering lesson, you will construct a robust prompt that injects this delivery pricing matrix dynamically into the LLM's context during the checkout phase. The AI must cross-reference the user's standardized location with the matrix to retrieve the correct fee.\n\nCrucially, Large Language Models are prone to hallucinating arithmetic. To prevent the bot from inventing a non-existent discount or miscalculating the total, you will offload the actual math (Cart Subtotal + Delivery Fee = Final Total) to your Node.js codebase. The backend performs the calculation and passes the verified total back into the prompt for formatting.\n\nThe final output must present the costs transparently. The agent will respond with a clear breakdown: \"Delivery to Karen is KES 350. Your final total is KES 1,850. Would you like to proceed to payment?\" You will also implement strict negative constraints to prevent the AI from negotiating these delivery fees if a customer attempts to haggle."
-          }
-        },
-        {
-          "id": "food-step-7",
-          "number": "07",
-          "title": "Order Confirmation & M-Pesa STK Push",
-          "subtitle": "Triggering instant mobile money payments",
-          "status": "locked",
-          "duration": "55 min",
-          "category": "Payments",
-          "summary": "Automate the checkout process using Safaricom's Daraja API to trigger an M-Pesa STK push for the order amount.",
-          "isGated": true,
-          "content": {
-            "overview": "Automate the checkout process using Safaricom's Daraja API. Learn how to trigger an M-Pesa STK push directly to the customer's phone once they confirm the final order amount.",
-            "keyLearnings": [
-              "Authenticating with the Safaricom Daraja API",
-              "Generating secure passwords and timestamps",
-              "Triggering the Lipa Na M-Pesa Online prompt"
-            ],
-            "lessonBody": "Cash on delivery creates immense friction and financial risk for restaurants, from cancelled orders to rider security concerns. Pre-payment via Safaricom M-Pesa is the gold standard for automated WhatsApp commerce in Kenya, ensuring the kitchen only fires up for committed orders.\n\nYou will automate the checkout process by integrating the Safaricom Daraja API. This requires registering for developer credentials, authenticating via OAuth to receive a time-bound access token, and securely managing these secrets within your application backend.\n\nOnce authenticated, your system will generate the base64-encoded password and precise timestamp required to initiate an M-Pesa STK Push (Lipa Na M-Pesa Online). When the customer confirms their total, the backend triggers this API call, instantly popping up a PIN prompt directly on the user's phone for the exact calculated amount.\n\nYou will also design flows for common edge cases. Often, a customer's WhatsApp number is different from the number registered with their M-Pesa account. The bot must proactively ask, \"Will you be paying with this WhatsApp number, or a different M-Pesa number?\" and gracefully handle the input of alternative phone numbers before triggering the push."
-          }
-        },
-        {
-          "id": "food-step-8",
-          "number": "08",
-          "title": "Payment Reconciliation & Callback Parsing",
-          "subtitle": "Verifying transaction success automatically",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Backend Dev",
-          "summary": "Build a webhook to receive and parse M-Pesa payment callbacks to automatically mark orders as Paid.",
-          "isGated": true,
-          "content": {
-            "overview": "Build a webhook to receive and parse M-Pesa payment callbacks. Automatically reconcile the transaction with the active order and update the status from 'Pending' to 'Paid'.",
-            "keyLearnings": [
-              "Setting up secure, HTTPS-enabled webhook endpoints",
-              "Parsing Safaricom callback JSON payloads",
-              "Handling failed or cancelled transactions gracefully"
-            ],
-            "codeSnippet": "app.post('/mpesa-callback', (req, res) => {\n  const result = req.body.Body.stkCallback;\n  if (result.ResultCode === 0) {\n    const receipt = result.CallbackMetadata.Item.find(i => i.Name === 'MpesaReceiptNumber').Value;\n    markOrderPaid(receipt);\n  }\n  res.sendStatus(200);\n});",
-            "lessonBody": "An STK push is an asynchronous operation. When you trigger the payment prompt, your application must wait for Safaricom to process the user's PIN entry and ping your servers with the final result. Without this automated confirmation, the system halts.\n\nYou will build a secure, public-facing Express webhook over HTTPS to receive Safaricom's payment callbacks. This endpoint listens for incoming JSON payloads from Daraja, which contain the critical data confirming whether the transaction succeeded, failed due to insufficient funds, or was cancelled by the user.\n\nYour code must parse this payload carefully, checking the `ResultCode`. A code of 0 indicates success. For successful transactions, you will extract the `MpesaReceiptNumber` and match the unique transaction identifier back to the pending cart session in your database.\n\nUpon successful reconciliation, the system automatically updates the order state from 'Pending' to 'Paid'. If the transaction fails, the webhook must update the state to 'Failed' and trigger the bot to message the user, politely informing them of the issue and offering a chance to retry the payment, ensuring no revenue is lost to simple timeouts."
-          }
-        },
-        {
-          "id": "food-step-9",
-          "number": "09",
-          "title": "Kitchen Handoff & POS Integration",
-          "subtitle": "Routing orders to the preparation team",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Operations",
-          "summary": "Translate the completed WhatsApp order into a structured format and route it to a kitchen display system or POS.",
-          "isGated": true,
-          "content": {
-            "overview": "Translate the completed WhatsApp order into a structured format for the kitchen. Send automated tickets to a kitchen display system or POS terminal with clear modification notes.",
-            "keyLearnings": [
-              "Formatting JSON payloads for external POS APIs",
-              "Ensuring critical dietary notes are highlighted",
-              "Handling peak-hour queue management and throttling"
-            ],
-            "lessonBody": "A fully paid order sitting silently in a database is useless; the kitchen must be alerted immediately. The handoff from the digital agent to the physical preparation team is a critical operational juncture where speed and clarity are paramount.\n\nYou will build the logic to translate the finalized, paid WhatsApp order into a clean, structured JSON payload. This payload will be routed directly to the restaurant's existing infrastructure, whether that is a modern Kitchen Display System (KDS), a Point of Sale (POS) API, or a dedicated receipt printer.\n\nFor smaller vendors lacking complex POS systems, you will implement a lightweight alternative: routing automated, beautifully formatted text tickets to a dedicated \"Kitchen\" WhatsApp group or Telegram channel. This ensures the chefs see the incoming ticket on a designated tablet or phone without needing expensive hardware.\n\nCrucially, the handoff must heavily emphasize dietary notes and custom modifications. A missed \"allergy: peanuts\" flag can be disastrous. You will format these payloads so that crucial modifications are visually highlighted, ensuring the prep team catches every detail while managing peak-hour volumes."
-          }
-        },
-        {
-          "id": "food-step-10",
-          "number": "10",
-          "title": "Order Status Updates & Queue Management",
-          "subtitle": "Keeping the customer informed",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Automation",
-          "summary": "Implement automated WhatsApp updates as the order moves through states like Received, Preparing, and Out for Delivery.",
-          "isGated": true,
-          "content": {
-            "overview": "Keep the customer informed to reduce follow-up messages. Implement automated WhatsApp updates as the order moves through states: Received, Preparing, and Out for Delivery.",
-            "keyLearnings": [
-              "Triggering outbound template messages based on state changes",
-              "Providing realistic ETA estimations based on queue length",
-              "Sharing rider contact details for the last mile"
-            ],
-            "lessonBody": "Customer anxiety peaks the moment payment is deducted. If there is silence from the restaurant, customers will repeatedly message the bot asking, \"Where is my food?\" which defeats the purpose of automation. Proactive communication is essential for a good user experience.\n\nYou will implement automated state-change notifications to keep the customer informed. As the kitchen and logistics team update the order status in their system, your backend will trigger outbound WhatsApp template messages, moving the order visibly from 'Received' to 'Preparing', and finally to 'Out for Delivery'.\n\nThese updates should provide realistic ETA estimations. By analyzing the current kitchen queue length and the delivery distance calculated earlier, the system can provide a dynamic, accurate delivery window rather than a generic guess, managing customer expectations effectively.\n\nFor the final step of the journey, you will automate the rider handoff. The bot will send a WhatsApp message containing the delivery rider's name, phone number, and a tracking link if available. This cleanly transitions the last-mile coordination away from the AI agent and directly to the rider, completing the automated flow."
-          }
-        },
-        {
-          "id": "food-step-11",
-          "number": "11",
-          "title": "Daily Sales Analytics & Owner Reporting",
-          "subtitle": "Automating end-of-day restaurant metrics",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Reporting",
-          "summary": "Build an automated dashboard for the owner by syncing daily WhatsApp orders and revenue to Google Sheets.",
-          "isGated": true,
-          "content": {
-            "overview": "Build a simple, automated dashboard for the restaurant owner. Sync daily WhatsApp orders, revenue, and popular items to a Google Sheet using API webhooks.",
-            "keyLearnings": [
-              "Integrating with the Google Sheets API",
-              "Summarizing daily M-Pesa collections",
-              "Identifying top-selling and frequently 86'd items"
-            ],
-            "lessonBody": "Restaurant owners rarely have the time to read through raw database logs or chat transcripts to understand how their business is doing. They need clear, actionable metrics delivered automatically to make informed decisions about inventory and staffing.\n\nYou will build an automated analytics pipeline using API webhooks to sync finalized orders, M-Pesa receipt numbers, and total daily revenue to a Google Sheet. This provides a familiar, accessible database format that the owner can easily view and manipulate without technical skills.\n\nThe dashboard will highlight critical daily metrics: total revenue in KES, total number of orders processed, and the average order value. By aggregating this data, the owner can quickly assess the day's performance and track growth trends over time.\n\nAdditionally, the system will identify operational bottlenecks. It will track the top-selling items to inform prep for the next day, and highlight items that were frequently 86'd, indicating a supply chain issue. You will set up a scheduled cron job to send a summarized mini-report directly to the owner's WhatsApp every night at closing."
-          }
-        },
-        {
-          "id": "food-step-12",
-          "number": "12",
-          "title": "Verified Portfolio Deployment: Live Restaurant Bot",
-          "subtitle": "Launching your AI food agent in the real world",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Deployment",
-          "summary": "Deploy your completed system for a real food vendor and secure a verified portfolio quote.",
-          "isGated": true,
-          "content": {
-            "overview": "Deploy your completed system for a real restaurant or food vendor. You'll generate a live WhatsApp link, a demo video of a successful order, and gather a quote from the vendor to verify your portfolio.",
-            "keyLearnings": [
-              "Pushing the final agent codebase to a production server",
-              "Conducting end-to-end testing from ordering to kitchen handoff",
-              "Securing vendor verification and launching your portfolio"
-            ],
-            "lessonBody": "Building the system in a local development environment is only the first half of the journey. To create a verified portfolio piece that you can sell to clients, you must move the project from localhost to a robust production server (like Render, Railway, or AWS) that runs reliably 24/7.\n\nYou will conduct rigorous end-to-end testing of your deployed application. This involves placing test orders, pushing extreme modifications, simulating failed and successful M-Pesa payments, and verifying that the correct tickets print in the kitchen—all ensuring the system won't crash during a busy Friday night service.\n\nTo finalize your portfolio, you will partner with a real local restaurant, cafe, or food vendor to pilot the system. Transitioning from a tutorial exercise to a live business asset proves your capability as a high-value automation engineer.\n\nYour final deliverable is not a grade, but proof of impact. You will generate a live WhatsApp link to the bot, record a short demo video of a successful end-to-end order cycle, and secure a written quote from the business owner detailing how the agent improved their operations. This forms a compelling, verified case study for your future clients."
-          }
-        }
-      ]
+        ]
   }
 ];
 
