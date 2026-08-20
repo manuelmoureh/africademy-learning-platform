@@ -5101,235 +5101,606 @@ export const INITIAL_TRACKS: Track[] = [
     whoBuysThis: 'Any business that invoices clients',
     impactStat: 'Automated payment reminders close a real, named gap in most SME billing today',
     steps: [
-        {
-          "id": "col-step-1",
-          "number": "01",
-          "title": "Overdue Detection & Escalation Sequencing",
-          "subtitle": "Triggering the first touchpoint automatically",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Flow Design",
-          "summary": "Mapping out the collection journey from a gentle day-1 reminder to firmer 30-day escalation, ensuring compliance with local standards.",
-          "isGated": false,
-          "content": {
-            "overview": "Before writing code, you need a defined escalation matrix. In this lesson, you map out the transition from a 'friendly nudge' (Day 1-3) to a 'firm reminder' (Day 15) and eventually 'formal notice' (Day 30+), ensuring the AI respects Kenyan data protection and anti-harassment laws.",
-            "lessonBody": "Before writing a single line of code, you must define the logic that decides when and how to contact a customer. A collections agent isn't just a bot that texts people every day until they pay; that approach is a quick way to get your WhatsApp Business number blocked and reported for spam. Instead, you need a timed escalation matrix. This matrix acts as the state machine for your agent, tracking exactly how many days an invoice is past due and what level of urgency the next message should carry.\n\nIn a standard Kenyan context, this timeline typically starts with a \"gentle nudge\" on Day 1 or Day 3 after the due date. The goal here is to assume positive intent—perhaps the customer simply forgot or is waiting for their own clients to pay them. The prompt injected at this stage instructs the AI to be warm, polite, and helpful, often simply providing a copy of the invoice for reference. You want to reduce friction, not create hostility.\n\nBy Day 15, the state machine shifts the tone to a \"firm reminder.\" The system prompt must be updated to reflect this urgency. At this stage, you might include clear deadlines or mention potential pauses in service provision. The AI's instructions become stricter, ensuring it doesn't use overly casual language (like slang or excessive emojis) that undermines the seriousness of an unpaid debt.\n\nBy Day 30 and beyond, the system enters the \"formal notice\" phase. In Kenya, debt collection is subject to specific data protection laws and anti-harassment regulations. Your AI must never threaten violence, public shaming, or illegal actions. The escalation matrix at this point often hands off the conversation to a human manager or outputs a formally formatted final notice, strictly avoiding any language that could expose the business to legal liability.\n\nMapping these states correctly ensures your variables—like the invoice amount, the original due date, and the customer's name—are dynamically injected into the right context at the right time. Your backend (often a cron job checking a database or Google Sheet) evaluates every overdue invoice daily, determines its position in the escalation matrix, and passes that exact state to the LLM to generate the appropriate outbound message.",
-            "keyLearnings": [
-              "Designing time-based overdue triggers",
-              "Understanding Kenyan debt-collection compliance and anti-shaming laws",
-              "Mapping variables (invoice amount, due date, customer name) for dynamic injection"
-            ]
-          }
-        },
-        {
-          "id": "col-step-2",
-          "number": "02",
-          "title": "WhatsApp Utility Templates for Reminders",
-          "subtitle": "Formatting compliant push notifications",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Messaging",
-          "summary": "Crafting Meta-approved Utility templates to initiate outbound payment reminders on WhatsApp.",
-          "isGated": false,
-          "content": {
-            "overview": "WhatsApp requires pre-approved Utility templates to start a conversation with a customer. You'll build and submit non-aggressive, clear reminder templates that include interactive 'Pay Now' buttons, maximizing open and payment rates.",
-            "lessonBody": "When initiating a conversation with a customer about an overdue payment, you cannot just send a free-form message through the WhatsApp Cloud API. Meta enforces a strict 24-hour customer service window; if the customer hasn't messaged the business in the last 24 hours, you must use a pre-approved Message Template. For payment reminders, this falls under the \"Utility\" category, which Meta strictly monitors for compliance.\n\nBuilding a Utility template requires logging into Meta Business Manager and defining a structured message with specific placeholders. These placeholders, formatted as {{1}}, {{2}}, etc., are where your backend will inject dynamic data like the customer's name, the invoice number, and the KES amount. It is crucial to draft these templates with a neutral, non-aggressive tone, as Meta's automated reviewers will reject templates that sound threatening or spammy.\n\nBeyond the text, modern WhatsApp templates allow you to attach interactive call-to-action (CTA) buttons. For a collections agent, a \"Pay via M-Pesa\" button is the most critical component. Instead of asking the customer to type out a response or manually search for a Paybill number, the button provides an immediate, frictionless next step. You can also include a \"Talk to Support\" button, which your webhook will intercept to route the user to a human if they need to dispute the charge.\n\nOnce the template is approved by Meta, your Node.js or Python backend triggers it by sending a POST request to the WhatsApp API. The payload includes the template name, the language code (usually 'en' or 'sw' for Swahili), and an array of parameters to fill the placeholders. If you miss a parameter or format it incorrectly, the API will reject the request, meaning the reminder never goes out.\n\nUnderstanding this template ecosystem is the foundation of proactive messaging. You are essentially building the bridge between your internal overdue detection logic and the customer's WhatsApp inbox. Getting the template right means higher open rates, fewer customer complaints, and a significantly faster path to payment recovery.",
-            "keyLearnings": [
-              "Navigating Meta's Business Manager to create Utility templates",
-              "Using variables like {{1}} for names and {{2}} for KES amounts",
-              "Adding interactive call-to-action (CTA) buttons to templates"
-            ],
-            "samplePrompt": "Template Body: 'Hi {{1}}, this is a friendly reminder that invoice {{2}} for KES {{3}} was due on {{4}}. Please tap below to view the invoice or pay via M-Pesa. If already settled, kindly ignore this message.'\nButtons: [Pay via M-Pesa] [Talk to Support]"
-          }
-        },
-        {
-          "id": "col-step-3",
-          "number": "03",
-          "title": "Generating Live M-Pesa Payment Links",
-          "subtitle": "Frictionless checkout from WhatsApp",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Integrations",
-          "summary": "Connecting Safaricom's Daraja API to generate STK push prompts or M-Pesa payment links directly inside the chat.",
-          "isGated": false,
-          "content": {
-            "overview": "A reminder is only effective if paying is effortless. You'll integrate the Safaricom Daraja API to trigger an M-Pesa STK push directly to the customer's phone or generate a dynamic payment link when they click the 'Pay Now' button.",
-            "lessonBody": "A payment reminder is only as effective as the checkout experience it provides. If a customer receives a WhatsApp message but has to manually open their M-Pesa app, type in a 6-digit Paybill number, double-check the account reference, and enter the exact amount, the friction will cost you conversions. To solve this, your agent must integrate directly with Safaricom's Daraja API to trigger an M-Pesa STK (Sim Toolkit) push right to the customer's phone.\n\nThe process begins by authenticating with the Daraja API using OAuth 2.0. Your backend requests a time-bound access token using your consumer key and secret. With this token, you can construct a Lipa Na M-Pesa Online (LNMO) payload. This payload requires strict formatting: you need a base64-encoded password (generated by combining your business shortcode, passkey, and a timestamp), the transaction amount, and the customer's Safaricom phone number.\n\nWhen the customer taps the \"Pay via M-Pesa\" button on WhatsApp, your webhook receives the interaction and immediately fires the STK push request to Daraja. Within seconds, a PIN prompt appears on the customer's screen displaying the exact KES amount and the business name. All they have to do is input their M-Pesa PIN. This frictionless flow is the most powerful tool in Kenyan digital commerce.\n\nCrucially, the STK push request is asynchronous. Daraja will return an immediate acknowledgment that the prompt was sent, but you won't know if the payment was successful until the customer actually enters their PIN. Safaricom handles this by sending a callback (a POST request) to a designated Webhook URL you provide in the payload. Your server must listen for this callback, parse the ResultCode (where 0 means success), and extract the receipt number.\n\nHandling these callbacks reliably is what separates a toy project from a production system. If your server goes down and misses the Daraja callback, the customer's money is deducted, but your system still thinks they owe you, leading to awkward and damaging follow-ups. You must build robust webhook receivers that acknowledge Safaricom's request quickly and update your database accurately.",
-            "keyLearnings": [
-              "Authenticating with the Safaricom Daraja API using OAuth 2.0",
-              "Formatting the Lipa Na M-Pesa Online (LNMO) payload",
-              "Handling asynchronous Daraja callback webhooks for payment success"
-            ],
-            "codeSnippet": "export async function triggerMpesaSTK(phoneNumber: string, amount: number, reference: string) {\n  const payload = {\n    BusinessShortCode: \"174379\",\n    Password: generateMpesaPassword(),\n    Timestamp: getTimestamp(),\n    TransactionType: \"CustomerPayBillOnline\",\n    Amount: amount,\n    PartyA: phoneNumber,\n    PartyB: \"174379\",\n    PhoneNumber: phoneNumber,\n    CallBackURL: \"https://your-api.com/mpesa/callback\",\n    AccountReference: reference,\n    TransactionDesc: \"Invoice Payment\"\n  };\n  return await axios.post(DARAJA_STK_URL, payload, { headers: { Authorization: `Bearer ${token}` } });\n}"
-          }
-        },
-        {
-          "id": "col-step-4",
-          "number": "04",
-          "title": "Tone Calibration by Account Size",
-          "subtitle": "Adapting messaging for different clients",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Prompt Design",
-          "summary": "Using AI to shift the conversation tone dynamically based on the overdue amount and customer history.",
-          "isGated": true,
-          "content": {
-            "overview": "A KES 2,000 overdue personal invoice shouldn't receive the exact same messaging as a KES 500,000 B2B invoice. You'll design prompt logic that instructs the LLM to adjust its formality, patience, and phrasing based on the account size and context.",
-            "lessonBody": "Not all debts are created equal, and your AI agent must understand the difference. A customer who forgot to pay a KES 2,000 personal invoice for a small repair job requires a vastly different approach than a corporate client who is 45 days late on a KES 500,000 B2B service contract. If your agent uses the exact same language for both, it will either insult the corporate client with excessive familiarity or overwhelm the small customer with intimidating legal jargon.\n\nTo solve this, you need to design conditional prompt logic that shifts the LLM's persona based on the invoice value and the customer's profile. Before sending a query to Gemini or GPT-4, your backend must evaluate the account size and select the appropriate system instructions. For smaller amounts, the prompt might instruct the AI to be \"warm, casual, and brief,\" using phrases like \"Hi there, just a quick reminder.\"\n\nFor larger B2B accounts, the prompt must enforce a strict, professional corporate tone. The AI should use formal salutations (\"Dear Operations Team\"), clearly outline the invoice details, and politely request an update on the payment processing status. It should avoid casual pleasantries and focus entirely on the business transaction. This dynamic shifting makes the agent feel like a nuanced human employee rather than a rigid script.\n\nEqually important in tone calibration is setting absolute negative constraints. Regardless of the account size or the customer's response, the AI must never resort to threats, aggression, or illegal collection tactics. Your system prompt must explicitly forbid statements like \"We will report you to the CRB immediately\" unless that is a verified, legally compliant next step authorized by the business owner.\n\nBy mastering tone calibration, you ensure the collections agent protects the business's reputation. It allows the business owner to trust the AI with sensitive client relationships, knowing that it will apply the right amount of pressure without burning bridges or crossing legal boundaries.",
-            "keyLearnings": [
-              "Creating conditional system instructions based on invoice value",
-              "Balancing B2B professional tone with B2C approachability",
-              "Ensuring the AI never uses threatening or illegal language"
-            ],
-            "samplePrompt": "You are a collections assistant. The current invoice is for {{AMOUNT}}. \nIf the amount is under KES 10,000, use a friendly, casual tone (e.g., 'Hi [Name], just a quick reminder...'). \nIf the amount is over KES 100,000, use a highly professional, formal corporate tone (e.g., 'Dear [Name], we are writing to follow up on...'). \nNEVER threaten the user or use aggressive language."
-          }
-        },
-        {
-          "id": "col-step-5",
-          "number": "05",
-          "title": "Handling Partial Payments Gracefully",
-          "subtitle": "Managing incomplete settlements",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Logic",
-          "summary": "Building logic to correctly acknowledge partial payments while politely requesting the balance.",
-          "isGated": true,
-          "content": {
-            "overview": "Customers often pay part of the balance. The system must recognize the Daraja webhook callback, update the CRM, and have the AI acknowledge the receipt of the partial amount while cleanly restating the remaining balance without sounding robotic.",
-            "lessonBody": "In the real world of small business finance, customers rarely pay perfectly. When faced with an overdue balance, a customer might pay half now to buy time, or they might send a slightly lower amount because of transaction fees or simple miscalculation. If your system rigidly expects the exact invoice total and fails when it sees anything else, it will create massive confusion. The agent must handle partial payments seamlessly.\n\nWhen your Daraja webhook receives a payment callback, the first step is reconciliation. Your backend script must compare the received amount against the expected invoice total. If the amount is lower, you shouldn't just reject it—you must update the database to reflect the new outstanding balance. The invoice state moves from \"Overdue\" to \"Partially Paid,\" which triggers a completely different logic path for your AI agent.\n\nThe LLM must be prompted to acknowledge the received funds specifically. For example, the system prompt injected into the next WhatsApp message should include the exact amount received and the exact amount remaining. The AI needs to say, \"Thank you for the KES 5,000 payment via M-Pesa. You currently have a remaining balance of KES 3,500.\" This confirms receipt, builds trust, and keeps the pressure on for the remainder without sounding robotic.\n\nFurthermore, a partial payment usually resets the escalation clock. If a customer was on Day 15 (Firm Reminder) but makes a significant partial payment, it is often bad practice to hit them with a Day 16 (Final Notice) message the next morning. Your logic engine should reset their status, giving them a brief grace period before the agent follows up on the remaining balance.\n\nHandling these nuances is what makes an AI agent genuinely useful to a Kenyan SME. By successfully managing partial payments, the agent reduces the administrative burden on the business owner, who no longer has to manually verify M-Pesa messages and text customers back with updated balances.",
-            "keyLearnings": [
-              "Reconciling M-Pesa receipts against expected invoice totals",
-              "Prompting the AI to calculate and state the remaining balance",
-              "Resetting the escalation clock when a partial payment is made"
-            ]
-          }
-        },
-        {
-          "id": "col-step-6",
-          "number": "06",
-          "title": "Payment Plan Negotiation Flows",
-          "subtitle": "AI-driven debt restructuring",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Prompt Engineering",
-          "summary": "Authoring strict prompts that allow the AI to negotiate and agree to structured installment plans within pre-approved business limits.",
-          "isGated": true,
-          "content": {
-            "overview": "In emerging markets, offering a payment plan often secures more revenue than rigid demands. You'll build a negotiation engine where the AI is authorized to offer split payments (e.g., '50% now, 50% next week') if the user claims financial hardship, extracting the agreed dates into structured JSON.",
-            "lessonBody": "In emerging markets, cash flow can be highly volatile. When a customer genuinely cannot pay a large invoice all at once, offering a structured payment plan is often the only way to recover the revenue. Instead of a rigid \"pay now or else\" approach, your collections agent can be authorized to negotiate installments. This requires advanced prompt engineering and strict boundary setting.\n\nYou must design a system prompt that outlines the exact rules of negotiation. The LLM needs clear constraints: for example, \"You may offer a maximum of two installments,\" \"The first installment must cover at least 40% of the total and be paid today,\" and \"The final payment must be scheduled within 14 days.\" Without these hard limits, a generative AI might happily agree to a five-year payment plan for a KES 10,000 debt, which is useless to the business.\n\nTo capture the outcome of this negotiation, you will use function calling (or structured JSON output). When the customer agrees to a plan—say, paying half today and half next Friday—the LLM must be instructed to output a specific JSON payload, such as `{\"installment1_amount\": 5000, \"installment1_date\": \"today\", \"installment2_amount\": 5000, \"installment2_date\": \"next_friday\"}`. This allows your backend to reliably parse the agreement rather than trying to read the chat history.\n\nThe AI must also handle counter-offers gracefully. If the user asks for a month-long extension but your prompt limits it to 14 days, the AI should politely decline the month-long offer and propose the 14-day maximum. It acts as a firm but fair negotiator, strictly adhering to the business owner's predefined risk tolerance.\n\nOnce the JSON payload is extracted by your backend, the system updates the database. The original invoice is flagged as \"Under Payment Plan,\" the escalation clock is paused, and new cron jobs are scheduled to trigger Daraja STK pushes on the agreed-upon dates. This transforms the AI from a simple reminder bot into a sophisticated financial mediator.",
-            "keyLearnings": [
-              "Defining negotiation boundaries (e.g., max 3 installments, max 30 days)",
-              "Using function calling to extract agreed dates and amounts",
-              "Handling user counter-offers gracefully"
-            ],
-            "samplePrompt": "You may negotiate a payment plan if the user cannot pay in full. \nRules: \n1. Maximum 2 installments. \n2. First installment must be at least 40% paid today. \n3. Final payment must be within 14 days.\nIf the user agrees to a valid plan, output the structured plan using the [PAYMENT_PLAN_AGREED: {\"installment1\": ..., \"date1\": ..., \"installment2\": ..., \"date2\": ...}] format.",
-            "testCase": {
-              "input": "I don't have the full 10k right now, business is slow. Can I pay 5k today and 5k end of month?",
-              "expectedOutput": "I understand. Since the end of the month is within our 14-day window, we can accept KES 5,000 today and KES 5,000 by the 30th. Shall I send the M-Pesa prompt for the first 5,000 now? [PAYMENT_PLAN_AGREED: {\"installment1\": 5000, \"date1\": \"today\", \"installment2\": 5000, \"date2\": \"end_of_month\"}]"
+          {
+            "id": "col-step-1",
+            "number": "01",
+            "title": "Overdue Detection & Escalation Sequencing",
+            "subtitle": "Triggering the first touchpoint automatically",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Flow Design",
+            "summary": "Mapping out the collection journey from a gentle day-1 reminder to firmer 30-day escalation, ensuring compliance with local standards.",
+            "isGated": false,
+            "content": {
+              "overview": "Before writing code, you need a defined escalation matrix. In this lesson, you map out the transition from a 'friendly nudge' (Day 1-3) to a 'firm reminder' (Day 15) and eventually 'formal notice' (Day 30+), ensuring the AI respects Kenyan data protection and anti-harassment laws.",
+              "lessonBody": "Before writing a single line of code, you must define the logic that decides when and how to contact a customer. A collections agent isn't just a bot that texts people every day until they pay; that approach is a quick way to get your WhatsApp Business number blocked and reported for spam. Instead, you need a timed escalation matrix. This matrix acts as the state machine for your agent, tracking exactly how many days an invoice is past due and what level of urgency the next message should carry.\n\nIn a standard Kenyan context, this timeline typically starts with a \"gentle nudge\" on Day 1 or Day 3 after the due date. The goal here is to assume positive intent—perhaps the customer simply forgot or is waiting for their own clients to pay them. The prompt injected at this stage instructs the AI to be warm, polite, and helpful, often simply providing a copy of the invoice for reference. You want to reduce friction, not create hostility.\n\nBy Day 15, the state machine shifts the tone to a \"firm reminder.\" The system prompt must be updated to reflect this urgency. At this stage, you might include clear deadlines or mention potential pauses in service provision. The AI's instructions become stricter, ensuring it doesn't use overly casual language (like slang or excessive emojis) that undermines the seriousness of an unpaid debt.\n\nBy Day 30 and beyond, the system enters the \"formal notice\" phase. In Kenya, debt collection is subject to specific data protection laws and anti-harassment regulations. Your AI must never threaten violence, public shaming, or illegal actions. The escalation matrix at this point often hands off the conversation to a human manager or outputs a formally formatted final notice, strictly avoiding any language that could expose the business to legal liability.\n\nMapping these states correctly ensures your variables—like the invoice amount, the original due date, and the customer's name—are dynamically injected into the right context at the right time. Your backend (often a cron job checking a database or Google Sheet) evaluates every overdue invoice daily, determines its position in the escalation matrix, and passes that exact state to the LLM to generate the appropriate outbound message.",
+              "keyLearnings": [
+                "Designing time-based overdue triggers",
+                "Understanding Kenyan debt-collection compliance and anti-shaming laws",
+                "Mapping variables (invoice amount, due date, customer name) for dynamic injection"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "The escalation matrix defines what tone is used at each stage.",
+                  "flow": [
+                    "Day 1-3: Gentle nudge",
+                    "Day 15: Firm reminder",
+                    "Day 30+: Formal notice / human handoff"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "What's the real risk of texting an overdue customer every single day with the same message?",
+                "options": [
+                  {
+                    "text": "Nothing - persistence is the best strategy for debt collection",
+                    "feedback": "Constant identical messaging is exactly what gets a business's WhatsApp number blocked and reported for spam.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The WhatsApp number risks getting blocked and reported for spam",
+                    "feedback": "Right. This is exactly why the escalation matrix paces messages over time instead.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Meta charges extra for every reminder sent past the first one",
+                    "feedback": "Cost isn't the concern described here - it's about spam reporting and number blocking.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-2",
+            "number": "02",
+            "title": "WhatsApp Utility Templates for Reminders",
+            "subtitle": "Formatting compliant push notifications",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Messaging",
+            "summary": "Crafting Meta-approved Utility templates to initiate outbound payment reminders on WhatsApp.",
+            "isGated": false,
+            "content": {
+              "overview": "WhatsApp requires pre-approved Utility templates to start a conversation with a customer. You'll build and submit non-aggressive, clear reminder templates that include interactive 'Pay Now' buttons, maximizing open and payment rates.",
+              "lessonBody": "When initiating a conversation with a customer about an overdue payment, you cannot just send a free-form message through the WhatsApp Cloud API. Meta enforces a strict 24-hour customer service window; if the customer hasn't messaged the business in the last 24 hours, you must use a pre-approved Message Template. For payment reminders, this falls under the \"Utility\" category, which Meta strictly monitors for compliance.\n\nBuilding a Utility template requires logging into Meta Business Manager and defining a structured message with specific placeholders. These placeholders, formatted as {{1}}, {{2}}, etc., are where your backend will inject dynamic data like the customer's name, the invoice number, and the KES amount. It is crucial to draft these templates with a neutral, non-aggressive tone, as Meta's automated reviewers will reject templates that sound threatening or spammy.\n\nBeyond the text, modern WhatsApp templates allow you to attach interactive call-to-action (CTA) buttons. For a collections agent, a \"Pay via M-Pesa\" button is the most critical component. Instead of asking the customer to type out a response or manually search for a Paybill number, the button provides an immediate, frictionless next step. You can also include a \"Talk to Support\" button, which your webhook will intercept to route the user to a human if they need to dispute the charge.\n\nOnce the template is approved by Meta, your Node.js or Python backend triggers it by sending a POST request to the WhatsApp API. The payload includes the template name, the language code (usually 'en' or 'sw' for Swahili), and an array of parameters to fill the placeholders. If you miss a parameter or format it incorrectly, the API will reject the request, meaning the reminder never goes out.\n\nUnderstanding this template ecosystem is the foundation of proactive messaging. You are essentially building the bridge between your internal overdue detection logic and the customer's WhatsApp inbox. Getting the template right means higher open rates, fewer customer complaints, and a significantly faster path to payment recovery.",
+              "keyLearnings": [
+                "Navigating Meta's Business Manager to create Utility templates",
+                "Using variables like {{1}} for names and {{2}} for KES amounts",
+                "Adding interactive call-to-action (CTA) buttons to templates"
+              ],
+              "samplePrompt": "Template Body: 'Hi {{1}}, this is a friendly reminder that invoice {{2}} for KES {{3}} was due on {{4}}. Please tap below to view the invoice or pay via M-Pesa. If already settled, kindly ignore this message.'\nButtons: [Pay via M-Pesa] [Talk to Support]",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A button removes every manual step between reminder and payment.",
+                  "compare": [
+                    {
+                      "label": "Text-only reminder",
+                      "text": "Customer has to manually find the Paybill number and type it in",
+                      "good": false
+                    },
+                    {
+                      "label": "'Pay via M-Pesa' button",
+                      "text": "Immediate, frictionless next step",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why will Meta's automated reviewers reject a payment reminder template that sounds aggressive or threatening?",
+                "options": [
+                  {
+                    "text": "Utility templates are strictly monitored for compliance and neutral tone",
+                    "feedback": "Right. Meta reviews Utility templates specifically for this kind of compliance.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Aggressive language uses more characters than Meta allows",
+                    "feedback": "Character count isn't the issue - it's tone compliance.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Templates are only reviewed for grammar, not tone",
+                    "feedback": "Meta explicitly reviews for tone here, not just grammar.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-3",
+            "number": "03",
+            "title": "Generating Live M-Pesa Payment Links",
+            "subtitle": "Frictionless checkout from WhatsApp",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Integrations",
+            "summary": "Connecting Safaricom's Daraja API to generate STK push prompts or M-Pesa payment links directly inside the chat.",
+            "isGated": false,
+            "content": {
+              "overview": "A reminder is only effective if paying is effortless. You'll integrate the Safaricom Daraja API to trigger an M-Pesa STK push directly to the customer's phone or generate a dynamic payment link when they click the 'Pay Now' button.",
+              "lessonBody": "A payment reminder is only as effective as the checkout experience it provides. If a customer receives a WhatsApp message but has to manually open their M-Pesa app, type in a 6-digit Paybill number, double-check the account reference, and enter the exact amount, the friction will cost you conversions. To solve this, your agent must integrate directly with Safaricom's Daraja API to trigger an M-Pesa STK (Sim Toolkit) push right to the customer's phone.\n\nThe process begins by authenticating with the Daraja API using OAuth 2.0. Your backend requests a time-bound access token using your consumer key and secret. With this token, you can construct a Lipa Na M-Pesa Online (LNMO) payload. This payload requires strict formatting: you need a base64-encoded password (generated by combining your business shortcode, passkey, and a timestamp), the transaction amount, and the customer's Safaricom phone number.\n\nWhen the customer taps the \"Pay via M-Pesa\" button on WhatsApp, your webhook receives the interaction and immediately fires the STK push request to Daraja. Within seconds, a PIN prompt appears on the customer's screen displaying the exact KES amount and the business name. All they have to do is input their M-Pesa PIN. This frictionless flow is the most powerful tool in Kenyan digital commerce.\n\nCrucially, the STK push request is asynchronous. Daraja will return an immediate acknowledgment that the prompt was sent, but you won't know if the payment was successful until the customer actually enters their PIN. Safaricom handles this by sending a callback (a POST request) to a designated Webhook URL you provide in the payload. Your server must listen for this callback, parse the ResultCode (where 0 means success), and extract the receipt number.\n\nHandling these callbacks reliably is what separates a toy project from a production system. If your server goes down and misses the Daraja callback, the customer's money is deducted, but your system still thinks they owe you, leading to awkward and damaging follow-ups. You must build robust webhook receivers that acknowledge Safaricom's request quickly and update your database accurately.",
+              "keyLearnings": [
+                "Authenticating with the Safaricom Daraja API using OAuth 2.0",
+                "Formatting the Lipa Na M-Pesa Online (LNMO) payload",
+                "Handling asynchronous Daraja callback webhooks for payment success"
+              ],
+              "codeSnippet": "export async function triggerMpesaSTK(phoneNumber: string, amount: number, reference: string) {\n  const payload = {\n    BusinessShortCode: \"174379\",\n    Password: generateMpesaPassword(),\n    Timestamp: getTimestamp(),\n    TransactionType: \"CustomerPayBillOnline\",\n    Amount: amount,\n    PartyA: phoneNumber,\n    PartyB: \"174379\",\n    PhoneNumber: phoneNumber,\n    CallBackURL: \"https://your-api.com/mpesa/callback\",\n    AccountReference: reference,\n    TransactionDesc: \"Invoice Payment\"\n  };\n  return await axios.post(DARAJA_STK_URL, payload, { headers: { Authorization: `Bearer ${token}` } });\n}",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The prompt firing and the payment confirming are two separate moments.",
+                  "flow": [
+                    "Customer taps 'Pay via M-Pesa'",
+                    "Webhook fires STK push to Daraja",
+                    "PIN prompt appears on customer's phone",
+                    "Customer enters PIN to confirm"
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "A customer taps \"Pay via M-Pesa\". The STK push request returns an immediate acknowledgment that the prompt was sent.",
+                "workedExample": "At this point, your server only knows the prompt reached the phone - it does NOT yet know if the customer actually entered their PIN and completed payment.",
+                "challenge": "Your server crashes right after the STK push is sent, before Safaricom's callback arrives. What happens to this transaction?",
+                "placeholder": "If the server is down when the callback ___, the customer's money may be deducted but your system never learns it, causing an awkward ___ follow-up.",
+                "solution": "If the server is down when the callback arrives, the customer's money may be deducted but your system never learns it, causing an awkward duplicate follow-up.",
+                "explanation": "This is exactly the reliability risk from the lesson - the STK push and the payment confirmation are two separate, asynchronous events, and a missed callback leaves your database out of sync."
+              }
+            }
+          },
+          {
+            "id": "col-step-4",
+            "number": "04",
+            "title": "Tone Calibration by Account Size",
+            "subtitle": "Adapting messaging for different clients",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Prompt Design",
+            "summary": "Using AI to shift the conversation tone dynamically based on the overdue amount and customer history.",
+            "isGated": true,
+            "content": {
+              "overview": "A KES 2,000 overdue personal invoice shouldn't receive the exact same messaging as a KES 500,000 B2B invoice. You'll design prompt logic that instructs the LLM to adjust its formality, patience, and phrasing based on the account size and context.",
+              "lessonBody": "Not all debts are created equal, and your AI agent must understand the difference. A customer who forgot to pay a KES 2,000 personal invoice for a small repair job requires a vastly different approach than a corporate client who is 45 days late on a KES 500,000 B2B service contract. If your agent uses the exact same language for both, it will either insult the corporate client with excessive familiarity or overwhelm the small customer with intimidating legal jargon.\n\nTo solve this, you need to design conditional prompt logic that shifts the LLM's persona based on the invoice value and the customer's profile. Before sending a query to Gemini or GPT-4, your backend must evaluate the account size and select the appropriate system instructions. For smaller amounts, the prompt might instruct the AI to be \"warm, casual, and brief,\" using phrases like \"Hi there, just a quick reminder.\"\n\nFor larger B2B accounts, the prompt must enforce a strict, professional corporate tone. The AI should use formal salutations (\"Dear Operations Team\"), clearly outline the invoice details, and politely request an update on the payment processing status. It should avoid casual pleasantries and focus entirely on the business transaction. This dynamic shifting makes the agent feel like a nuanced human employee rather than a rigid script.\n\nEqually important in tone calibration is setting absolute negative constraints. Regardless of the account size or the customer's response, the AI must never resort to threats, aggression, or illegal collection tactics. Your system prompt must explicitly forbid statements like \"We will report you to the CRB immediately\" unless that is a verified, legally compliant next step authorized by the business owner.\n\nBy mastering tone calibration, you ensure the collections agent protects the business's reputation. It allows the business owner to trust the AI with sensitive client relationships, knowing that it will apply the right amount of pressure without burning bridges or crossing legal boundaries.",
+              "keyLearnings": [
+                "Creating conditional system instructions based on invoice value",
+                "Balancing B2B professional tone with B2C approachability",
+                "Ensuring the AI never uses threatening or illegal language"
+              ],
+              "samplePrompt": "You are a collections assistant. The current invoice is for {{AMOUNT}}. \nIf the amount is under KES 10,000, use a friendly, casual tone (e.g., 'Hi [Name], just a quick reminder...'). \nIf the amount is over KES 100,000, use a highly professional, formal corporate tone (e.g., 'Dear [Name], we are writing to follow up on...'). \nNEVER threaten the user or use aggressive language.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Two very different amounts, two very different registers.",
+                  "compare": [
+                    {
+                      "label": "KES 2,000 personal invoice",
+                      "text": "'Hi there, just a quick reminder' - warm and casual",
+                      "good": true
+                    },
+                    {
+                      "label": "KES 500,000 B2B invoice",
+                      "text": "'Dear Operations Team' - strictly formal and professional",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Regardless of account size, what must the AI's tone calibration NEVER include?",
+                "options": [
+                  {
+                    "text": "Threats, aggression, or illegal collection tactics",
+                    "feedback": "Right. This is the absolute negative constraint that applies no matter the account size.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Any mention of the exact overdue amount",
+                    "feedback": "Stating the exact amount is normal and expected.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Formal language for B2B accounts",
+                    "feedback": "Formal language for B2B accounts is exactly what is recommended, not forbidden.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-5",
+            "number": "05",
+            "title": "Handling Partial Payments Gracefully",
+            "subtitle": "Managing incomplete settlements",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Logic",
+            "summary": "Building logic to correctly acknowledge partial payments while politely requesting the balance.",
+            "isGated": true,
+            "content": {
+              "overview": "Customers often pay part of the balance. The system must recognize the Daraja webhook callback, update the CRM, and have the AI acknowledge the receipt of the partial amount while cleanly restating the remaining balance without sounding robotic.",
+              "lessonBody": "In the real world of small business finance, customers rarely pay perfectly. When faced with an overdue balance, a customer might pay half now to buy time, or they might send a slightly lower amount because of transaction fees or simple miscalculation. If your system rigidly expects the exact invoice total and fails when it sees anything else, it will create massive confusion. The agent must handle partial payments seamlessly.\n\nWhen your Daraja webhook receives a payment callback, the first step is reconciliation. Your backend script must compare the received amount against the expected invoice total. If the amount is lower, you shouldn't just reject it—you must update the database to reflect the new outstanding balance. The invoice state moves from \"Overdue\" to \"Partially Paid,\" which triggers a completely different logic path for your AI agent.\n\nThe LLM must be prompted to acknowledge the received funds specifically. For example, the system prompt injected into the next WhatsApp message should include the exact amount received and the exact amount remaining. The AI needs to say, \"Thank you for the KES 5,000 payment via M-Pesa. You currently have a remaining balance of KES 3,500.\" This confirms receipt, builds trust, and keeps the pressure on for the remainder without sounding robotic.\n\nFurthermore, a partial payment usually resets the escalation clock. If a customer was on Day 15 (Firm Reminder) but makes a significant partial payment, it is often bad practice to hit them with a Day 16 (Final Notice) message the next morning. Your logic engine should reset their status, giving them a brief grace period before the agent follows up on the remaining balance.\n\nHandling these nuances is what makes an AI agent genuinely useful to a Kenyan SME. By successfully managing partial payments, the agent reduces the administrative burden on the business owner, who no longer has to manually verify M-Pesa messages and text customers back with updated balances.",
+              "keyLearnings": [
+                "Reconciling M-Pesa receipts against expected invoice totals",
+                "Prompting the AI to calculate and state the remaining balance",
+                "Resetting the escalation clock when a partial payment is made"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "The remaining balance is stated plainly, not hidden.",
+                  "flow": [
+                    "Full invoice: KES 8,500",
+                    "Customer pays KES 5,000",
+                    "Status updates: Overdue -> Partially Paid",
+                    "Remaining balance: KES 3,500"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer on Day 15 (Firm Reminder) makes a significant partial payment. What should happen to the escalation clock?",
+                "options": [
+                  {
+                    "text": "It continues exactly as scheduled - a Day 16 Final Notice still goes out the next morning",
+                    "feedback": "Hitting someone with a Final Notice right after they just paid something is exactly the bad practice this lesson warns against.",
+                    "correct": false
+                  },
+                  {
+                    "text": "It resets, giving the customer a brief grace period before following up on the remainder",
+                    "feedback": "Right. This is exactly the nuance that makes the agent feel less robotic.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The invoice is marked fully Paid and reminders stop entirely",
+                    "feedback": "A partial payment is not the full amount - reminders should continue for the remainder, just with a reset clock.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-6",
+            "number": "06",
+            "title": "Payment Plan Negotiation Flows",
+            "subtitle": "AI-driven debt restructuring",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Prompt Engineering",
+            "summary": "Authoring strict prompts that allow the AI to negotiate and agree to structured installment plans within pre-approved business limits.",
+            "isGated": true,
+            "content": {
+              "overview": "In emerging markets, offering a payment plan often secures more revenue than rigid demands. You'll build a negotiation engine where the AI is authorized to offer split payments (e.g., '50% now, 50% next week') if the user claims financial hardship, extracting the agreed dates into structured JSON.",
+              "lessonBody": "In emerging markets, cash flow can be highly volatile. When a customer genuinely cannot pay a large invoice all at once, offering a structured payment plan is often the only way to recover the revenue. Instead of a rigid \"pay now or else\" approach, your collections agent can be authorized to negotiate installments. This requires advanced prompt engineering and strict boundary setting.\n\nYou must design a system prompt that outlines the exact rules of negotiation. The LLM needs clear constraints: for example, \"You may offer a maximum of two installments,\" \"The first installment must cover at least 40% of the total and be paid today,\" and \"The final payment must be scheduled within 14 days.\" Without these hard limits, a generative AI might happily agree to a five-year payment plan for a KES 10,000 debt, which is useless to the business.\n\nTo capture the outcome of this negotiation, you will use function calling (or structured JSON output). When the customer agrees to a plan—say, paying half today and half next Friday—the LLM must be instructed to output a specific JSON payload, such as `{\"installment1_amount\": 5000, \"installment1_date\": \"today\", \"installment2_amount\": 5000, \"installment2_date\": \"next_friday\"}`. This allows your backend to reliably parse the agreement rather than trying to read the chat history.\n\nThe AI must also handle counter-offers gracefully. If the user asks for a month-long extension but your prompt limits it to 14 days, the AI should politely decline the month-long offer and propose the 14-day maximum. It acts as a firm but fair negotiator, strictly adhering to the business owner's predefined risk tolerance.\n\nOnce the JSON payload is extracted by your backend, the system updates the database. The original invoice is flagged as \"Under Payment Plan,\" the escalation clock is paused, and new cron jobs are scheduled to trigger Daraja STK pushes on the agreed-upon dates. This transforms the AI from a simple reminder bot into a sophisticated financial mediator.",
+              "keyLearnings": [
+                "Defining negotiation boundaries (e.g., max 3 installments, max 30 days)",
+                "Using function calling to extract agreed dates and amounts",
+                "Handling user counter-offers gracefully"
+              ],
+              "samplePrompt": "You may negotiate a payment plan if the user cannot pay in full. \nRules: \n1. Maximum 2 installments. \n2. First installment must be at least 40% paid today. \n3. Final payment must be within 14 days.\nIf the user agrees to a valid plan, output the structured plan using the [PAYMENT_PLAN_AGREED: {\"installment1\": ..., \"date1\": ..., \"installment2\": ..., \"date2\": ...}] format.",
+              "testCase": {
+                "input": "I don't have the full 10k right now, business is slow. Can I pay 5k today and 5k end of month?",
+                "expectedOutput": "I understand. Since the end of the month is within our 14-day window, we can accept KES 5,000 today and KES 5,000 by the 30th. Shall I send the M-Pesa prompt for the first 5,000 now? [PAYMENT_PLAN_AGREED: {\"installment1\": 5000, \"date1\": \"today\", \"installment2\": 5000, \"date2\": \"end_of_month\"}]"
+              },
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Hard limits keep the negotiation useful to the business.",
+                  "compare": [
+                    {
+                      "label": "No negotiation limits",
+                      "text": "AI might agree to a 5-year plan for a KES 10,000 debt",
+                      "good": false
+                    },
+                    {
+                      "label": "Hard-coded rules",
+                      "text": "Max 2 installments, first must be 40%+ paid today",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer asks for a month-long extension, but the prompt limits any plan to 14 days maximum. What should the AI do?",
+                "options": [
+                  {
+                    "text": "Agree to the month-long extension since the customer requested it",
+                    "feedback": "Agreeing beyond the hard limit defeats the purpose of setting negotiation boundaries.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Politely decline and propose the 14-day maximum instead",
+                    "feedback": "Right. This is exactly the firm-but-fair negotiator behavior described in the lesson.",
+                    "correct": true
+                  },
+                  {
+                    "text": "End the conversation immediately without offering any alternative",
+                    "feedback": "Ending with no alternative wastes the negotiation opportunity.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-7",
+            "number": "07",
+            "title": "Dispute Flagging & Resolution",
+            "subtitle": "When the customer says 'I already paid'",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Flow Design",
+            "summary": "Building a fallback flow to capture proof of payment and pause automated reminders during a dispute.",
+            "isGated": true,
+            "content": {
+              "overview": "The most common response to a reminder is 'I paid this yesterday.' The agent must instantly stop the dunning sequence, ask the customer for the M-Pesa transaction code, and flag the account for manual reconciliation by the business owner.",
+              "lessonBody": "The most common friction point in automated collections is the crossed-wire dispute. A customer receives a reminder on WhatsApp and immediately replies, \"I paid this yesterday,\" or \"I sent the money to the other Paybill number.\" If the AI simply ignores this context and continues sending daily payment reminders, it will infuriate the customer and damage the business's credibility.\n\nYour agent needs a reliable fallback flow for disputes. The first step is intent classification. You must prompt the LLM to analyze every incoming customer message for dispute language. If the model detects that the user is claiming they already paid, or if they are disputing the quality of the service provided, the AI must instantly shift out of \"collection mode\" and into \"resolution mode.\"\n\nWhen a dispute is detected, the AI's immediate action should be to ask for proof. In Kenya, this usually means requesting the M-Pesa transaction code (e.g., \"OQ12ABC345\"). The prompt instructs the agent to say, \"I apologize for the confusion. Could you please share the M-Pesa confirmation code so I can track this payment?\" This gathers actionable data while keeping the interaction professional.\n\nSimultaneously, your backend must pause all automated reminders for that specific invoice. If you are using a cron job to schedule messages, the database status for this invoice must be flipped to 'Disputed.' This ensures that the Day 15 or Day 30 escalation scripts skip this user until the issue is resolved, preventing embarrassing automated follow-ups.\n\nFinally, the dispute must be flagged for manual review. The system should alert the business owner—either via a separate WhatsApp notification, an email, or a dashboard flag—summarizing the customer's claim and providing the transaction code. This loop ensures that the AI handles the initial triage but defers complex reconciliation to a human, keeping the system safe and reliable.",
+              "keyLearnings": [
+                "Detecting dispute intents via LLM classification",
+                "Prompting the user for an M-Pesa confirmation code",
+                "Pausing scheduled Cron/reminder jobs for a specific invoice"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A dispute reply gets a request for proof, not another reminder.",
+                  "chat": [
+                    {
+                      "sender": "customer",
+                      "text": "I already paid this yesterday!"
+                    },
+                    {
+                      "sender": "agent",
+                      "text": "I apologize for the confusion. Could you share the M-Pesa confirmation code so I can track this payment?"
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A customer replies 'I already paid this yesterday' to a reminder. What should happen immediately on the backend?",
+                "options": [
+                  {
+                    "text": "Nothing changes - the scheduled Day 15 reminder still goes out on time",
+                    "feedback": "Continuing the automated sequence while a dispute is being investigated is exactly what damages credibility.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The invoice status flips to 'Disputed' and automated reminders pause for that invoice",
+                    "feedback": "Right. This prevents embarrassing automated follow-ups during a dispute.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The customer's account is automatically marked as Paid",
+                    "feedback": "The claim is not verified yet - the correct step is pausing and requesting proof, not assuming it is true.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-8",
+            "number": "08",
+            "title": "CRM Integration & Aging Reports",
+            "subtitle": "Keeping the ledger updated in real-time",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Backend Dev",
+            "summary": "Syncing conversation outcomes back to a Google Sheet or CRM to generate real-time 30/60/90-day aging reports.",
+            "isGated": true,
+            "content": {
+              "overview": "Collections don't happen in a vacuum. You'll build the integration that writes the agent's findings (e.g., 'Promised to pay Friday', 'Disputed', 'Partial Payment') back to the business owner's CRM or Google Sheets, dynamically updating the aging report dashboard.",
+              "lessonBody": "A collections agent cannot operate in a silo. If the AI is having conversations on WhatsApp but the business owner has no idea who has paid, who is negotiating, and who is ignoring messages, the system is fundamentally broken. You must build an integration that syncs the agent's real-time findings back to a central source of truth, typically a CRM or a simple Google Sheet.\n\nUsing the Google Sheets API (or a CRM API like HubSpot), your backend script must update specific rows corresponding to each invoice. When the Daraja webhook confirms a payment, the script updates the 'Status' column to 'Paid' and fills in the 'Date Paid' column. When the AI extracts a payment plan, it updates a 'Notes' column with the agreed dates. This ensures the business owner always has a live view of their cash flow.\n\nBeyond simple status updates, you must programmatically categorize the debt into standard accounting buckets: 30-day, 60-day, and 90-day aging. Your backend can run a daily cron job that calculates the age of every unpaid invoice and updates a summary dashboard. This turns raw conversation data into a formal Aging Report, a critical financial document for any growing SME.\n\nThis integration also allows for daily summary alerts. Instead of forcing the owner to read through hundreds of WhatsApp chats, your system can aggregate the data and send a single morning message: \"Yesterday, the agent recovered KES 45,000. 3 accounts agreed to payment plans. 2 accounts disputed their balances and need your review.\"\n\nBy connecting the conversational AI to a structured backend, you elevate the project from a neat chatbot to a core piece of financial infrastructure. The business owner relies on this dashboard to make payroll decisions, understanding exactly what cash is likely to arrive and what debt might need to be written off.",
+              "keyLearnings": [
+                "Updating Google Sheets via API to reflect invoice status",
+                "Categorizing debt into 30/60/90+ day buckets programmatically",
+                "Generating a daily summary alert for the business owner"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A daily scan turns raw due dates into a formal aging report.",
+                  "flow": [
+                    "Every unpaid invoice checked daily",
+                    "Age calculated from due date",
+                    "Bucketed into 30 / 60 / 90-day categories",
+                    "Aging report dashboard updates automatically"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the lesson insist on syncing the AI's WhatsApp findings back to a Google Sheet or CRM rather than leaving them only in the chat history?",
+                "options": [
+                  {
+                    "text": "Chat history is technically impossible to search",
+                    "feedback": "Chat history can be searched - the real problem is the owner having no consolidated view.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Without a synced source of truth, the owner has no visibility into who has paid, negotiated, or gone quiet",
+                    "feedback": "Right. This is exactly why the sync exists.",
+                    "correct": true
+                  },
+                  {
+                    "text": "WhatsApp automatically deletes chat history after 24 hours",
+                    "feedback": "WhatsApp doesn't auto-delete chats - that is not the reason given.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-9",
+            "number": "09",
+            "title": "Human Handoff & Edge Cases",
+            "subtitle": "Knowing when to escalate",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Operations",
+            "summary": "Designing safe escape hatches for angry customers or complex B2B negotiations that require a human touch.",
+            "isGated": true,
+            "content": {
+              "overview": "Not every debt can be collected by a bot. When a customer uses abusive language, threatens legal action, or requires a custom B2B settlement, the AI must instantly assign the ticket to a human agent in the WhatsApp shared inbox and mute itself.",
+              "lessonBody": "No matter how advanced your prompt engineering is, there are always scenarios where an AI should immediately stop talking. In collections, these edge cases include customers using abusive language, threatening legal action, or attempting complex B2B settlements that fall far outside standard payment plans. If the AI tries to handle these situations, it risks severely escalating the conflict.\n\nTo build a safe escape hatch, you must configure the LLM (or a faster, cheaper sentiment analysis model) to constantly monitor for anger, threats, or explicit requests to speak to a manager. When this threshold is crossed, the system must trigger a \"human handoff\" protocol. The AI's final message should be a polite de-escalation: \"I understand. I am transferring you to our account manager who will assist you shortly.\"\n\nOn the backend, triggering this handoff requires muting the AI for that specific phone number. You must update your database to flag the conversation as \"Human Managed,\" ensuring your webhook simply ignores any further messages from that user rather than passing them to Gemini. If the AI keeps replying while the human owner is trying to negotiate, it creates chaos.\n\nRouting the conversation to the human inbox depends on your infrastructure. If you are using a shared WhatsApp inbox tool, the system simply tags the conversation for review. If you are building a custom solution, your backend might forward the chat history to the owner's personal WhatsApp number or a dedicated Slack channel, allowing them to step in with full context.\n\nBuilding this safety mechanism is crucial for trust. Business owners will only deploy an autonomous agent if they are absolutely certain it won't make a bad situation worse. The human handoff guarantees that the AI handles the routine 80% of collections, while reserving the owner's time and empathy for the critical 20%.",
+              "keyLearnings": [
+                "Configuring sentiment analysis to detect anger or threats",
+                "Routing WhatsApp conversations to a human inbox",
+                "Muting the AI webhook for a specific phone number"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A detected threat triggers a clean handoff, not a debate.",
+                  "flow": [
+                    "Anger/threat/manager-request detected",
+                    "AI sends a polite de-escalation message",
+                    "Conversation flagged 'Human Managed'",
+                    "Webhook mutes AI for that phone number"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "After a human handoff is triggered for an angry customer, why must the AI be muted for that specific phone number rather than just continuing alongside the human?",
+                "options": [
+                  {
+                    "text": "If both the AI and the human reply to the same customer, it creates chaos and undermines the human negotiation",
+                    "feedback": "Right. This is exactly why the AI must be muted once a human takes over.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Muting saves money on API calls",
+                    "feedback": "Cost savings is not the reason given here.",
+                    "correct": false
+                  },
+                  {
+                    "text": "WhatsApp technically only allows one active conversation per number",
+                    "feedback": "This is not a WhatsApp platform limitation - it is a deliberate design choice.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-10",
+            "number": "10",
+            "title": "Analytics: Collections Performance",
+            "subtitle": "Measuring recovery rates",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Reporting",
+            "summary": "Building a simple dashboard to track how much debt the agent has successfully recovered this month.",
+            "isGated": true,
+            "content": {
+              "overview": "To prove the system's value to the business owner, it needs to show ROI. You'll aggregate the successful M-Pesa callbacks to calculate the total amount recovered by the AI vs the amount still outstanding.",
+              "lessonBody": "To convince a business owner to keep paying for your collections system, you have to prove its Return on Investment (ROI). It's not enough to say the bot is sending messages; you must definitively show how much cash the bot has brought back into the business. This requires building a lightweight analytics engine that tracks recovery rates.\n\nThe core metric is the total amount recovered versus the total amount outstanding. Your backend must query the database to sum up all successful M-Pesa callbacks attributed to the agent's interventions in a given month. If the agent chased down KES 200,000 in overdue invoices and successfully collected KES 150,000, it has a 75% recovery rate. This is a hard, undeniable metric of success.\n\nYou should also track the effectiveness of your escalation matrix. By logging which day of the sequence (Day 3 vs Day 15) yields the highest number of Daraja payments, you can optimize the flow. If you find that 90% of people pay after the Day 3 \"gentle nudge,\" but almost nobody pays after Day 30, the business owner might decide to cut their losses earlier or hand off to a human sooner.\n\nFormatting this data into an easily digestible report is key. Business owners rarely want to log into a new web dashboard. Instead, you can write a script that compiles these statistics into a clean, formatted WhatsApp message or a simple PDF generated on the fly. Sending a weekly summary—\"This week, the AI agent recovered KES 85,000 from 12 overdue accounts\"—keeps the value of your system top-of-mind.\n\nBy focusing on performance analytics, you transition from being a developer who built a cool tool to a consultant who provided a measurable business solution. This data-driven approach is what allows you to charge premium prices for the systems you build.",
+              "keyLearnings": [
+                "Calculating the recovery rate percentage",
+                "Tracking which escalation day (Day 3 vs Day 15) yields the most payments",
+                "Formatting a weekly WhatsApp summary report for the boss"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "One clean number proves the system paid for itself.",
+                  "flow": [
+                    "KES 200,000 chased down this month",
+                    "KES 150,000 successfully collected",
+                    "= 75% recovery rate",
+                    "Hard, undeniable proof of ROI"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "If 90% of customers pay after the Day 3 'gentle nudge' but almost nobody pays after Day 30, what should the business owner consider doing?",
+                "options": [
+                  {
+                    "text": "Nothing - every escalation day should always be treated equally",
+                    "feedback": "The whole point of tracking this metric is to let the data inform whether later stages are worth running.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Consider cutting losses earlier or handing off to a human sooner instead of running the full 30-day sequence",
+                    "feedback": "Right. This is exactly the optimization this analytics layer enables.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Send the Day 3 message more frequently since it works best",
+                    "feedback": "Repeating the same message more often is the spam risk flagged back in an earlier lesson.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "col-step-11",
+            "number": "11",
+            "title": "Verified Portfolio Deployment",
+            "subtitle": "Launch your collections agent",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Deployment",
+            "summary": "Deploy your fully functional AI collections agent for a real client, securing your verified portfolio link.",
+            "isGated": true,
+            "content": {
+              "overview": "It's time to go live. You will deploy the collections agent to a cloud environment, connect it to a real business's WhatsApp number, and run a safe test with a live M-Pesa STK push. Once the business confirms it works, you receive your verified portfolio link and a direct quote from the owner.",
+              "lessonBody": "Everything you have built so far has been in a controlled development environment. The final step is to deploy your collections agent into the real world for an actual business, proving that your code holds up under the pressure of real money and real customers. This deployment is the definitive proof of your competence.\n\nYou will start by hosting your Node.js or Python backend on a stable cloud provider like Render, Heroku, or AWS. You must ensure your environment variables (like Daraja consumer keys and Meta API tokens) are securely stored and never exposed. Once deployed, you will connect your live webhook URL to the WhatsApp Cloud API and verify that it can receive messages from external numbers.\n\nThe most critical phase is the safe end-to-end test. Working with your client, you will identify a real, low-risk overdue invoice (perhaps a trusted regular customer or a test account) and trigger the escalation sequence. You must verify that the WhatsApp Utility template fires, the \"Pay Now\" button triggers the M-Pesa STK push, the Daraja callback is successfully received by your server, and the Google Sheet is updated to \"Paid.\"\n\nOnce the system is running smoothly, it's time to gather your portfolio assets. Take screenshots of the successful M-Pesa flow, record a short screen-share demonstrating how the Google Sheet updates automatically, and most importantly, ask the business owner for a direct quote about the time and money the system has saved them.\n\nThis process culminates in your Verified Portfolio link. Instead of a generic certificate or an arbitrary audit score, you walk away with a live, revenue-generating system and a real client testimonial. This is the ultimate proof that you can build functional, high-value AI automation for the Kenyan market.",
+              "keyLearnings": [
+                "Deploying the webhook safely to a production environment",
+                "Running an end-to-end test on a real overdue invoice",
+                "Securing a verified client testimonial for your portfolio"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Every stage of the pipeline is proven before it ships.",
+                  "flow": [
+                    "Utility template fires on a real low-risk invoice",
+                    "'Pay Now' button triggers the M-Pesa STK push",
+                    "Daraja callback received by your server",
+                    "Google Sheet updates to 'Paid'"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "According to this lesson, what should you use for the live end-to-end test - a random real customer, or something else?",
+                "options": [
+                  {
+                    "text": "Any random overdue customer, to maximize the realism of the test",
+                    "feedback": "Testing on a random real customer risks a genuinely bad experience if something breaks.",
+                    "correct": false
+                  },
+                  {
+                    "text": "A real, low-risk overdue invoice, like a trusted regular customer or a test account",
+                    "feedback": "Right. This keeps the test realistic while minimizing risk.",
+                    "correct": true
+                  },
+                  {
+                    "text": "A completely fabricated invoice that doesn't exist in the business's real records",
+                    "feedback": "A fully fabricated invoice would not prove the system works against real live infrastructure.",
+                    "correct": false
+                  }
+                ]
+              }
             }
           }
-        },
-        {
-          "id": "col-step-7",
-          "number": "07",
-          "title": "Dispute Flagging & Resolution",
-          "subtitle": "When the customer says 'I already paid'",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Flow Design",
-          "summary": "Building a fallback flow to capture proof of payment and pause automated reminders during a dispute.",
-          "isGated": true,
-          "content": {
-            "overview": "The most common response to a reminder is 'I paid this yesterday.' The agent must instantly stop the dunning sequence, ask the customer for the M-Pesa transaction code, and flag the account for manual reconciliation by the business owner.",
-            "lessonBody": "The most common friction point in automated collections is the crossed-wire dispute. A customer receives a reminder on WhatsApp and immediately replies, \"I paid this yesterday,\" or \"I sent the money to the other Paybill number.\" If the AI simply ignores this context and continues sending daily payment reminders, it will infuriate the customer and damage the business's credibility.\n\nYour agent needs a reliable fallback flow for disputes. The first step is intent classification. You must prompt the LLM to analyze every incoming customer message for dispute language. If the model detects that the user is claiming they already paid, or if they are disputing the quality of the service provided, the AI must instantly shift out of \"collection mode\" and into \"resolution mode.\"\n\nWhen a dispute is detected, the AI's immediate action should be to ask for proof. In Kenya, this usually means requesting the M-Pesa transaction code (e.g., \"OQ12ABC345\"). The prompt instructs the agent to say, \"I apologize for the confusion. Could you please share the M-Pesa confirmation code so I can track this payment?\" This gathers actionable data while keeping the interaction professional.\n\nSimultaneously, your backend must pause all automated reminders for that specific invoice. If you are using a cron job to schedule messages, the database status for this invoice must be flipped to 'Disputed.' This ensures that the Day 15 or Day 30 escalation scripts skip this user until the issue is resolved, preventing embarrassing automated follow-ups.\n\nFinally, the dispute must be flagged for manual review. The system should alert the business owner—either via a separate WhatsApp notification, an email, or a dashboard flag—summarizing the customer's claim and providing the transaction code. This loop ensures that the AI handles the initial triage but defers complex reconciliation to a human, keeping the system safe and reliable.",
-            "keyLearnings": [
-              "Detecting dispute intents via LLM classification",
-              "Prompting the user for an M-Pesa confirmation code",
-              "Pausing scheduled Cron/reminder jobs for a specific invoice"
-            ]
-          }
-        },
-        {
-          "id": "col-step-8",
-          "number": "08",
-          "title": "CRM Integration & Aging Reports",
-          "subtitle": "Keeping the ledger updated in real-time",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Backend Dev",
-          "summary": "Syncing conversation outcomes back to a Google Sheet or CRM to generate real-time 30/60/90-day aging reports.",
-          "isGated": true,
-          "content": {
-            "overview": "Collections don't happen in a vacuum. You'll build the integration that writes the agent's findings (e.g., 'Promised to pay Friday', 'Disputed', 'Partial Payment') back to the business owner's CRM or Google Sheets, dynamically updating the aging report dashboard.",
-            "lessonBody": "A collections agent cannot operate in a silo. If the AI is having conversations on WhatsApp but the business owner has no idea who has paid, who is negotiating, and who is ignoring messages, the system is fundamentally broken. You must build an integration that syncs the agent's real-time findings back to a central source of truth, typically a CRM or a simple Google Sheet.\n\nUsing the Google Sheets API (or a CRM API like HubSpot), your backend script must update specific rows corresponding to each invoice. When the Daraja webhook confirms a payment, the script updates the 'Status' column to 'Paid' and fills in the 'Date Paid' column. When the AI extracts a payment plan, it updates a 'Notes' column with the agreed dates. This ensures the business owner always has a live view of their cash flow.\n\nBeyond simple status updates, you must programmatically categorize the debt into standard accounting buckets: 30-day, 60-day, and 90-day aging. Your backend can run a daily cron job that calculates the age of every unpaid invoice and updates a summary dashboard. This turns raw conversation data into a formal Aging Report, a critical financial document for any growing SME.\n\nThis integration also allows for daily summary alerts. Instead of forcing the owner to read through hundreds of WhatsApp chats, your system can aggregate the data and send a single morning message: \"Yesterday, the agent recovered KES 45,000. 3 accounts agreed to payment plans. 2 accounts disputed their balances and need your review.\"\n\nBy connecting the conversational AI to a structured backend, you elevate the project from a neat chatbot to a core piece of financial infrastructure. The business owner relies on this dashboard to make payroll decisions, understanding exactly what cash is likely to arrive and what debt might need to be written off.",
-            "keyLearnings": [
-              "Updating Google Sheets via API to reflect invoice status",
-              "Categorizing debt into 30/60/90+ day buckets programmatically",
-              "Generating a daily summary alert for the business owner"
-            ]
-          }
-        },
-        {
-          "id": "col-step-9",
-          "number": "09",
-          "title": "Human Handoff & Edge Cases",
-          "subtitle": "Knowing when to escalate",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Operations",
-          "summary": "Designing safe escape hatches for angry customers or complex B2B negotiations that require a human touch.",
-          "isGated": true,
-          "content": {
-            "overview": "Not every debt can be collected by a bot. When a customer uses abusive language, threatens legal action, or requires a custom B2B settlement, the AI must instantly assign the ticket to a human agent in the WhatsApp shared inbox and mute itself.",
-            "lessonBody": "No matter how advanced your prompt engineering is, there are always scenarios where an AI should immediately stop talking. In collections, these edge cases include customers using abusive language, threatening legal action, or attempting complex B2B settlements that fall far outside standard payment plans. If the AI tries to handle these situations, it risks severely escalating the conflict.\n\nTo build a safe escape hatch, you must configure the LLM (or a faster, cheaper sentiment analysis model) to constantly monitor for anger, threats, or explicit requests to speak to a manager. When this threshold is crossed, the system must trigger a \"human handoff\" protocol. The AI's final message should be a polite de-escalation: \"I understand. I am transferring you to our account manager who will assist you shortly.\"\n\nOn the backend, triggering this handoff requires muting the AI for that specific phone number. You must update your database to flag the conversation as \"Human Managed,\" ensuring your webhook simply ignores any further messages from that user rather than passing them to Gemini. If the AI keeps replying while the human owner is trying to negotiate, it creates chaos.\n\nRouting the conversation to the human inbox depends on your infrastructure. If you are using a shared WhatsApp inbox tool, the system simply tags the conversation for review. If you are building a custom solution, your backend might forward the chat history to the owner's personal WhatsApp number or a dedicated Slack channel, allowing them to step in with full context.\n\nBuilding this safety mechanism is crucial for trust. Business owners will only deploy an autonomous agent if they are absolutely certain it won't make a bad situation worse. The human handoff guarantees that the AI handles the routine 80% of collections, while reserving the owner's time and empathy for the critical 20%.",
-            "keyLearnings": [
-              "Configuring sentiment analysis to detect anger or threats",
-              "Routing WhatsApp conversations to a human inbox",
-              "Muting the AI webhook for a specific phone number"
-            ]
-          }
-        },
-        {
-          "id": "col-step-10",
-          "number": "10",
-          "title": "Analytics: Collections Performance",
-          "subtitle": "Measuring recovery rates",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Reporting",
-          "summary": "Building a simple dashboard to track how much debt the agent has successfully recovered this month.",
-          "isGated": true,
-          "content": {
-            "overview": "To prove the system's value to the business owner, it needs to show ROI. You'll aggregate the successful M-Pesa callbacks to calculate the total amount recovered by the AI vs the amount still outstanding.",
-            "lessonBody": "To convince a business owner to keep paying for your collections system, you have to prove its Return on Investment (ROI). It's not enough to say the bot is sending messages; you must definitively show how much cash the bot has brought back into the business. This requires building a lightweight analytics engine that tracks recovery rates.\n\nThe core metric is the total amount recovered versus the total amount outstanding. Your backend must query the database to sum up all successful M-Pesa callbacks attributed to the agent's interventions in a given month. If the agent chased down KES 200,000 in overdue invoices and successfully collected KES 150,000, it has a 75% recovery rate. This is a hard, undeniable metric of success.\n\nYou should also track the effectiveness of your escalation matrix. By logging which day of the sequence (Day 3 vs Day 15) yields the highest number of Daraja payments, you can optimize the flow. If you find that 90% of people pay after the Day 3 \"gentle nudge,\" but almost nobody pays after Day 30, the business owner might decide to cut their losses earlier or hand off to a human sooner.\n\nFormatting this data into an easily digestible report is key. Business owners rarely want to log into a new web dashboard. Instead, you can write a script that compiles these statistics into a clean, formatted WhatsApp message or a simple PDF generated on the fly. Sending a weekly summary—\"This week, the AI agent recovered KES 85,000 from 12 overdue accounts\"—keeps the value of your system top-of-mind.\n\nBy focusing on performance analytics, you transition from being a developer who built a cool tool to a consultant who provided a measurable business solution. This data-driven approach is what allows you to charge premium prices for the systems you build.",
-            "keyLearnings": [
-              "Calculating the recovery rate percentage",
-              "Tracking which escalation day (Day 3 vs Day 15) yields the most payments",
-              "Formatting a weekly WhatsApp summary report for the boss"
-            ]
-          }
-        },
-        {
-          "id": "col-step-11",
-          "number": "11",
-          "title": "Verified Portfolio Deployment",
-          "subtitle": "Launch your collections agent",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Deployment",
-          "summary": "Deploy your fully functional AI collections agent for a real client, securing your verified portfolio link.",
-          "isGated": true,
-          "content": {
-            "overview": "It's time to go live. You will deploy the collections agent to a cloud environment, connect it to a real business's WhatsApp number, and run a safe test with a live M-Pesa STK push. Once the business confirms it works, you receive your verified portfolio link and a direct quote from the owner.",
-            "lessonBody": "Everything you have built so far has been in a controlled development environment. The final step is to deploy your collections agent into the real world for an actual business, proving that your code holds up under the pressure of real money and real customers. This deployment is the definitive proof of your competence.\n\nYou will start by hosting your Node.js or Python backend on a stable cloud provider like Render, Heroku, or AWS. You must ensure your environment variables (like Daraja consumer keys and Meta API tokens) are securely stored and never exposed. Once deployed, you will connect your live webhook URL to the WhatsApp Cloud API and verify that it can receive messages from external numbers.\n\nThe most critical phase is the safe end-to-end test. Working with your client, you will identify a real, low-risk overdue invoice (perhaps a trusted regular customer or a test account) and trigger the escalation sequence. You must verify that the WhatsApp Utility template fires, the \"Pay Now\" button triggers the M-Pesa STK push, the Daraja callback is successfully received by your server, and the Google Sheet is updated to \"Paid.\"\n\nOnce the system is running smoothly, it's time to gather your portfolio assets. Take screenshots of the successful M-Pesa flow, record a short screen-share demonstrating how the Google Sheet updates automatically, and most importantly, ask the business owner for a direct quote about the time and money the system has saved them.\n\nThis process culminates in your Verified Portfolio link. Instead of a generic certificate or an arbitrary audit score, you walk away with a live, revenue-generating system and a real client testimonial. This is the ultimate proof that you can build functional, high-value AI automation for the Kenyan market.",
-            "keyLearnings": [
-              "Deploying the webhook safely to a production environment",
-              "Running an end-to-end test on a real overdue invoice",
-              "Securing a verified client testimonial for your portfolio"
-            ]
-          }
-        }
-      ]
+        ]
   },
   {
     id: 'food-ordering-agent',
