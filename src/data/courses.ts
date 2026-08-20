@@ -3731,254 +3731,666 @@ export const INITIAL_TRACKS: Track[] = [
     whoBuysThis: 'Retailers, distributors, and small manufacturers',
     impactStat: 'Better demand forecasting means shops stock what actually sells, not what they guess',
     steps: [
-        {
-          "id": "inv2-step-1",
-          "number": "01",
-          "title": "Sales Velocity & Stockout Prediction",
-          "subtitle": "Moving beyond flat reorder thresholds",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Forecasting",
-          "summary": "Calculate dynamic sales velocity based on rolling averages and predict exact stockout dates for fast-moving items.",
-          "isGated": false,
-          "content": {
-            "overview": "Abandon the arbitrary 'reorder when stock hits 10' rule. In this lesson, you'll build a rolling-average sales velocity calculator that adapts to recent trends and predicts precise stockout dates.",
-            "keyLearnings": [
-              "Calculating 7-day and 30-day rolling sales averages",
-              "Predicting stockout dates using current inventory divided by sales velocity",
-              "Accounting for supplier lead time in the replenishment formula"
-            ],
-            "lessonBody": "Most small Kenyan distributors still rely on a flat reorder point—for example, ordering more cooking oil when stock hits 50 cartons. The problem is that demand isn't flat. If 50 cartons normally last a month but suddenly sell out in three days due to a localized supply shock in Nairobi, a flat threshold guarantees a stockout. Your agent needs to understand the rate of sale, not just the current total.\n\nTo solve this, we move from static thresholds to a rolling sales velocity model. Sales velocity measures how many units of a specific SKU leave the warehouse per day. By calculating both a fast 7-day average and a slower 30-day average from your database (like PostgreSQL or even a connected Google Sheet), the agent detects sudden demand spikes without overreacting to a single bulk order.\n\nOnce the agent knows the velocity, predicting the exact stockout date becomes a simple mathematical operation. You divide the current inventory count by the daily sales velocity. If you have 200 bags of flour and the velocity is 25 bags per day, the agent knows you have exactly eight days of cover left. This dynamic baseline replaces guesswork with hard data.\n\nHowever, knowing when you will run out is only half the battle. The agent also needs to know when to trigger the reorder to avoid a gap on the shelves. This introduces the concept of the reorder point formula: Sales Velocity multiplied by Lead Time. If a supplier takes three days to deliver, the agent must trigger the reorder when stock drops to three days of cover, plus a safety margin, rather than waiting until the shelves are empty."
+          {
+            "id": "inv2-step-1",
+            "number": "01",
+            "title": "Sales Velocity & Stockout Prediction",
+            "subtitle": "Moving beyond flat reorder thresholds",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Forecasting",
+            "summary": "Calculate dynamic sales velocity based on rolling averages and predict exact stockout dates for fast-moving items.",
+            "isGated": false,
+            "content": {
+              "overview": "Abandon the arbitrary 'reorder when stock hits 10' rule. In this lesson, you'll build a rolling-average sales velocity calculator that adapts to recent trends and predicts precise stockout dates.",
+              "keyLearnings": [
+                "Calculating 7-day and 30-day rolling sales averages",
+                "Predicting stockout dates using current inventory divided by sales velocity",
+                "Accounting for supplier lead time in the replenishment formula"
+              ],
+              "lessonBody": "Most small Kenyan distributors still rely on a flat reorder point—for example, ordering more cooking oil when stock hits 50 cartons. The problem is that demand isn't flat. If 50 cartons normally last a month but suddenly sell out in three days due to a localized supply shock in Nairobi, a flat threshold guarantees a stockout. Your agent needs to understand the rate of sale, not just the current total.\n\nTo solve this, we move from static thresholds to a rolling sales velocity model. Sales velocity measures how many units of a specific SKU leave the warehouse per day. By calculating both a fast 7-day average and a slower 30-day average from your database (like PostgreSQL or even a connected Google Sheet), the agent detects sudden demand spikes without overreacting to a single bulk order.\n\nOnce the agent knows the velocity, predicting the exact stockout date becomes a simple mathematical operation. You divide the current inventory count by the daily sales velocity. If you have 200 bags of flour and the velocity is 25 bags per day, the agent knows you have exactly eight days of cover left. This dynamic baseline replaces guesswork with hard data.\n\nHowever, knowing when you will run out is only half the battle. The agent also needs to know when to trigger the reorder to avoid a gap on the shelves. This introduces the concept of the reorder point formula: Sales Velocity multiplied by Lead Time. If a supplier takes three days to deliver, the agent must trigger the reorder when stock drops to three days of cover, plus a safety margin, rather than waiting until the shelves are empty.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Stock divided by velocity gives an exact stockout date.",
+                  "flow": [
+                    "200 bags of flour in stock",
+                    "Velocity: 25 bags sold per day",
+                    "200 / 25 = 8 days of cover left",
+                    "Agent knows the exact stockout date"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A SKU has 200 units in stock and sells at a velocity of 25 units/day. How many days of cover does the agent calculate?",
+                "options": [
+                  {
+                    "text": "25 days",
+                    "feedback": "That's the velocity number itself, not the stockout calculation.",
+                    "correct": false
+                  },
+                  {
+                    "text": "8 days",
+                    "feedback": "Right. 200 divided by 25 is exactly 8 days of cover.",
+                    "correct": true
+                  },
+                  {
+                    "text": "It can't be calculated without knowing the supplier's lead time",
+                    "feedback": "Days of cover is just stock divided by velocity - lead time matters for the reorder point formula, not this.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-2",
+            "number": "02",
+            "title": "Automated Supplier Reorder Messaging",
+            "subtitle": "Programmatic restock alerts",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Automation",
+            "summary": "Trigger templated reorder messages to suppliers instantly when a SKU hits its dynamic reorder point.",
+            "isGated": false,
+            "content": {
+              "overview": "Connect your forecasting engine to the WhatsApp Cloud API. When stock hits the critical threshold, automatically send a formatted restock request to your supplier with exact SKU quantities.",
+              "keyLearnings": [
+                "Triggering events based on dynamic stock thresholds",
+                "Formatting WhatsApp Cloud API Template Messages for B2B",
+                "Including SKU, Quantity, and requested delivery date in outbound payloads"
+              ],
+              "lessonBody": "Knowing when to reorder is useless if the purchase order sits on a manager's desk for two days. In this lesson, we connect the forecasting engine's output directly to the WhatsApp Cloud API. This transforms the agent from a passive dashboard into an active procurement assistant that reaches out to suppliers the moment a stockout risk is detected.\n\nWhen the dynamic threshold is crossed, your backend triggers a webhook that formats a highly structured WhatsApp message. Unlike customer-facing conversational bots, B2B supplier communication requires strict accuracy. We use WhatsApp Cloud API Template Messages to ensure the outbound request follows a predictable, professional format that vendors in areas like Industrial Area or Kamukunji are accustomed to receiving.\n\nThe payload sent to the Meta Graph API must include all necessary context to prevent back-and-forth delays. The agent injects the exact SKU name, the internal item code if applicable, the calculated requested quantity, and the required delivery date. This structure eliminates ambiguity; the supplier doesn't have to ask 'which size?' or 'how many?' because the agent has provided a complete purchase request.\n\nCrucially, this automation removes the emotional friction from restocking. Business owners often hesitate to place orders when cash is tight, delaying until a stockout forces their hand. By programming the agent to dispatch the request automatically, the business commits to maintaining its most profitable lines, allowing the owner to focus on sales rather than manual supply chain management.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A complete request needs no follow-up questions.",
+                  "compare": [
+                    {
+                      "label": "Vague request",
+                      "text": "'We need more flour soon' - supplier has to ask for details",
+                      "good": false
+                    },
+                    {
+                      "label": "Structured template",
+                      "text": "SKU, quantity, and delivery date included upfront",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the lesson recommend WhatsApp Template Messages instead of a casual free-text message for B2B supplier requests?",
+                "options": [
+                  {
+                    "text": "Template messages are cheaper to send than regular messages",
+                    "feedback": "Cost isn't the reason given - it's about the format being predictable and professional.",
+                    "correct": false
+                  },
+                  {
+                    "text": "They enforce a strict, predictable, professional format that eliminates back-and-forth ambiguity",
+                    "feedback": "Right. This is exactly why B2B messages use Template Messages.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Free-text messages aren't technically possible via the WhatsApp Cloud API",
+                    "feedback": "Free-text messages are technically possible - this is about reliability, not a technical limitation.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-3",
+            "number": "03",
+            "title": "Incorporating Supplier Lead Times",
+            "subtitle": "Accounting for delivery delays",
+            "status": "locked",
+            "duration": "25 min",
+            "category": "Supply Chain",
+            "summary": "Adjust your reorder logic by baking in historical supplier lead times to prevent stockouts during transit.",
+            "isGated": false,
+            "content": {
+              "overview": "A supplier taking 4 days instead of 2 changes everything. We'll add lead time data to our forecasting engine to ensure we reorder before the critical window, keeping shelves stocked.",
+              "keyLearnings": [
+                "Storing and updating average supplier delivery days",
+                "Calculating Lead Time Demand (Sales Velocity × Lead Time)",
+                "Establishing Safety Stock buffers for unreliable vendors"
+              ],
+              "lessonBody": "In the real world of Kenyan logistics, a supplier rarely delivers exactly on time every time. A vendor in Mombasa shipping to a retailer in Nairobi might promise two days, but a truck breakdown or heavy rain can push that to five. If your agent's reorder logic strictly assumes a perfect two-day turnaround, those extra three days mean empty shelves and lost revenue.\n\nTo make the agent resilient, we must bake historical supplier lead times into the forecasting engine. Instead of hardcoding a 'delivery days' constant, the system tracks the timestamp of when the WhatsApp reorder message was sent via the Cloud API and compares it to the timestamp when the stock was manually received into the inventory system.\n\nBy averaging this historical lead time data over the last five deliveries, the agent establishes a realistic, empirical delivery window for each vendor. If a supplier starts slipping, the agent's calculated lead time automatically expands. This dynamic adjustment feeds directly back into the reorder point formula discussed in the first lesson.\n\nTo further protect against variance, we introduce a safety stock buffer. This is an additional quantity of inventory kept on hand to protect against unexpected supplier delays. The agent calculates safety stock by multiplying the maximum recorded daily sales by the maximum recorded lead time, then subtracting the average sales by the average lead time. The result is a robust system that orders early enough to cover the vendor's worst days.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Real delivery data, not the promised number, drives the math.",
+                  "flow": [
+                    "Reorder message sent (timestamp A)",
+                    "Stock physically received (timestamp B)",
+                    "Lead time = B - A",
+                    "Averaged over last 5 deliveries"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A supplier promised 2-day delivery but the last 5 deliveries actually averaged 4 days. What should the agent do?",
+                "options": [
+                  {
+                    "text": "Keep using the promised 2-day figure since that's the official agreement",
+                    "feedback": "Trusting the promised figure over the actual pattern is exactly what leads to stockouts during transit.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Update its lead time calculation to reflect the real, empirical 4-day average",
+                    "feedback": "Right. This dynamic adjustment is what keeps the reorder point formula accurate.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Stop ordering from that supplier entirely",
+                    "feedback": "The lesson's fix is adjusting the reorder math, not dropping the supplier outright.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-4",
+            "number": "04",
+            "title": "Seasonal Demand & Trend Adjustments",
+            "subtitle": "Tuning forecasts for peaks and dips",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Forecasting",
+            "summary": "Adapt the baseline forecasting model to account for seasonal spikes, holidays, or sudden trend shifts in the market.",
+            "isGated": true,
+            "content": {
+              "overview": "Learn to inject a seasonality multiplier into your forecast. This ensures you don't under-order during peak seasons (like holidays) or over-order immediately after the rush ends.",
+              "keyLearnings": [
+                "Applying seasonality indexes to base sales velocity",
+                "Smoothing outliers from viral sales events",
+                "Using moving averages for short-term trend detection"
+              ],
+              "codeSnippet": "export function calculateAdjustedVelocity(baseVelocity: number, seasonalIndex: number, trendMultiplier: number) {\n  // Smooths out spikes while respecting the overall trend direction\n  const adjusted = baseVelocity * seasonalIndex * trendMultiplier;\n  return Math.max(adjusted, 1); // Never project zero sales if item is active\n}",
+              "lessonBody": "Sales velocity is rarely a smooth line; it experiences sharp peaks and valleys driven by external factors. A hardware store selling roofing sheets will see massive spikes right before the rainy season, while a distributor of school supplies will face extreme volatility in January. If your agent only looks at a 30-day rolling average, it will completely miss these predictable surges until it's too late.\n\nTo anticipate these shifts, we introduce a seasonal index into the forecasting algorithm. A seasonal index is a multiplier that compares historical sales during a specific period against the average sales of the entire year. By querying historical order data from your database, you can determine if a particular SKU consistently sells 40% more in December, giving it an index of 1.4.\n\nWhen calculating the forward-looking sales velocity, the agent multiplies the base velocity by this seasonal index. This ensures the system proactively increases the reorder quantity ahead of the rush, rather than reactively scrambling to catch up after the peak has already begun. The math protects the business from stocking out during the most profitable weeks of the year.\n\nConversely, the agent must also handle the drop-off. If the system orders heavily in late December, it must apply a downward multiplier for January to avoid bloated post-holiday inventory. By using moving averages combined with trend multipliers, the forecasting model smooths out temporary viral spikes while respecting long-term growth or decline patterns, ensuring capital is always deployed efficiently.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "A seasonal index of 1.4 means 40% more sales than average.",
+                  "compare": [
+                    {
+                      "label": "Base velocity only",
+                      "text": "Misses the December surge until it's too late",
+                      "good": false
+                    },
+                    {
+                      "label": "Base velocity x seasonal index (1.4)",
+                      "text": "Proactively increases the reorder quantity ahead of the rush",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "A SKU has baseVelocity of 10 units/day. Historical data shows it sells 40% more in December (seasonalIndex: 1.4) and is currently trending flat (trendMultiplier: 1.0).",
+                "workedExample": "calculateAdjustedVelocity(10, 1.4, 1.0) returns 10 * 1.4 * 1.0 = 14. The agent now forecasts 14 units/day instead of 10 for December.",
+                "challenge": "In January, the same SKU's seasonalIndex drops to 0.7 (post-holiday dip). What does calculateAdjustedVelocity(10, 0.7, 1.0) return, and why does that matter?",
+                "placeholder": "It returns 10 * 0.7 * 1.0 = ___, which prevents the agent from over-ordering ___ stock right after the holiday rush ends.",
+                "solution": "It returns 7, which prevents the agent from over-ordering bloated stock right after the holiday rush ends.",
+                "explanation": "The same multiplier mechanism works in both directions - it raises the forecast ahead of a predictable spike and lowers it again once the spike has passed."
+              }
+            }
+          },
+          {
+            "id": "inv2-step-5",
+            "number": "05",
+            "title": "Dead-Stock & Slow-Mover Detection",
+            "subtitle": "Freeing up trapped capital",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Analytics",
+            "summary": "Identify inventory that isn't moving, flagging slow-moving SKUs so you can liquidate and reallocate budget.",
+            "isGated": true,
+            "content": {
+              "overview": "Capital tied up in dust-gathering products is a killer for SMEs. We build an analyzer that flags items with zero movement over 60 days, triggering liquidation alerts before they become dead stock.",
+              "keyLearnings": [
+                "Defining aging criteria (30, 60, 90 days without sales)",
+                "Generating slow-mover alerts for the business owner",
+                "Prioritizing capital reallocation to fast-moving SKUs"
+              ],
+              "lessonBody": "While stockouts cost you missed sales, overstocking kills a business by trapping critical working capital. Small retailers often have shelves full of inventory that hasn't moved in months, while simultaneously struggling to find the cash to restock their fastest-selling items. An inventory agent isn't just about ordering more; it's also about identifying what to stop ordering.\n\nWe build an analyzer that continuously scans the inventory database for aging criteria. By establishing strict thresholds—such as 30, 60, or 90 days without a single recorded sale—the agent flags SKUs that are tying up funds. This requires running a cron job or scheduled task that cross-references current stock levels against the timestamp of the last recorded transaction.\n\nOnce a slow-mover is detected, the agent generates an automated alert for the business owner. Instead of hiding this data in a complex spreadsheet, the alert is pushed directly via WhatsApp or a simple dashboard. The message details the trapped capital value: 'You have KES 45,000 tied up in SKU X, which has not sold in 65 days.' This transparency forces a decision.\n\nThe goal is to prioritize capital reallocation. By surfacing dead stock, the owner can initiate liquidation strategies—such as bundling the slow-mover with a high-velocity item or running a flash discount. The cash recovered from these sales is then funneled back into the agent's budget for fast-moving SKUs, dramatically improving the overall health of the supply chain.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "The scan runs on a schedule, not just when someone remembers to check.",
+                  "flow": [
+                    "Cron job scans inventory database",
+                    "Cross-references stock vs. last-sale timestamp",
+                    "No sale in 60+ days -> flagged as slow-mover",
+                    "Alert pushed to owner with trapped capital value"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "An item has KES 45,000 worth of stock but hasn't sold in 65 days. What is the actual business problem this lesson describes?",
+                "options": [
+                  {
+                    "text": "The item is technically in stock, so there's no problem at all",
+                    "feedback": "Having stock isn't the issue - the KES 45,000 tied up in it is capital that can't fund fast-moving SKUs.",
+                    "correct": false
+                  },
+                  {
+                    "text": "That KES 45,000 is trapped capital that could instead fund fast-moving SKUs",
+                    "feedback": "Right. This is exactly the trapped-capital problem the analyzer is built to surface.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The item should immediately be marked as out of stock in the system",
+                    "feedback": "It's not an out-of-stock data error - the item genuinely has stock, it's just not selling.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-6",
+            "number": "06",
+            "title": "Multi-Supplier & Multi-SKU Prioritization",
+            "subtitle": "Routing orders when budget is limited",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Logic",
+            "summary": "Build a decision engine that prioritizes reordering high-margin SKUs from the most reliable suppliers when cash is tight.",
+            "isGated": true,
+            "content": {
+              "overview": "If you only have KES 50,000 for restocking but need KES 80,000 in goods, what do you order? We'll create logic that prioritizes high-margin, fast-velocity items and routes the orders to the suppliers with the best terms.",
+              "keyLearnings": [
+                "Ranking products by Gross Margin Return on Investment (GMROI)",
+                "Dynamic supplier routing based on pricing and reliability",
+                "Creating budget-constrained cart payloads"
+              ],
+              "testCase": {
+                "input": "Available Budget: KES 30,000. Needed: SKU_A (Margin 40%, Velocity 5/day, KES 20k), SKU_B (Margin 15%, Velocity 2/day, KES 20k).",
+                "expectedOutput": "Order Generation: Allocate KES 20,000 to SKU_A (High Priority). Allocate remaining KES 10,000 to SKU_B (Partial Restock)."
+              },
+              "lessonBody": "When a business has unlimited cash, restocking is easy: you order everything you need. In reality, a Kenyan SME might receive a daily sales deposit of KES 50,000, but the agent determines that KES 80,000 worth of inventory has hit the reorder threshold. The system must now make a critical decision: how to allocate a limited budget across competing priorities.\n\nWe solve this by building a decision engine that ranks products by their Gross Margin Return on Investment (GMROI). This metric doesn't just look at how fast an item sells, but how much profit it generates for every shilling invested in it. The agent queries the database to calculate the GMROI for all flagged SKUs, instantly determining which items will generate the most cash if restocked immediately.\n\nOnce the SKUs are prioritized, the agent must handle supplier routing. If the highest-priority SKU can be sourced from three different vendors, the agent evaluates them based on a combination of unit price and the historical reliability score we established in earlier lessons. The system dynamically generates a budget-constrained cart payload, fulfilling the high-margin items completely before allocating the remainder to lower-priority goods.\n\nThis logic transforms the agent from a simple calculator into a strategic procurement manager. It ensures that when cash is tight, the business never spends its limited capital on low-margin filler while allowing its most profitable products to remain out of stock. The automated prioritization protects the bottom line during cash flow crunches.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "GMROI ranks by profit per shilling, not just by how fast something sells.",
+                  "compare": [
+                    {
+                      "label": "Ranking by sales speed alone",
+                      "text": "Ignores how much profit each sale actually generates",
+                      "good": false
+                    },
+                    {
+                      "label": "Ranking by GMROI",
+                      "text": "Prioritizes the SKUs that generate the most profit per shilling invested",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "With only KES 30,000 available and two SKUs needing restock, why does the agent prioritize by GMROI instead of just splitting the budget evenly?",
+                "options": [
+                  {
+                    "text": "Splitting evenly is always the fairest and safest option",
+                    "feedback": "Fairness between SKUs isn't the goal here - maximizing return on limited capital is.",
+                    "correct": false
+                  },
+                  {
+                    "text": "GMROI identifies which SKU generates the most profit per shilling invested, so limited cash gets deployed where it matters most",
+                    "feedback": "Right. This is exactly what makes the agent a strategic procurement manager.",
+                    "correct": true
+                  },
+                  {
+                    "text": "GMROI is a legal requirement for inventory reporting in Kenya",
+                    "feedback": "GMROI isn't a legal requirement - it's a business decision-making metric.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-7",
+            "number": "07",
+            "title": "Building the Supplier Chatbot Agent",
+            "subtitle": "LLMs for vendor negotiations",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Prompt Engineering",
+            "summary": "Design the core system prompt that enables your AI agent to negotiate quantities, handle out-of-stock replies from vendors, and confirm delivery schedules.",
+            "isGated": true,
+            "content": {
+              "overview": "When a supplier replies 'We only have 20 units left', your agent needs to understand and adjust. We'll use Gemini to interpret unstructured supplier WhatsApp replies and update the internal order state.",
+              "keyLearnings": [
+                "Structuring system prompts for B2B negotiation and context awareness",
+                "Extracting adjusted quantities and dates from unstructured vendor text",
+                "Enforcing polite but firm tone constraints suitable for suppliers"
+              ],
+              "samplePrompt": "You are a procurement assistant for a Nairobi hardware store. A supplier has responded to your restock request.\nExtract the confirmed quantities and delivery dates.\n- If a requested item is out of stock, ask when the next shipment arrives.\n- If they offer a partial quantity, accept it and output JSON: [{\"sku\": \"...\", \"confirmedQty\": 10}]\n- Maintain a professional, concise tone. Do not make small talk.",
+              "lessonBody": "B2B procurement is rarely as simple as sending a request and receiving exactly what you asked for. When the agent dispatches a WhatsApp message for 50 units, the supplier might reply, 'We only have 20 left, but a new shipment arrives on Thursday.' A rigid, rules-based bot will fail here because it cannot parse the unstructured natural language of a human vendor.\n\nTo handle this, we integrate a Large Language Model—like Gemini—to act as the interpretive layer between the supplier and the database. You will construct a strict system prompt that instructs the LLM to read the supplier's WhatsApp reply and extract specific variables: confirmed quantities, adjusted prices, and updated delivery dates. The LLM converts the messy conversational text into structured JSON.\n\nThe prompt engineering for this task must enforce a professional, B2B persona. The agent is representing a business, so the prompt strictly forbids small talk, emojis, or casual slang. It must remain polite but focused entirely on finalizing the procurement details. If the supplier offers a partial quantity, the LLM is instructed to accept it, log the deficit, and output the data payload required to update the internal system.\n\nCrucially, the agent must also know when to ask follow-up questions. If a requested item is entirely out of stock, the LLM prompt dictates that the agent must proactively ask for the next expected availability date. By handling these minor negotiations autonomously, the agent secures available stock instantly, without waiting for the business owner to manually read and reply to the supplier's message.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "The agent has to parse a real, unstructured human reply.",
+                  "chat": [
+                    {
+                      "sender": "agent",
+                      "text": "Requesting 50 units of Cooking Oil 5L."
+                    },
+                    {
+                      "sender": "customer",
+                      "text": "We only have 20 left, but a new shipment arrives Thursday."
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A supplier replies to the agent's restock request with casual small talk mixed into their answer. What should the prompt make the agent do?",
+                "options": [
+                  {
+                    "text": "Match their tone and chat casually back to build rapport",
+                    "feedback": "The prompt strictly forbids small talk - the agent represents a business and needs to stay focused.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Stay polite but focused, extracting only the procurement details needed",
+                    "feedback": "Right. This is the professional B2B persona the prompt enforces.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Refuse to process the reply until the supplier responds more formally",
+                    "feedback": "Refusing to process a valid reply over tone would stall a real order unnecessarily.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-8",
+            "number": "08",
+            "title": "Handling Supplier Non-Response Escalation",
+            "subtitle": "Never let an order stall",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Flow Design",
+            "summary": "Implement a timeout and escalation flow if a supplier ignores the restock request, routing to alternatives or human managers.",
+            "isGated": true,
+            "content": {
+              "overview": "Suppliers don't always reply immediately. We build an escalation sequence: a 24-hour reminder, 48-hour routing to an alternate supplier, and an alert to the owner. This ensures procurement never stalls silently.",
+              "keyLearnings": [
+                "Setting up scheduled delays and webhooks for check-ins",
+                "Routing orders to backup vendors dynamically when primary fails",
+                "Alerting human managers when all automated paths are exhausted"
+              ],
+              "lessonBody": "Automating the outreach and negotiation is powerful, but what happens when the supplier simply doesn't reply? In a manual system, a manager might forget they placed the order, only realizing the mistake when shelves go empty five days later. An autonomous agent must treat silence as a critical failure condition and act accordingly.\n\nWe implement an escalation flow using scheduled background jobs or a workflow engine. When the initial WhatsApp restock request is sent via the Cloud API, the system records a timestamp. If a webhook confirming the supplier's reply is not received within a set window—for example, 24 hours—the agent automatically fires a polite but urgent follow-up message to bump the thread.\n\nIf the supplier remains unresponsive after 48 hours, the agent executes a routing fallback. It queries the database for an alternate vendor that carries the same SKU. The system abandons the stalled order and immediately dispatches a new request to the backup supplier. This ensures that the procurement process never stalls silently, keeping the supply chain moving even when primary vendors fail.\n\nFinally, we must build a circuit breaker for human intervention. If the backup supplier also fails, or if no alternate vendor exists, the agent sends an urgent alert to the business owner or procurement manager. The alert details the failed attempts and hands over control, ensuring that edge cases which require a human relationship to resolve are surfaced before they cause a critical stockout.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Silence triggers escalation, not an indefinite wait.",
+                  "flow": [
+                    "No reply after 24h -> automated follow-up sent",
+                    "Still no reply after 48h -> order routed to backup supplier",
+                    "Backup also fails -> alert sent to business owner"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A supplier doesn't reply at all to the restock request, and no backup vendor exists for that SKU. What's the final step in the escalation flow?",
+                "options": [
+                  {
+                    "text": "The agent keeps retrying the same supplier indefinitely",
+                    "feedback": "Indefinite silent retrying is exactly what this escalation flow is designed to prevent.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The agent sends an urgent alert to the business owner and hands over control",
+                    "feedback": "Right. This is the circuit breaker for human intervention described in the lesson.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The agent cancels the reorder entirely and waits for the next scheduled check",
+                    "feedback": "Silently cancelling would let a real stockout risk go unaddressed.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-9",
+            "number": "09",
+            "title": "M-Pesa Supplier Payment Prep (B2B)",
+            "subtitle": "Streamlining vendor settlement",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Payments",
+            "summary": "Format and prep Safaricom Daraja B2B Paybill payloads once a supplier confirms an order, readying it for human approval.",
+            "isGated": true,
+            "content": {
+              "overview": "Once the vendor confirms the delivery schedule and total price, the agent prepares the exact M-Pesa Paybill payload. A human manager just clicks 'Approve' to release the funds, securely merging communication and finance.",
+              "keyLearnings": [
+                "Understanding Safaricom Daraja B2B API requirements",
+                "Generating structured payment approval summaries for management",
+                "Validating vendor Paybill numbers and expected totals"
+              ],
+              "codeSnippet": "export function formatDarajaB2BRequest(paybill: string, accountNo: string, amount: number) {\n  return {\n    Initiator: \"procurement_agent\",\n    CommandID: \"BusinessPayBill\",\n    PartyA: process.env.SHORTCODE,\n    PartyB: paybill,\n    AccountReference: accountNo,\n    Amount: amount,\n    Remarks: \"Restock payment approved via automated agent\"\n  };\n}",
+              "lessonBody": "Once a supplier has confirmed the quantities and delivery dates via the WhatsApp negotiation flow, the final step in the procurement cycle is settlement. In Kenya, this often means transferring funds via M-Pesa. However, allowing an autonomous agent to instantly disburse funds without oversight is a massive security and cash-flow risk for any SME.\n\nInstead of full automation, we design a payment preparation pipeline using the Safaricom Daraja B2B API. When the LLM successfully extracts the final confirmed total from the vendor's chat, the agent automatically formats the exact JSON payload required for a BusinessPayBill command. It pre-fills the supplier's Paybill number, the account reference, and the precise settlement amount.\n\nThis prepped payload is then surfaced to a human manager for final authorization. The agent can send a WhatsApp message to the owner stating, 'Supplier confirmed 50 units for KES 25,000. Reply APPROVE to release funds via M-Pesa.' When the owner replies, the backend triggers the Daraja API call, securely executing the transaction.\n\nThis architecture perfectly balances automation with financial control. The agent handles the tedious work of calculating totals, checking vendor details, and structuring the API request, eliminating manual data entry errors. The human remains strictly in the loop for the actual release of funds, ensuring the business owner retains absolute authority over their cash flow while saving hours of administrative time.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "The agent prepares the payment - a human still has to release it.",
+                  "compare": [
+                    {
+                      "label": "Full auto-disbursement",
+                      "text": "Agent releases funds with no oversight - real security risk",
+                      "good": false
+                    },
+                    {
+                      "label": "Prepared payload + human approval",
+                      "text": "Agent formats the payment, owner clicks Approve",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "A supplier confirms 50 units for KES 25,000. Using formatDarajaB2BRequest, the agent needs to prepare the payment payload.",
+                "workedExample": "formatDarajaB2BRequest('174379', 'SUPPLIER-001', 25000) returns a payload with CommandID: 'BusinessPayBill', PartyB: '174379', AccountReference: 'SUPPLIER-001', Amount: 25000 - fully formatted, but not yet sent.",
+                "challenge": "Why does the lesson insist this payload gets sent to the owner for approval instead of the agent calling the Daraja API immediately?",
+                "placeholder": "Letting an autonomous agent instantly disburse funds without oversight is a ___ risk - the human stays in the loop for the actual ___ of funds.",
+                "solution": "Letting an autonomous agent instantly disburse funds without oversight is a security and cash-flow risk - the human stays in the loop for the actual release of funds.",
+                "explanation": "The agent does all the tedious prep work - formatting, validating totals - but the owner retains final authority over when real money actually moves."
+              }
+            }
+          },
+          {
+            "id": "inv2-step-10",
+            "number": "10",
+            "title": "Owner-Facing Inventory Health Dashboard",
+            "subtitle": "Visualizing supply chain status",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Reporting",
+            "summary": "Roll up velocity, stockouts, and pending orders into a clear, single-view dashboard for the business owner.",
+            "isGated": true,
+            "content": {
+              "overview": "The agent does the heavy lifting, but the owner needs oversight. We'll structure the data to populate a simple dashboard showing critical alerts, pending deliveries, and capital trapped in dead stock.",
+              "keyLearnings": [
+                "Aggregating inventory metrics into summary objects",
+                "Designing intuitive status indicators (Red for stockouts, Green for healthy)",
+                "Structuring JSON payloads for frontend dashboard ingestion"
+              ],
+              "lessonBody": "While the agent is operating autonomously via WhatsApp and background tasks, the business owner still requires visibility into the overall health of their supply chain. Relying purely on chat alerts for individual stockouts creates noise. We need to aggregate the agent's data into a single, comprehensive view that a manager can check at a glance.\n\nWe will design a simple frontend dashboard—which could be a lightweight web app or even a synced Google Sheet—that pulls data directly from the agent's underlying database. The dashboard rolls up the critical metrics calculated in previous lessons: current sales velocity, predicted stockout dates for top SKUs, and the total value of capital trapped in slow-moving inventory.\n\nThe data must be structured to highlight actionable insights immediately. We implement a traffic-light status system based on the calculated reorder thresholds. Items well above their safety stock are marked green, items within the reorder window are yellow, and items actively stocked out or stalled in vendor negotiations are marked red. This visual hierarchy guides the owner's attention to the most pressing issues.\n\nCrucially, the dashboard also displays the active state of the agent. It lists pending orders, unresponded vendor pings, and payment approvals awaiting the owner's authorization. By structuring the JSON payloads to feed cleanly into this dashboard, the system provides total transparency, proving to the user that the AI is working efficiently in the background and building trust in the automation.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "A traffic-light status guides the owner straight to what matters.",
+                  "compare": [
+                    {
+                      "label": "Green",
+                      "text": "Well above safety stock",
+                      "good": true
+                    },
+                    {
+                      "label": "Yellow",
+                      "text": "Within the reorder window",
+                      "good": false
+                    },
+                    {
+                      "label": "Red",
+                      "text": "Stocked out or stalled in negotiation",
+                      "good": false
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the lesson recommend a single aggregated dashboard instead of relying purely on individual WhatsApp alerts for every stockout?",
+                "options": [
+                  {
+                    "text": "Individual chat alerts for every event create noise, while a dashboard gives one comprehensive view",
+                    "feedback": "Right. This is exactly the noise problem the dashboard solves.",
+                    "correct": true
+                  },
+                  {
+                    "text": "WhatsApp alerts are technically unreliable for business use",
+                    "feedback": "Reliability isn't the issue described - it's alert noise versus a consolidated view.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Dashboards are required by Kenyan business regulations",
+                    "feedback": "This isn't a regulatory requirement - it's a UX decision about owner visibility.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-11",
+            "number": "11",
+            "title": "Edge Cases: Damaged Goods & Returns",
+            "subtitle": "Handling reality on the ground",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Operations",
+            "summary": "Add logic for logging damaged deliveries and automatically requesting credit notes from suppliers via WhatsApp.",
+            "isGated": true,
+            "content": {
+              "overview": "When a delivery arrives with broken items, the inventory count drops. We'll build a flow where the staff inputs the damage count, and the agent automatically messages the supplier requesting a credit note.",
+              "keyLearnings": [
+                "Adjusting received inventory versus ordered inventory",
+                "Automating credit note request formatting via Meta Graph API",
+                "Tracking pending supplier credits in the database"
+              ],
+              "lessonBody": "Inventory math assumes that what you order is exactly what you receive in pristine condition. The reality of logistics is that cartons get crushed, bottles break, and suppliers send the wrong items. If the system assumes 50 units were received but 5 were destroyed in transit, your agent's calculations will be permanently skewed, eventually causing a premature stockout.\n\nWe must build a reconciliation flow to handle these inevitable edge cases. When a delivery arrives, the receiving staff must have a simple interface—often just a structured WhatsApp command—to log discrepancies. If they input 'Received 45, Damaged 5', the agent immediately adjusts the database, ensuring the current inventory count accurately reflects the usable goods on hand.\n\nUpon logging the damage, the agent triggers an automated credit note request. It uses the Meta Graph API to send a formatted message back to the supplier, detailing the exact discrepancy and attaching any photographic evidence uploaded by the staff. This immediate, automated follow-up ensures the business doesn't absorb the cost of vendor errors due to administrative oversight.\n\nFinally, the agent logs the pending credit note in the database. This allows the system to deduct the owed amount from the next automated purchase order sent to that specific supplier. By tightly integrating discrepancy logging, automated vendor communication, and financial reconciliation, the agent handles the messy reality of physical goods just as effectively as the perfect-case scenarios.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "A simple structured reply keeps inventory counts accurate.",
+                  "chat": [
+                    {
+                      "sender": "agent",
+                      "text": "Confirm delivery: how many received, how many damaged?"
+                    },
+                    {
+                      "sender": "customer",
+                      "text": "Received 45, Damaged 5"
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A delivery of 50 units arrives but 5 are damaged in transit. What happens if the agent isn't told about the damage?",
+                "options": [
+                  {
+                    "text": "Nothing changes - damaged goods still count as usable stock in most systems",
+                    "feedback": "Damaged goods aren't usable stock - if the agent isn't told, its calculations stay permanently skewed.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The agent's inventory count stays inflated by 5 units, eventually causing a premature stockout",
+                    "feedback": "Right. This is exactly why the reconciliation flow exists.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The supplier automatically gets flagged as unreliable",
+                    "feedback": "The lesson's fix is a credit note request and database adjustment, not an automatic reliability flag.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "inv2-step-12",
+            "number": "12",
+            "title": "Verified Portfolio Deployment",
+            "subtitle": "Launching your live procurement engine",
+            "status": "locked",
+            "duration": "60 min",
+            "category": "Deployment",
+            "summary": "Connect your fully tested agent to a live WhatsApp Business number, run a real supplier interaction, and secure your verified portfolio link.",
+            "isGated": true,
+            "content": {
+              "overview": "It's time to go live. You will deploy the application, integrate it with a test supplier number, process a simulated restock cycle end-to-end, and generate your verified portfolio link complete with a demo.",
+              "keyLearnings": [
+                "End-to-end production testing of the restock agent",
+                "Live deployment and webhook configuration for Meta and M-Pesa",
+                "Generating your verified portfolio artifact demonstrating a working system"
+              ],
+              "lessonBody": "You have built a comprehensive forecasting engine, a negotiation agent, and a secure payment pipeline. Now, it is time to deploy this system into production. In this final lesson, you will take the code you've written, host it on a live server environment, and expose your webhook endpoints to the public internet so they can communicate with Meta and Safaricom.\n\nDeployment requires strictly separating your test data from your production data. You will configure your environment variables to connect your deployed agent to a live WhatsApp Business number. This transforms your local scripts into an always-on service capable of monitoring the database and reacting to inventory thresholds around the clock.\n\nTo finalize your portfolio, you will run a complete, end-to-end simulated restock cycle. You will artificially spike the sales velocity of a test SKU, watch the agent automatically dispatch a template message to a test supplier number, negotiate the quantity using the LLM, and generate the Daraja B2B payment prompt. This proves the entire architecture functions flawlessly in a live environment.\n\nThe culmination of this course is your verified portfolio artifact. You will record a short, unedited screen capture demonstrating the automated flow—from the stockout trigger in the database to the final M-Pesa approval prompt on your phone. This demo, alongside a live link to your dashboard and the architecture code, proves you can build resilient supply chain automation, ready to be deployed for any real business.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "The full pipeline gets tested end to end before going live.",
+                  "flow": [
+                    "Artificially spike a test SKU's sales velocity",
+                    "Agent dispatches template message to test supplier",
+                    "LLM negotiates quantity from the reply",
+                    "Daraja B2B payment prompt generated"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "What does the end-to-end test in this lesson actually prove before you ship the system to a real business?",
+                "options": [
+                  {
+                    "text": "That the code compiles without errors",
+                    "feedback": "Compiling is a much lower bar - this test proves the full pipeline works together in a live environment.",
+                    "correct": false
+                  },
+                  {
+                    "text": "That the entire architecture - forecasting, negotiation, and payment prep - functions together in a live environment",
+                    "feedback": "Right. This is what makes it a real verified portfolio artifact.",
+                    "correct": true
+                  },
+                  {
+                    "text": "That the supplier's WhatsApp number is verified by Meta",
+                    "feedback": "Number verification is a separate setup step, not what this simulated cycle tests.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
           }
-        },
-        {
-          "id": "inv2-step-2",
-          "number": "02",
-          "title": "Automated Supplier Reorder Messaging",
-          "subtitle": "Programmatic restock alerts",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Automation",
-          "summary": "Trigger templated reorder messages to suppliers instantly when a SKU hits its dynamic reorder point.",
-          "isGated": false,
-          "content": {
-            "overview": "Connect your forecasting engine to the WhatsApp Cloud API. When stock hits the critical threshold, automatically send a formatted restock request to your supplier with exact SKU quantities.",
-            "keyLearnings": [
-              "Triggering events based on dynamic stock thresholds",
-              "Formatting WhatsApp Cloud API Template Messages for B2B",
-              "Including SKU, Quantity, and requested delivery date in outbound payloads"
-            ],
-            "lessonBody": "Knowing when to reorder is useless if the purchase order sits on a manager's desk for two days. In this lesson, we connect the forecasting engine's output directly to the WhatsApp Cloud API. This transforms the agent from a passive dashboard into an active procurement assistant that reaches out to suppliers the moment a stockout risk is detected.\n\nWhen the dynamic threshold is crossed, your backend triggers a webhook that formats a highly structured WhatsApp message. Unlike customer-facing conversational bots, B2B supplier communication requires strict accuracy. We use WhatsApp Cloud API Template Messages to ensure the outbound request follows a predictable, professional format that vendors in areas like Industrial Area or Kamukunji are accustomed to receiving.\n\nThe payload sent to the Meta Graph API must include all necessary context to prevent back-and-forth delays. The agent injects the exact SKU name, the internal item code if applicable, the calculated requested quantity, and the required delivery date. This structure eliminates ambiguity; the supplier doesn't have to ask 'which size?' or 'how many?' because the agent has provided a complete purchase request.\n\nCrucially, this automation removes the emotional friction from restocking. Business owners often hesitate to place orders when cash is tight, delaying until a stockout forces their hand. By programming the agent to dispatch the request automatically, the business commits to maintaining its most profitable lines, allowing the owner to focus on sales rather than manual supply chain management."
-          }
-        },
-        {
-          "id": "inv2-step-3",
-          "number": "03",
-          "title": "Incorporating Supplier Lead Times",
-          "subtitle": "Accounting for delivery delays",
-          "status": "locked",
-          "duration": "25 min",
-          "category": "Supply Chain",
-          "summary": "Adjust your reorder logic by baking in historical supplier lead times to prevent stockouts during transit.",
-          "isGated": false,
-          "content": {
-            "overview": "A supplier taking 4 days instead of 2 changes everything. We'll add lead time data to our forecasting engine to ensure we reorder before the critical window, keeping shelves stocked.",
-            "keyLearnings": [
-              "Storing and updating average supplier delivery days",
-              "Calculating Lead Time Demand (Sales Velocity × Lead Time)",
-              "Establishing Safety Stock buffers for unreliable vendors"
-            ],
-            "lessonBody": "In the real world of Kenyan logistics, a supplier rarely delivers exactly on time every time. A vendor in Mombasa shipping to a retailer in Nairobi might promise two days, but a truck breakdown or heavy rain can push that to five. If your agent's reorder logic strictly assumes a perfect two-day turnaround, those extra three days mean empty shelves and lost revenue.\n\nTo make the agent resilient, we must bake historical supplier lead times into the forecasting engine. Instead of hardcoding a 'delivery days' constant, the system tracks the timestamp of when the WhatsApp reorder message was sent via the Cloud API and compares it to the timestamp when the stock was manually received into the inventory system.\n\nBy averaging this historical lead time data over the last five deliveries, the agent establishes a realistic, empirical delivery window for each vendor. If a supplier starts slipping, the agent's calculated lead time automatically expands. This dynamic adjustment feeds directly back into the reorder point formula discussed in the first lesson.\n\nTo further protect against variance, we introduce a safety stock buffer. This is an additional quantity of inventory kept on hand to protect against unexpected supplier delays. The agent calculates safety stock by multiplying the maximum recorded daily sales by the maximum recorded lead time, then subtracting the average sales by the average lead time. The result is a robust system that orders early enough to cover the vendor's worst days."
-          }
-        },
-        {
-          "id": "inv2-step-4",
-          "number": "04",
-          "title": "Seasonal Demand & Trend Adjustments",
-          "subtitle": "Tuning forecasts for peaks and dips",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Forecasting",
-          "summary": "Adapt the baseline forecasting model to account for seasonal spikes, holidays, or sudden trend shifts in the market.",
-          "isGated": true,
-          "content": {
-            "overview": "Learn to inject a seasonality multiplier into your forecast. This ensures you don't under-order during peak seasons (like holidays) or over-order immediately after the rush ends.",
-            "keyLearnings": [
-              "Applying seasonality indexes to base sales velocity",
-              "Smoothing outliers from viral sales events",
-              "Using moving averages for short-term trend detection"
-            ],
-            "codeSnippet": "export function calculateAdjustedVelocity(baseVelocity: number, seasonalIndex: number, trendMultiplier: number) {\n  // Smooths out spikes while respecting the overall trend direction\n  const adjusted = baseVelocity * seasonalIndex * trendMultiplier;\n  return Math.max(adjusted, 1); // Never project zero sales if item is active\n}",
-            "lessonBody": "Sales velocity is rarely a smooth line; it experiences sharp peaks and valleys driven by external factors. A hardware store selling roofing sheets will see massive spikes right before the rainy season, while a distributor of school supplies will face extreme volatility in January. If your agent only looks at a 30-day rolling average, it will completely miss these predictable surges until it's too late.\n\nTo anticipate these shifts, we introduce a seasonal index into the forecasting algorithm. A seasonal index is a multiplier that compares historical sales during a specific period against the average sales of the entire year. By querying historical order data from your database, you can determine if a particular SKU consistently sells 40% more in December, giving it an index of 1.4.\n\nWhen calculating the forward-looking sales velocity, the agent multiplies the base velocity by this seasonal index. This ensures the system proactively increases the reorder quantity ahead of the rush, rather than reactively scrambling to catch up after the peak has already begun. The math protects the business from stocking out during the most profitable weeks of the year.\n\nConversely, the agent must also handle the drop-off. If the system orders heavily in late December, it must apply a downward multiplier for January to avoid bloated post-holiday inventory. By using moving averages combined with trend multipliers, the forecasting model smooths out temporary viral spikes while respecting long-term growth or decline patterns, ensuring capital is always deployed efficiently."
-          }
-        },
-        {
-          "id": "inv2-step-5",
-          "number": "05",
-          "title": "Dead-Stock & Slow-Mover Detection",
-          "subtitle": "Freeing up trapped capital",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Analytics",
-          "summary": "Identify inventory that isn't moving, flagging slow-moving SKUs so you can liquidate and reallocate budget.",
-          "isGated": true,
-          "content": {
-            "overview": "Capital tied up in dust-gathering products is a killer for SMEs. We build an analyzer that flags items with zero movement over 60 days, triggering liquidation alerts before they become dead stock.",
-            "keyLearnings": [
-              "Defining aging criteria (30, 60, 90 days without sales)",
-              "Generating slow-mover alerts for the business owner",
-              "Prioritizing capital reallocation to fast-moving SKUs"
-            ],
-            "lessonBody": "While stockouts cost you missed sales, overstocking kills a business by trapping critical working capital. Small retailers often have shelves full of inventory that hasn't moved in months, while simultaneously struggling to find the cash to restock their fastest-selling items. An inventory agent isn't just about ordering more; it's also about identifying what to stop ordering.\n\nWe build an analyzer that continuously scans the inventory database for aging criteria. By establishing strict thresholds—such as 30, 60, or 90 days without a single recorded sale—the agent flags SKUs that are tying up funds. This requires running a cron job or scheduled task that cross-references current stock levels against the timestamp of the last recorded transaction.\n\nOnce a slow-mover is detected, the agent generates an automated alert for the business owner. Instead of hiding this data in a complex spreadsheet, the alert is pushed directly via WhatsApp or a simple dashboard. The message details the trapped capital value: 'You have KES 45,000 tied up in SKU X, which has not sold in 65 days.' This transparency forces a decision.\n\nThe goal is to prioritize capital reallocation. By surfacing dead stock, the owner can initiate liquidation strategies—such as bundling the slow-mover with a high-velocity item or running a flash discount. The cash recovered from these sales is then funneled back into the agent's budget for fast-moving SKUs, dramatically improving the overall health of the supply chain."
-          }
-        },
-        {
-          "id": "inv2-step-6",
-          "number": "06",
-          "title": "Multi-Supplier & Multi-SKU Prioritization",
-          "subtitle": "Routing orders when budget is limited",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Logic",
-          "summary": "Build a decision engine that prioritizes reordering high-margin SKUs from the most reliable suppliers when cash is tight.",
-          "isGated": true,
-          "content": {
-            "overview": "If you only have KES 50,000 for restocking but need KES 80,000 in goods, what do you order? We'll create logic that prioritizes high-margin, fast-velocity items and routes the orders to the suppliers with the best terms.",
-            "keyLearnings": [
-              "Ranking products by Gross Margin Return on Investment (GMROI)",
-              "Dynamic supplier routing based on pricing and reliability",
-              "Creating budget-constrained cart payloads"
-            ],
-            "testCase": {
-              "input": "Available Budget: KES 30,000. Needed: SKU_A (Margin 40%, Velocity 5/day, KES 20k), SKU_B (Margin 15%, Velocity 2/day, KES 20k).",
-              "expectedOutput": "Order Generation: Allocate KES 20,000 to SKU_A (High Priority). Allocate remaining KES 10,000 to SKU_B (Partial Restock)."
-            },
-            "lessonBody": "When a business has unlimited cash, restocking is easy: you order everything you need. In reality, a Kenyan SME might receive a daily sales deposit of KES 50,000, but the agent determines that KES 80,000 worth of inventory has hit the reorder threshold. The system must now make a critical decision: how to allocate a limited budget across competing priorities.\n\nWe solve this by building a decision engine that ranks products by their Gross Margin Return on Investment (GMROI). This metric doesn't just look at how fast an item sells, but how much profit it generates for every shilling invested in it. The agent queries the database to calculate the GMROI for all flagged SKUs, instantly determining which items will generate the most cash if restocked immediately.\n\nOnce the SKUs are prioritized, the agent must handle supplier routing. If the highest-priority SKU can be sourced from three different vendors, the agent evaluates them based on a combination of unit price and the historical reliability score we established in earlier lessons. The system dynamically generates a budget-constrained cart payload, fulfilling the high-margin items completely before allocating the remainder to lower-priority goods.\n\nThis logic transforms the agent from a simple calculator into a strategic procurement manager. It ensures that when cash is tight, the business never spends its limited capital on low-margin filler while allowing its most profitable products to remain out of stock. The automated prioritization protects the bottom line during cash flow crunches."
-          }
-        },
-        {
-          "id": "inv2-step-7",
-          "number": "07",
-          "title": "Building the Supplier Chatbot Agent",
-          "subtitle": "LLMs for vendor negotiations",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Prompt Engineering",
-          "summary": "Design the core system prompt that enables your AI agent to negotiate quantities, handle out-of-stock replies from vendors, and confirm delivery schedules.",
-          "isGated": true,
-          "content": {
-            "overview": "When a supplier replies 'We only have 20 units left', your agent needs to understand and adjust. We'll use Gemini to interpret unstructured supplier WhatsApp replies and update the internal order state.",
-            "keyLearnings": [
-              "Structuring system prompts for B2B negotiation and context awareness",
-              "Extracting adjusted quantities and dates from unstructured vendor text",
-              "Enforcing polite but firm tone constraints suitable for suppliers"
-            ],
-            "samplePrompt": "You are a procurement assistant for a Nairobi hardware store. A supplier has responded to your restock request.\nExtract the confirmed quantities and delivery dates.\n- If a requested item is out of stock, ask when the next shipment arrives.\n- If they offer a partial quantity, accept it and output JSON: [{\"sku\": \"...\", \"confirmedQty\": 10}]\n- Maintain a professional, concise tone. Do not make small talk.",
-            "lessonBody": "B2B procurement is rarely as simple as sending a request and receiving exactly what you asked for. When the agent dispatches a WhatsApp message for 50 units, the supplier might reply, 'We only have 20 left, but a new shipment arrives on Thursday.' A rigid, rules-based bot will fail here because it cannot parse the unstructured natural language of a human vendor.\n\nTo handle this, we integrate a Large Language Model—like Gemini—to act as the interpretive layer between the supplier and the database. You will construct a strict system prompt that instructs the LLM to read the supplier's WhatsApp reply and extract specific variables: confirmed quantities, adjusted prices, and updated delivery dates. The LLM converts the messy conversational text into structured JSON.\n\nThe prompt engineering for this task must enforce a professional, B2B persona. The agent is representing a business, so the prompt strictly forbids small talk, emojis, or casual slang. It must remain polite but focused entirely on finalizing the procurement details. If the supplier offers a partial quantity, the LLM is instructed to accept it, log the deficit, and output the data payload required to update the internal system.\n\nCrucially, the agent must also know when to ask follow-up questions. If a requested item is entirely out of stock, the LLM prompt dictates that the agent must proactively ask for the next expected availability date. By handling these minor negotiations autonomously, the agent secures available stock instantly, without waiting for the business owner to manually read and reply to the supplier's message."
-          }
-        },
-        {
-          "id": "inv2-step-8",
-          "number": "08",
-          "title": "Handling Supplier Non-Response Escalation",
-          "subtitle": "Never let an order stall",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Flow Design",
-          "summary": "Implement a timeout and escalation flow if a supplier ignores the restock request, routing to alternatives or human managers.",
-          "isGated": true,
-          "content": {
-            "overview": "Suppliers don't always reply immediately. We build an escalation sequence: a 24-hour reminder, 48-hour routing to an alternate supplier, and an alert to the owner. This ensures procurement never stalls silently.",
-            "keyLearnings": [
-              "Setting up scheduled delays and webhooks for check-ins",
-              "Routing orders to backup vendors dynamically when primary fails",
-              "Alerting human managers when all automated paths are exhausted"
-            ],
-            "lessonBody": "Automating the outreach and negotiation is powerful, but what happens when the supplier simply doesn't reply? In a manual system, a manager might forget they placed the order, only realizing the mistake when shelves go empty five days later. An autonomous agent must treat silence as a critical failure condition and act accordingly.\n\nWe implement an escalation flow using scheduled background jobs or a workflow engine. When the initial WhatsApp restock request is sent via the Cloud API, the system records a timestamp. If a webhook confirming the supplier's reply is not received within a set window—for example, 24 hours—the agent automatically fires a polite but urgent follow-up message to bump the thread.\n\nIf the supplier remains unresponsive after 48 hours, the agent executes a routing fallback. It queries the database for an alternate vendor that carries the same SKU. The system abandons the stalled order and immediately dispatches a new request to the backup supplier. This ensures that the procurement process never stalls silently, keeping the supply chain moving even when primary vendors fail.\n\nFinally, we must build a circuit breaker for human intervention. If the backup supplier also fails, or if no alternate vendor exists, the agent sends an urgent alert to the business owner or procurement manager. The alert details the failed attempts and hands over control, ensuring that edge cases which require a human relationship to resolve are surfaced before they cause a critical stockout."
-          }
-        },
-        {
-          "id": "inv2-step-9",
-          "number": "09",
-          "title": "M-Pesa Supplier Payment Prep (B2B)",
-          "subtitle": "Streamlining vendor settlement",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Payments",
-          "summary": "Format and prep Safaricom Daraja B2B Paybill payloads once a supplier confirms an order, readying it for human approval.",
-          "isGated": true,
-          "content": {
-            "overview": "Once the vendor confirms the delivery schedule and total price, the agent prepares the exact M-Pesa Paybill payload. A human manager just clicks 'Approve' to release the funds, securely merging communication and finance.",
-            "keyLearnings": [
-              "Understanding Safaricom Daraja B2B API requirements",
-              "Generating structured payment approval summaries for management",
-              "Validating vendor Paybill numbers and expected totals"
-            ],
-            "codeSnippet": "export function formatDarajaB2BRequest(paybill: string, accountNo: string, amount: number) {\n  return {\n    Initiator: \"procurement_agent\",\n    CommandID: \"BusinessPayBill\",\n    PartyA: process.env.SHORTCODE,\n    PartyB: paybill,\n    AccountReference: accountNo,\n    Amount: amount,\n    Remarks: \"Restock payment approved via automated agent\"\n  };\n}",
-            "lessonBody": "Once a supplier has confirmed the quantities and delivery dates via the WhatsApp negotiation flow, the final step in the procurement cycle is settlement. In Kenya, this often means transferring funds via M-Pesa. However, allowing an autonomous agent to instantly disburse funds without oversight is a massive security and cash-flow risk for any SME.\n\nInstead of full automation, we design a payment preparation pipeline using the Safaricom Daraja B2B API. When the LLM successfully extracts the final confirmed total from the vendor's chat, the agent automatically formats the exact JSON payload required for a BusinessPayBill command. It pre-fills the supplier's Paybill number, the account reference, and the precise settlement amount.\n\nThis prepped payload is then surfaced to a human manager for final authorization. The agent can send a WhatsApp message to the owner stating, 'Supplier confirmed 50 units for KES 25,000. Reply APPROVE to release funds via M-Pesa.' When the owner replies, the backend triggers the Daraja API call, securely executing the transaction.\n\nThis architecture perfectly balances automation with financial control. The agent handles the tedious work of calculating totals, checking vendor details, and structuring the API request, eliminating manual data entry errors. The human remains strictly in the loop for the actual release of funds, ensuring the business owner retains absolute authority over their cash flow while saving hours of administrative time."
-          }
-        },
-        {
-          "id": "inv2-step-10",
-          "number": "10",
-          "title": "Owner-Facing Inventory Health Dashboard",
-          "subtitle": "Visualizing supply chain status",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Reporting",
-          "summary": "Roll up velocity, stockouts, and pending orders into a clear, single-view dashboard for the business owner.",
-          "isGated": true,
-          "content": {
-            "overview": "The agent does the heavy lifting, but the owner needs oversight. We'll structure the data to populate a simple dashboard showing critical alerts, pending deliveries, and capital trapped in dead stock.",
-            "keyLearnings": [
-              "Aggregating inventory metrics into summary objects",
-              "Designing intuitive status indicators (Red for stockouts, Green for healthy)",
-              "Structuring JSON payloads for frontend dashboard ingestion"
-            ],
-            "lessonBody": "While the agent is operating autonomously via WhatsApp and background tasks, the business owner still requires visibility into the overall health of their supply chain. Relying purely on chat alerts for individual stockouts creates noise. We need to aggregate the agent's data into a single, comprehensive view that a manager can check at a glance.\n\nWe will design a simple frontend dashboard—which could be a lightweight web app or even a synced Google Sheet—that pulls data directly from the agent's underlying database. The dashboard rolls up the critical metrics calculated in previous lessons: current sales velocity, predicted stockout dates for top SKUs, and the total value of capital trapped in slow-moving inventory.\n\nThe data must be structured to highlight actionable insights immediately. We implement a traffic-light status system based on the calculated reorder thresholds. Items well above their safety stock are marked green, items within the reorder window are yellow, and items actively stocked out or stalled in vendor negotiations are marked red. This visual hierarchy guides the owner's attention to the most pressing issues.\n\nCrucially, the dashboard also displays the active state of the agent. It lists pending orders, unresponded vendor pings, and payment approvals awaiting the owner's authorization. By structuring the JSON payloads to feed cleanly into this dashboard, the system provides total transparency, proving to the user that the AI is working efficiently in the background and building trust in the automation."
-          }
-        },
-        {
-          "id": "inv2-step-11",
-          "number": "11",
-          "title": "Edge Cases: Damaged Goods & Returns",
-          "subtitle": "Handling reality on the ground",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Operations",
-          "summary": "Add logic for logging damaged deliveries and automatically requesting credit notes from suppliers via WhatsApp.",
-          "isGated": true,
-          "content": {
-            "overview": "When a delivery arrives with broken items, the inventory count drops. We'll build a flow where the staff inputs the damage count, and the agent automatically messages the supplier requesting a credit note.",
-            "keyLearnings": [
-              "Adjusting received inventory versus ordered inventory",
-              "Automating credit note request formatting via Meta Graph API",
-              "Tracking pending supplier credits in the database"
-            ],
-            "lessonBody": "Inventory math assumes that what you order is exactly what you receive in pristine condition. The reality of logistics is that cartons get crushed, bottles break, and suppliers send the wrong items. If the system assumes 50 units were received but 5 were destroyed in transit, your agent's calculations will be permanently skewed, eventually causing a premature stockout.\n\nWe must build a reconciliation flow to handle these inevitable edge cases. When a delivery arrives, the receiving staff must have a simple interface—often just a structured WhatsApp command—to log discrepancies. If they input 'Received 45, Damaged 5', the agent immediately adjusts the database, ensuring the current inventory count accurately reflects the usable goods on hand.\n\nUpon logging the damage, the agent triggers an automated credit note request. It uses the Meta Graph API to send a formatted message back to the supplier, detailing the exact discrepancy and attaching any photographic evidence uploaded by the staff. This immediate, automated follow-up ensures the business doesn't absorb the cost of vendor errors due to administrative oversight.\n\nFinally, the agent logs the pending credit note in the database. This allows the system to deduct the owed amount from the next automated purchase order sent to that specific supplier. By tightly integrating discrepancy logging, automated vendor communication, and financial reconciliation, the agent handles the messy reality of physical goods just as effectively as the perfect-case scenarios."
-          }
-        },
-        {
-          "id": "inv2-step-12",
-          "number": "12",
-          "title": "Verified Portfolio Deployment",
-          "subtitle": "Launching your live procurement engine",
-          "status": "locked",
-          "duration": "60 min",
-          "category": "Deployment",
-          "summary": "Connect your fully tested agent to a live WhatsApp Business number, run a real supplier interaction, and secure your verified portfolio link.",
-          "isGated": true,
-          "content": {
-            "overview": "It's time to go live. You will deploy the application, integrate it with a test supplier number, process a simulated restock cycle end-to-end, and generate your verified portfolio link complete with a demo.",
-            "keyLearnings": [
-              "End-to-end production testing of the restock agent",
-              "Live deployment and webhook configuration for Meta and M-Pesa",
-              "Generating your verified portfolio artifact demonstrating a working system"
-            ],
-            "lessonBody": "You have built a comprehensive forecasting engine, a negotiation agent, and a secure payment pipeline. Now, it is time to deploy this system into production. In this final lesson, you will take the code you've written, host it on a live server environment, and expose your webhook endpoints to the public internet so they can communicate with Meta and Safaricom.\n\nDeployment requires strictly separating your test data from your production data. You will configure your environment variables to connect your deployed agent to a live WhatsApp Business number. This transforms your local scripts into an always-on service capable of monitoring the database and reacting to inventory thresholds around the clock.\n\nTo finalize your portfolio, you will run a complete, end-to-end simulated restock cycle. You will artificially spike the sales velocity of a test SKU, watch the agent automatically dispatch a template message to a test supplier number, negotiate the quantity using the LLM, and generate the Daraja B2B payment prompt. This proves the entire architecture functions flawlessly in a live environment.\n\nThe culmination of this course is your verified portfolio artifact. You will record a short, unedited screen capture demonstrating the automated flow—from the stockout trigger in the database to the final M-Pesa approval prompt on your phone. This demo, alongside a live link to your dashboard and the architecture code, proves you can build resilient supply chain automation, ready to be deployed for any real business."
-          }
-        }
-      ]
+        ]
   },
   {
     id: 'hr-screening-agent',
