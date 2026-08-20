@@ -32,7 +32,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Chat endpoint with Gemini AI integration and Kenyan retail fallback
 app.post('/api/agent/chat', async (req: Request, res: Response) => {
   try {
-    const { message, inventory, systemPrompt, history = [] } = req.body;
+    const { message, inventory, history = [] } = req.body;
 
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'Message is required' });
@@ -48,7 +48,7 @@ app.post('/api/agent/chat', async (req: Request, res: Response) => {
           ? inventory.map((i: any) => `- ${i.name} (SKU: ${i.sku}) | KES ${i.priceKES} / $${i.priceUSD} | Stock: ${i.stock} (${i.status}) | Location: ${i.location || 'Nairobi'}`).join('\n')
           : '';
 
-        const systemInstructionText = `${systemPrompt || 'You are an autonomous WhatsApp retail sales agent for a Kenyan merchant in Nairobi.'}
+        const systemInstructionText = `You are an autonomous WhatsApp retail sales agent for a Kenyan merchant in Nairobi.
 
 LIVE STORE INVENTORY:
 ${inventoryContext}

@@ -9,14 +9,36 @@ function getGemini(): GoogleGenAI | null {
   return geminiClient;
 }
 
+// In-memory per-instance rate limit: this is a course-lesson demo endpoint, not tied to
+// real customer data, so a simple fixed-window counter is enough to stop it being scripted
+// into a free, unauthenticated way to burn through the Gemini quota. Resets if the
+// serverless instance recycles - acceptable for a demo, not meant to be airtight.
+const RATE_LIMIT = 20;
+const WINDOW_MS = 60_000;
+const requestLog = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (requestLog.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  timestamps.push(now);
+  requestLog.set(ip, timestamps);
+  return timestamps.length > RATE_LIMIT;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
 
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) {
+    res.status(429).json({ error: 'Too many requests. Try again in a minute.' });
+    return;
+  }
+
   try {
-    const { message, inventory, systemPrompt, history = [] } = req.body || {};
+    const { message, inventory, history = [] } = req.body || {};
 
     if (!message || typeof message !== 'string') {
       res.status(400).json({ error: 'Message is required' });
@@ -31,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ? inventory.map((i: any) => `- ${i.name} (SKU: ${i.sku}) | KES ${i.priceKES} / $${i.priceUSD} | Stock: ${i.stock} (${i.status}) | Location: ${i.location || 'Nairobi'}`).join('\n')
           : '';
 
-        const systemInstructionText = `${systemPrompt || 'You are an autonomous WhatsApp retail sales agent for a Kenyan merchant in Nairobi.'}
+        const systemInstructionText = `You are an autonomous WhatsApp retail sales agent for a Kenyan merchant in Nairobi.
 
 LIVE STORE INVENTORY:
 ${inventoryContext}
