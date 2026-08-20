@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check, ArrowRight, Loader2, Smartphone, AlertCircle, ShieldCheck, Lock, Tag } from 'lucide-react';
+import { X, Check, ArrowRight, Loader2, AlertCircle, ShieldCheck, Lock, Tag } from 'lucide-react';
 import { COUPONS } from '../data/coupons';
 
 interface CheckoutModalProps {
@@ -26,6 +26,15 @@ const MastercardMark: React.FC = () => (
   <svg viewBox="0 0 32 20" className="h-4 w-auto" aria-label="Mastercard">
     <circle cx="12" cy="10" r="9" fill="#EB001B" />
     <circle cx="20" cy="10" r="9" fill="#F79E1B" fillOpacity={0.85} />
+  </svg>
+);
+
+const MpesaMark: React.FC = () => (
+  <svg viewBox="0 0 64 22" className="h-4 w-auto" aria-label="M-Pesa">
+    <rect width="64" height="22" rx="3" fill="#00A859" />
+    <text x="32" y="15.5" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight={900} fontSize="10" fill="#FFFFFF" letterSpacing="0.3">
+      M-PESA
+    </text>
   </svg>
 );
 
@@ -244,8 +253,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     : 'border-[#12102A]/10 bg-white hover:bg-gray-50'
                 }`}
               >
-                <div className="w-8 h-8 rounded-lg bg-[#00A859] text-white flex items-center justify-center font-bold text-xs shrink-0">
-                  <Smartphone className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-lg bg-white border border-[#12102A]/10 flex items-center justify-center shrink-0">
+                  <MpesaMark />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-[#12102A]">M-Pesa</p>
