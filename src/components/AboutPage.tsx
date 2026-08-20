@@ -166,7 +166,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
     >
       <div className="max-w-3xl mx-auto p-6 md:p-8 rounded-2xl border border-[#12102A]/10 bg-white space-y-2">
         <p className="text-sm text-[#12102A]/80 leading-relaxed italic">
-          "I'm Manuel, born and raised in Nairobi. I've spent years scaling AI-driven systems for brands like Jumia and my own company, Trance AI, and I kept seeing the same gap: young Kenyans with real hustle, but nothing to prove what they can actually do. Afridemy is how I'm fixing that, because I want to see more of us kutoka block and build the life we actually chose for ourselves."
+          "I'm Manuel, born and raised in Nairobi. I've spent years scaling AI-driven systems for brands like Jumia and my own company, Trance AI, and I kept seeing the same gap: young Kenyans with real hustle, but nothing to prove what they can actually do. Afridemy is how I'm fixing that, because I want to see more of us, tukitoka block, build the life we actually chose for ourselves."
         </p>
         <p className="text-xs font-bold text-[#12102A]/50">Manuel, Founder</p>
       </div>
