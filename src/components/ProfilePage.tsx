@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Track, UserAccount } from '../types';
 import { Header } from './Header';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 import {
   updateProfile,
   uploadAvatar,
@@ -76,6 +77,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onSignOut,
   onProfileUpdated,
 }) => {
+  useDocumentMeta('Your Profile', 'Manage your Afridemy account, progress, and unlocked systems.');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [name, setName] = useState(user.name);

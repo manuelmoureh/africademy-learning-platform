@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star, Eye, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Lock, CheckCircle2, Star, Eye, X, ChevronRight } from 'lucide-react';
 import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 import { StarRating } from './StarRating';
 import { SystemThumbnail } from './SystemThumbnail';
 import { fetchUserTrackRating, submitTrackRating } from '../lib/db';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 const RateSystem: React.FC<{ trackId: string; userId: string | null; onOpenAuth: () => void }> = ({ trackId, userId, onOpenAuth }) => {
   const [myRating, setMyRating] = useState<number | null>(null);
@@ -79,15 +80,20 @@ const ModuleRow: React.FC<{ step: Track['steps'][number]; isUnlocked: boolean }>
 
 interface CourseDetailPageProps {
   track: Track;
+  allTracks: Track[];
   isUnlocked: boolean;
   userId: string | null;
   onBack: () => void;
+  onGoHome: () => void;
   onStart: () => void;
   onOpenAuth: () => void;
+  onSelectCourse: (trackId: string) => void;
 }
 
-export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnlocked, userId, onBack, onStart, onOpenAuth }) => {
+export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, allTracks, isUnlocked, userId, onBack, onGoHome, onStart, onOpenAuth, onSelectCourse }) => {
+  useDocumentMeta(track.title, track.description);
   const [showDemo, setShowDemo] = useState(false);
+  const relatedTracks = allTracks.filter((t) => t.id !== track.id).slice(0, 3);
   const learnings = Array.from(
     new Set(track.steps.flatMap((s) => s.content.keyLearnings).slice(0, 6))
   );
@@ -97,8 +103,16 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnl
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="p-6 md:p-10 max-w-5xl mx-auto w-full space-y-8"
+      className="p-6 md:p-10 max-w-5xl mx-auto w-full space-y-8 pb-28 lg:pb-8"
     >
+      <nav className="flex items-center gap-1.5 text-xs font-semibold text-[#12102A]/50">
+        <button onClick={onGoHome} className="hover:text-[#12102A] transition-colors cursor-pointer">Home</button>
+        <ChevronRight className="w-3.5 h-3.5" />
+        <button onClick={onBack} className="hover:text-[#12102A] transition-colors cursor-pointer">Systems</button>
+        <ChevronRight className="w-3.5 h-3.5" />
+        <span className="text-[#12102A] truncate max-w-[180px] sm:max-w-none">{track.title}</span>
+      </nav>
+
       <button
         onClick={onBack}
         className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/60 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97]"
@@ -181,6 +195,29 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnl
               </motion.div>
             )}
           </div>
+
+          {relatedTracks.length > 0 && (
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-[#12102A]/50 mb-3">
+                Explore Other Systems
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {relatedTracks.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => onSelectCourse(t.id)}
+                    className="text-left p-3.5 rounded-xl border border-[#12102A]/10 bg-white hover:border-[#F5A623]/40 cursor-pointer transition-all active:scale-[0.98] space-y-1"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-[#F5A623]/10 flex items-center justify-center">
+                      <TrackIcon name={t.icon} className="w-3.5 h-3.5 text-[#F5A623]" />
+                    </div>
+                    <p className="text-xs font-bold text-[#12102A] leading-snug">{t.title}</p>
+                    <p className="text-[10px] text-[#12102A]/50 font-semibold">KES {t.price.toLocaleString()}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: pricing + CTA */}
@@ -244,6 +281,23 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ track, isUnl
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Sticky mobile CTA - the pricing panel above is desktop-sticky in the right column,
+          but that column stacks below the fold on mobile, so this keeps the CTA reachable
+          without scrolling back up. */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#12102A]/10 p-4 flex items-center gap-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold text-[#12102A]/50">Cost</p>
+          <p className="text-base font-black text-[#12102A] truncate">KES {track.price.toLocaleString()}</p>
+        </div>
+        <button
+          onClick={onStart}
+          className="flex-1 py-3 bg-[#F5A623] hover:bg-[#e4971c] text-[#12102A] text-sm font-black rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] shadow-xs"
+        >
+          Start This System
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
     </motion.section>
   );
 };

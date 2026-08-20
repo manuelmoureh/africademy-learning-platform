@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles, Lock, ChevronRight } from 'lucide-react';
 import { Track, Step, UserAccount } from '../types';
 import { Header } from './Header';
 import { SystemThumbnail } from './SystemThumbnail';
@@ -10,6 +10,7 @@ import { CodeBlock } from './CodeBlock';
 import { ChatDemo } from './ChatDemo';
 import { FlowDiagram } from './FlowDiagram';
 import { CompareCard } from './CompareCard';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 interface LessonPageProps {
   tracks: Track[];
@@ -56,6 +57,7 @@ export const LessonPage: React.FC<LessonPageProps> = ({
   onUnlock,
   onNavigateToStep,
 }) => {
+  useDocumentMeta(`${step.title} - ${track.title}`, step.summary);
   const isLocked = step.isGated && !isUnlocked;
   const isCompleted = step.status === 'completed';
   const badgeLabel = isLocked ? 'LOCKED' : isCompleted ? 'COMPLETED' : 'AVAILABLE';
@@ -124,6 +126,14 @@ export const LessonPage: React.FC<LessonPageProps> = ({
         transition={{ duration: 0.35, ease: 'easeOut' }}
         className="max-w-2xl mx-auto px-6 py-12"
       >
+        <nav className="flex items-center gap-1.5 text-xs font-semibold text-[#12102A]/50 mb-4 flex-wrap">
+          <button onClick={onGoHome} className="hover:text-[#12102A] transition-colors cursor-pointer">Home</button>
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+          <button onClick={() => onSelectCourse(track.id)} className="hover:text-[#12102A] transition-colors cursor-pointer">{track.title}</button>
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+          <span className="text-[#12102A] truncate max-w-[160px] sm:max-w-none">{step.title}</span>
+        </nav>
+
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 text-sm font-bold text-[#12102A]/60 hover:text-[#12102A] cursor-pointer transition-all active:scale-[0.97] mb-8"

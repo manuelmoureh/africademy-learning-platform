@@ -5,6 +5,7 @@ import { PortfolioVerification, Track, UserAccount } from '../types';
 import { PLACEHOLDER_VERIFIED_WORK } from '../data/courses';
 import { VerifiedPortfolioModal } from './VerifiedPortfolioModal';
 import { Header } from './Header';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -45,6 +46,7 @@ export const VerifiedWorkPage: React.FC<VerifiedWorkPageProps> = ({
   onOpenAbout,
   onOpenAuth,
 }) => {
+  useDocumentMeta('Verified Work', 'See real, verified portfolio projects built by Afridemy learners for actual Kenyan businesses.');
   const [openProfile, setOpenProfile] = useState<PortfolioVerification | null>(null);
 
   return (

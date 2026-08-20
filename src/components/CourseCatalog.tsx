@@ -5,6 +5,7 @@ import { Track } from '../types';
 import { TrackIcon } from '../utils/trackIcons';
 import { SystemThumbnail } from './SystemThumbnail';
 import { StarRating } from './StarRating';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -37,6 +38,7 @@ interface CourseCatalogProps {
 }
 
 export const CourseCatalog: React.FC<CourseCatalogProps> = ({ tracks, searchQuery = '', onSelectCourse, onGoHome }) => {
+  useDocumentMeta('All Systems', 'Browse all AI automation systems on Afridemy: WhatsApp agents, M-Pesa pipelines, invoicing, support, and more.');
   const reduce = useReducedMotion();
   const [activeField, setActiveField] = useState('All');
   const q = searchQuery.trim().toLowerCase();

@@ -25,6 +25,7 @@ import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { PaymentCallbackPage } from './components/PaymentCallbackPage';
 import { ProfilePage } from './components/ProfilePage';
 import { CommunityView } from './components/CommunityView';
+import { NotFoundPage } from './components/NotFoundPage';
 import { INITIAL_TRACKS, INITIAL_PORTFOLIO_VERIFICATION } from './data/courses';
 import { Step, Track, UserAccount, PortfolioVerification } from './types';
 import { supabase } from './lib/supabase';
@@ -34,7 +35,8 @@ import { trackPageView } from './lib/analytics';
 // Maps the URL to what used to be `viewMode`/`activeNav` state, so every page the app
 // can show has a real, bookmarkable, back-button-friendly URL instead of living entirely
 // in memory.
-function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'lesson' | 'payment-callback' | 'profile' | 'app'; activeNav: string; trackId: string | null; stepId: string | null } {
+function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'lesson' | 'payment-callback' | 'profile' | 'app' | 'not-found'; activeNav: string; trackId: string | null; stepId: string | null } {
+  if (pathname === '/') return { view: 'landing', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/about') return { view: 'about', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/privacy') return { view: 'privacy', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/terms') return { view: 'terms', activeNav: '', trackId: null, stepId: null };
@@ -54,7 +56,7 @@ function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' |
   const detailMatch = pathname.match(/^\/systems\/([^/]+)\/?$/);
   if (detailMatch) return { view: 'app', activeNav: 'course-detail', trackId: detailMatch[1], stepId: null };
 
-  return { view: 'landing', activeNav: '', trackId: null, stepId: null };
+  return { view: 'not-found', activeNav: '', trackId: null, stepId: null };
 }
 
 const GUEST_USER: UserAccount = {
@@ -417,6 +419,26 @@ export default function App() {
     );
   }
 
+  if (viewMode === 'not-found') {
+    return (
+      <NotFoundPage
+        tracks={tracks}
+        user={user}
+        isAuthenticated={!!authUserId}
+        authLoading={authLoading}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={() => navigate('/systems')}
+        onGoHome={() => navigate('/')}
+        onEnterApp={() => navigate('/systems')}
+        onSelectCourse={(id) => navigate(`/systems/${id}`)}
+        onOpenVerifiedWork={() => navigate('/verified')}
+        onOpenAbout={() => navigate('/about')}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
+    );
+  }
+
   // If on Landing Page view
   if (viewMode === 'landing') {
     return (
@@ -538,11 +560,14 @@ export default function App() {
           {activeNav === 'course-detail' && (
             <CourseDetailPage
               track={activeTrack}
+              allTracks={tracks}
               isUnlocked={isTrackUnlocked(activeTrack.id)}
               userId={authUserId}
               onBack={() => navigate('/systems')}
+              onGoHome={() => navigate('/')}
               onStart={() => navigate(`/systems/${activeTrack.id}/learn`)}
               onOpenAuth={() => setIsAuthOpen(true)}
+              onSelectCourse={(id) => navigate(`/systems/${id}`)}
             />
           )}
 

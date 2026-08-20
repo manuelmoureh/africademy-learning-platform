@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ArrowRight, AlertCircle, Lightbulb, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { Track, UserAccount } from '../types';
 import { Header } from './Header';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -37,7 +38,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({
   onSelectCourse,
   onOpenVerifiedWork,
   onOpenAuth,
-}) => (
+}) => {
+  useDocumentMeta('About', "Meet the founder and the story behind Afridemy - teaching young Kenyans to build AI systems businesses actually pay for.");
+  return (
   <div className="min-h-screen bg-[#F0EEF6] text-[#12102A]">
     <Header
       tracks={tracks}
@@ -193,4 +196,5 @@ export const AboutPage: React.FC<AboutPageProps> = ({
       </div>
     </motion.section>
   </div>
-);
+  );
+};

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home } from 'lucide-react';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 interface StaticPageProps {
   title: string;
@@ -8,6 +9,7 @@ interface StaticPageProps {
 }
 
 export const StaticPage: React.FC<StaticPageProps> = ({ title, onBack, children }) => {
+  useDocumentMeta(title, `Afridemy's ${title.toLowerCase()}.`);
   return (
     <div className="min-h-screen bg-[#F0EEF6] text-[#12102A]">
       <nav className="flex items-center gap-4 px-6 lg:px-12 h-20 bg-white/80 backdrop-blur-md border-b border-[#12102A]/10 sticky top-0 z-30">
