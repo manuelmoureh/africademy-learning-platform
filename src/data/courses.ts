@@ -3163,214 +3163,554 @@ export const INITIAL_TRACKS: Track[] = [
     impactStat: 'Kenyan SMEs are shifting from rented social platforms to owned, automated systems',
     featuredOnHomepage: true,
     steps: [
-        {
-          "id": "soc-step-1",
-          "number": "01",
-          "title": "Voice Note Transcription Foundation",
-          "subtitle": "Processing raw owner ideas via audio",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Architecture",
-          "summary": "Building the intake pipeline to receive an audio message and convert it to clean text using the Whisper API.",
-          "isGated": false,
-          "content": {
-            "overview": "Business owners are busy; they prefer speaking over typing. In this lesson, we capture incoming audio notes and use OpenAI's Whisper API to transcribe them accurately, accounting for local accents and background noise.",
-            "lessonBody": "Introduction to why voice notes are powerful for busy Kenyan merchants (e.g., in Gikomba or Eastleigh) who don't have time to type out full captions while handling customers. A WhatsApp voice note is a low-friction intake method.\n\nThe architecture of the ingestion pipeline begins with setting up a WhatsApp webhook to listen for incoming audio messages, usually in .ogg format. When a merchant sends a voice note, the webhook receives a payload containing the media ID rather than the file itself.\n\nBefore sending it to a transcription service, the system must authenticate with the WhatsApp Cloud API using a bearer token, request the media URL, and download the actual audio payload to a temporary server buffer securely.\n\nCalling the OpenAI Whisper API is the next critical step. The Whisper model is particularly effective for this because it handles accents well and can process code-switching, like mixing Swahili and English, or Sheng. The audio file is sent via a multipart/form-data request to the /v1/audio/transcriptions endpoint.\n\nFinally, error handling and clean up must be implemented. If the audio is too noisy or Whisper returns an empty string, the system must immediately reply to the merchant on WhatsApp asking them to re-record. Once transcribed successfully, the temporary audio file is deleted from the server to save space and ensure data privacy.",
-            "keyLearnings": [
-              "Handling audio file ingestion from webhooks",
-              "Calling the Whisper API for accurate voice-to-text",
-              "Pre-processing audio for better transcription results"
-            ]
-          }
-        },
-        {
-          "id": "soc-step-2",
-          "number": "02",
-          "title": "The Caption Generation Engine",
-          "subtitle": "From raw transcript to engaging copy",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Content Engine",
-          "summary": "Using LLMs to turn a raw, unedited voice transcript into a structured, engaging social media caption.",
-          "isGated": false,
-          "content": {
-            "overview": "We will write a system prompt that transforms a rough voice transcription into a polished caption. We'll enforce a specific brand voice, ensuring prices are listed in KES and the tone matches a local boutique.",
-            "lessonBody": "Converting raw text to engaging copy requires careful handling. A Whisper transcript is often rambling and full of filler words or hesitations. The next step is feeding this raw text into a Large Language Model, like Gemini 1.5 Flash, to extract the core message and reformat it into a structured caption.\n\nBuilding the system prompt is where the true value is created. The prompt must strictly define the persona—perhaps a vibrant, professional Nairobi boutique voice. It needs rules to enforce local context, such as always formatting prices in Kenyan Shillings (KES) and avoiding generic AI phrasing.\n\nInstead of just asking the LLM for a caption, we request a JSON response containing both the exact caption text and the extracted metadata like price, product name, and available colors. This structured output makes it easier to validate that the LLM didn't hallucinate a price that the merchant never mentioned.\n\nHandling missing information is crucial for reliability. If a merchant says to post new dresses but forgets to mention the price, the LLM should be prompted to return a specific needs_info flag. The system can then automatically message the merchant back on WhatsApp to ask for the price, rather than posting an incomplete caption.\n\nSocial media platforms do not render standard Markdown, like asterisks for bolding. The prompt must explicitly forbid the use of Markdown formatting, ensuring the output uses native line breaks and emojis instead, keeping the final text ready for immediate publication.",
-            "keyLearnings": [
-              "Prompt engineering for tone matching and brand voice",
-              "Extracting prices and product details from unstructured speech",
-              "Formatting output safely without markdown hallucinations"
-            ],
-            "samplePrompt": "You are a social media copywriter for a trendy Nairobi boutique. Take the raw voice transcript and write an Instagram caption. Keep it under 4 sentences. Include relevant emojis, format prices clearly in KES, and end with a call to action to visit the store or WhatsApp to order."
-          }
-        },
-        {
-          "id": "soc-step-3",
-          "number": "03",
-          "title": "Multi-Platform Adaptation",
-          "subtitle": "One voice note, multiple channel formats",
-          "status": "locked",
-          "duration": "25 min",
-          "category": "Prompt Design",
-          "summary": "Adapting the generated content for different platforms—differentiating a visual Instagram caption from a conversational Facebook Page post.",
-          "isGated": false,
-          "content": {
-            "overview": "Different platforms require different copy structures. We will extend our prompt engine to return a JSON payload with platform-specific variations: a hashtag-heavy Instagram version and a link-focused Facebook version.",
-            "lessonBody": "The reality of multi-channel marketing means a single piece of content performs differently on Instagram compared to a Facebook Page. Instagram relies heavily on visual aesthetics, emojis, and clusters of hashtags, while Facebook posts often need a more conversational tone and direct links, as Instagram doesn't support clickable links in captions.\n\nInstead of writing one generic caption, the system prompt is configured to return an array of platform-specific variations. The LLM processes the same original voice transcript but applies different formatting rules based on the target platform provided in the prompt instructions.\n\nInstagram captions have a character limit and truncate after the first few lines, meaning the hook and the price in KES must appear early. The LLM is instructed to front-load critical information for the Instagram variant, while the Facebook variant might include a full paragraph explaining the product's origin or material.\n\nOn Facebook, the call-to-action can directly include a WhatsApp API link for immediate purchasing. For Instagram, the system generates a 'Link in bio' or 'DM to order' instruction, adapting perfectly to the platform's constraints without requiring manual editing by the business owner.\n\nOnce the LLM returns the structured payload containing both variants, the system uses a schema validator to ensure both instagram_caption and facebook_caption keys exist and meet the character limits before moving them to the approval or publishing queue.",
-            "keyLearnings": [
-              "Structuring LLM outputs into strictly typed JSON",
-              "Adapting tone and length per social media platform",
-              "Generating platform-specific calls-to-action"
-            ]
-          }
-        },
-        {
-          "id": "soc-step-4",
-          "number": "04",
-          "title": "Meta Graph API Authentication",
-          "subtitle": "Connecting the business accounts securely",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Integrations",
-          "summary": "Navigating Meta's OAuth flow to connect an Instagram Professional account and Facebook Page for API publishing.",
-          "isGated": true,
-          "content": {
-            "overview": "To publish automatically, we need the right permissions. This lesson covers setting up a Meta App, authenticating a business account, and generating the required long-lived access tokens for seamless background posting.",
-            "lessonBody": "To publish content directly to a Facebook Page or an Instagram Professional account, your system must authenticate through the Meta Graph API. This process replaces manual password sharing with secure, token-based authorization via Meta's standard OAuth 2.0 flow.\n\nThe first step involves creating an app in the Meta Developer portal and configuring the Facebook Login for Business product. You must request specific permissions—namely instagram_basic, instagram_content_publish, pages_show_list, and pages_read_engagement—to allow the system to post on the owner's behalf.\n\nWhen a boutique owner onboarding onto your system clicks Connect Facebook, they are redirected to Meta's servers to approve your app. Upon approval, Meta redirects them back to your application with a short-lived authorization code, which your backend immediately exchanges for a User Access Token.\n\nShort-lived tokens expire in hours, which breaks background automation. The system must hit the /oauth/access_token endpoint to trade the short-lived token for a long-lived one, valid for 60 days. It then queries the /me/accounts endpoint to get the specific Page Access Token, which never expires as long as the user's password remains unchanged.\n\nBecause Instagram publishing is routed through the connected Facebook Page, the system queries the Page's instagram_business_account field. Securing this specific Instagram Account ID is mandatory before any publishing requests can be made, completing the authentication pipeline.",
-            "keyLearnings": [
-              "Understanding Meta App Review and required permissions",
-              "Linking Instagram Professional accounts to Facebook Pages",
-              "Generating and securing long-lived access tokens"
-            ]
-          }
-        },
-        {
-          "id": "soc-step-5",
-          "number": "05",
-          "title": "Media Handling & Public URLs",
-          "subtitle": "Preparing images for Meta's servers",
-          "status": "locked",
-          "duration": "30 min",
-          "category": "Media Engine",
-          "summary": "Processing product images and ensuring they are hosted on publicly accessible URLs required by the Instagram API.",
-          "isGated": true,
-          "content": {
-            "overview": "The Instagram Graph API cannot accept direct file uploads; it requires a public URL to fetch the image. We will build a pipeline to temporarily host uploaded product photos and pass the correct URL format to the API.",
-            "lessonBody": "The Instagram Graph API does not allow you to send image or video files directly in the body of a publishing request. Instead, it requires a publicly accessible URL pointing to the media file, which Meta's servers will then download and process independently.\n\nWhen the business owner uploads a product photo via WhatsApp or a web portal, your system must temporarily store it. The architecture relies on an object storage service like AWS S3 or Google Cloud Storage, saving the image and generating a presigned URL or placing it in a publicly readable bucket temporarily.\n\nInstagram is notoriously strict about image dimensions. Before generating a public URL, the system should inspect the image file. If it doesn't meet the aspect ratio constraints, between 4:5 and 1.91:1, or is in an unsupported format like WebP, the system must convert it to a standard JPEG or reject it with a clear error message.\n\nWhen Meta's servers attempt to fetch the provided media URL, they expect an immediate successful response. If the URL points to a slow cold-storage bucket or a lambda function that needs to wake up, the Meta request will time out and the post will fail. Fast, direct links are essential.\n\nOnce the media has been successfully published to the social feed, the temporary public URL is no longer needed. To avoid hosting costs and prevent the unauthorized scraping of the boutique's product imagery, a background worker is triggered to delete the staged image from the temporary bucket.",
-            "keyLearnings": [
-              "Hosting media securely for API access",
-              "Validating image aspect ratios and formats for Instagram",
-              "Handling temporary presigned URLs for privacy"
-            ]
-          }
-        },
-        {
-          "id": "soc-step-6",
-          "number": "06",
-          "title": "The 2-Step Publishing Pipeline",
-          "subtitle": "Creating containers and pushing to feed",
-          "status": "locked",
-          "duration": "50 min",
-          "category": "Backend Dev",
-          "summary": "Implementing the core Instagram Graph API logic: creating a media container and executing the publish command.",
-          "isGated": true,
-          "content": {
-            "overview": "In this core lesson, you will build the actual posting logic. Meta requires a two-step process: first, creating a media container with the image URL and caption, and second, triggering the publish endpoint once the container is ready.",
-            "lessonBody": "Publishing to Instagram via the Graph API is not a single API call; it is a mandatory two-step process. Meta first requires you to create a media container on their servers, and then, only after that container is successfully processed, you issue a second command to actually publish it to the feed.\n\nThe system sends a POST request to the media endpoint, passing the public image URL, the generated caption, and the access token. Meta downloads the image, validates the aspect ratio, and returns a container ID. At this stage, the post exists on Meta's servers but is completely invisible to the public.\n\nFor simple JPEGs, the container is usually ready immediately. However, for videos or larger carousels, Meta requires time to encode the media. If you try to publish immediately, the API will throw an error. The system must implement a polling mechanism, checking the container's status until it returns a FINISHED state.\n\nOnce the container is ready, the system sends a final POST request to the media_publish endpoint, providing the container ID. This executes the actual posting action, pushing the content live to the business's Instagram grid and returning the final permanent post ID.\n\nMeta APIs are prone to opaque error codes. If the container creation fails due to a copyrighted audio track or a malformed image, the system must catch the specific Graph API error code, translate it into plain language, and alert the business owner via WhatsApp so they can fix the issue.",
-            "keyLearnings": [
-              "Executing the POST request to /{ig-user-id}/media",
-              "Capturing the creation_id container reference",
-              "Publishing the container to the live Instagram feed",
-              "Handling Meta API error codes and rate limits gracefully"
-            ],
-            "codeSnippet": "export async function publishToInstagram(igUserId: string, imageUrl: string, caption: string, token: string) {\n  // Step 1: Create Container\n  const containerRes = await fetch(`https://graph.facebook.com/v22.0/${igUserId}/media`, {\n    method: 'POST',\n    body: new URLSearchParams({ image_url: imageUrl, caption, access_token: token })\n  });\n  const { id: creationId } = await containerRes.json();\n\n  // Step 2: Publish\n  const publishRes = await fetch(`https://graph.facebook.com/v22.0/${igUserId}/media_publish`, {\n    method: 'POST',\n    body: new URLSearchParams({ creation_id: creationId, access_token: token })\n  });\n  return publishRes.json();\n}"
-          }
-        },
-        {
-          "id": "soc-step-7",
-          "number": "07",
-          "title": "Building the Scheduling Logic",
-          "subtitle": "Automating the timing of posts",
-          "status": "locked",
-          "duration": "45 min",
-          "category": "Automation",
-          "summary": "Moving away from instant publishing by building a background scheduler to post content at optimal engagement times.",
-          "isGated": true,
-          "content": {
-            "overview": "Because the Instagram API doesn't have a native 'schedule for later' endpoint, we must build our own. We will store approved captions and image URLs in a database with a target timestamp, then use a cron job to trigger the publish pipeline.",
-            "lessonBody": "The Instagram Graph API does not offer a native scheduled publishing parameter for standard feed posts. If a boutique owner records five voice notes on a Sunday evening, the system cannot rely on Meta to drip them out over the week; it must maintain its own scheduling engine.\n\nWe need a database table that stores the approved caption text, the public image URL, the target platform, the authenticated User ID, and a critical publish timestamp. This acts as the single source of truth for the upcoming content calendar.\n\nA background process, often implemented via a cron job or a specialized task queue, runs every minute. It queries the database for any records where the publish timestamp is less than or equal to the current time and the status is still pending.\n\nA major risk in background scheduling is double-posting if the worker crashes mid-execution and restarts. Before initiating the Meta publishing pipeline, the system must lock the row in the database by updating its status to processing. If the worker fails, the lock expires; if it succeeds, it updates to published.\n\nEven with long-lived tokens, an owner might change their Facebook password, instantly invalidating the token. If the cron worker attempts to publish and receives an OAuth exception, it must immediately halt the post, mark it as a failure, and trigger a WhatsApp alert to the owner to re-authenticate.",
-            "keyLearnings": [
-              "Storing scheduled post metadata and target timestamps",
-              "Writing a reliable background worker or cron job",
-              "Ensuring idempotent operations so posts don't duplicate"
-            ]
-          }
-        },
-        {
-          "id": "soc-step-8",
-          "number": "08",
-          "title": "Hashtag & Visual Suggestion",
-          "subtitle": "Enriching the post metadata automatically",
-          "status": "locked",
-          "duration": "35 min",
-          "category": "Content Gen",
-          "summary": "Using AI to automatically recommend locally trending hashtags and visual directions based on the generated caption.",
-          "isGated": true,
-          "content": {
-            "overview": "A good post needs discoverability. We will add a pipeline step that reads the drafted caption and suggests relevant Kenyan hashtags (e.g., #NairobiFashion, #MadeInKenya) and prompts the owner on what kind of photo would match the text best.",
-            "lessonBody": "A social media manager does more than just write captions; they curate the visual strategy and discoverability. Our agent replicates this by running a secondary AI pass over the generated caption to intelligently suggest missing metadata, specifically hashtags and visual direction.\n\nUsing generic tags like fashion or clothes results in the post being buried in global feeds. The system prompts the LLM to generate highly contextual, localized hashtags—like #NairobiStyle or #GikombaFinds—based on the specific items mentioned in the owner's voice note.\n\nInstagram algorithms actively penalize posts that use banned or spammy hashtags, or that use the exact same cluster of tags on every post. The prompt explicitly instructs the LLM to vary the tags, limit the count to an optimal number, and avoid known flagged terms, protecting the account's reach.\n\nOften, a merchant knows what they want to sell but doesn't know how to photograph it. The LLM is instructed to generate a visual suggestion string. For example, if the caption is about office tote bags, the system suggests a well-lit photo of the tote bag resting on an office desk next to a laptop, guiding the owner's photography.\n\nBefore the post is scheduled, this enriched metadata is sent back to the owner via WhatsApp. This transforms the system from a passive transcription tool into an active creative director for the small business, ensuring the final asset matches the quality of the generated text.",
-            "keyLearnings": [
-              "Generating contextual hashtag clusters",
-              "Avoiding banned or overused spam tags",
-              "Prompting the business owner for the correct media type"
-            ],
-            "testCase": {
-              "input": "Transcript: 'Just got the new leather tote bags in, selling them for 4500 shillings. Really great quality for office wear.'",
-              "expectedOutput": "{\"caption\": \"Upgrade your office look! ✨ New premium leather tote bags just landed in store. Only KES 4,500. DM or WhatsApp to reserve yours before they sell out!\", \"hashtags\": [\"#NairobiFashion\", \"#KenyanLeather\", \"#OfficeWearNairobi\"], \"visual_suggestion\": \"A well-lit photo of the tote bag resting on an office desk next to a laptop.\"}"
+          {
+            "id": "soc-step-1",
+            "number": "01",
+            "title": "Voice Note Transcription Foundation",
+            "subtitle": "Processing raw owner ideas via audio",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Architecture",
+            "summary": "Building the intake pipeline to receive an audio message and convert it to clean text using the Whisper API.",
+            "isGated": false,
+            "content": {
+              "overview": "Business owners are busy; they prefer speaking over typing. In this lesson, we capture incoming audio notes and use OpenAI's Whisper API to transcribe them accurately, accounting for local accents and background noise.",
+              "lessonBody": "Introduction to why voice notes are powerful for busy Kenyan merchants (e.g., in Gikomba or Eastleigh) who don't have time to type out full captions while handling customers. A WhatsApp voice note is a low-friction intake method.\n\nThe architecture of the ingestion pipeline begins with setting up a WhatsApp webhook to listen for incoming audio messages, usually in .ogg format. When a merchant sends a voice note, the webhook receives a payload containing the media ID rather than the file itself.\n\nBefore sending it to a transcription service, the system must authenticate with the WhatsApp Cloud API using a bearer token, request the media URL, and download the actual audio payload to a temporary server buffer securely.\n\nCalling the OpenAI Whisper API is the next critical step. The Whisper model is particularly effective for this because it handles accents well and can process code-switching, like mixing Swahili and English, or Sheng. The audio file is sent via a multipart/form-data request to the /v1/audio/transcriptions endpoint.\n\nFinally, error handling and clean up must be implemented. If the audio is too noisy or Whisper returns an empty string, the system must immediately reply to the merchant on WhatsApp asking them to re-record. Once transcribed successfully, the temporary audio file is deleted from the server to save space and ensure data privacy.",
+              "keyLearnings": [
+                "Handling audio file ingestion from webhooks",
+                "Calling the Whisper API for accurate voice-to-text",
+                "Pre-processing audio for better transcription results"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "A voice note becomes clean text in four hops.",
+                  "flow": [
+                    "Merchant sends WhatsApp voice note (.ogg)",
+                    "Webhook receives media ID",
+                    "System downloads audio via authenticated request",
+                    "Audio sent to Whisper for transcription"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Whisper returns an empty string for a noisy voice note. What should the system do?",
+                "options": [
+                  {
+                    "text": "Silently skip that voice note and wait for the next one",
+                    "feedback": "Silently dropping it leaves the merchant wondering why nothing happened.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Immediately reply on WhatsApp asking the merchant to re-record",
+                    "feedback": "Right. This is exactly the graceful failure the lesson describes.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Post the caption anyway with a placeholder for the missing content",
+                    "feedback": "Publishing a placeholder caption to a real business's feed is worse than asking for a re-record first.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-2",
+            "number": "02",
+            "title": "The Caption Generation Engine",
+            "subtitle": "From raw transcript to engaging copy",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Content Engine",
+            "summary": "Using LLMs to turn a raw, unedited voice transcript into a structured, engaging social media caption.",
+            "isGated": false,
+            "content": {
+              "overview": "We will write a system prompt that transforms a rough voice transcription into a polished caption. We'll enforce a specific brand voice, ensuring prices are listed in KES and the tone matches a local boutique.",
+              "lessonBody": "Converting raw text to engaging copy requires careful handling. A Whisper transcript is often rambling and full of filler words or hesitations. The next step is feeding this raw text into a Large Language Model, like Gemini 1.5 Flash, to extract the core message and reformat it into a structured caption.\n\nBuilding the system prompt is where the true value is created. The prompt must strictly define the persona—perhaps a vibrant, professional Nairobi boutique voice. It needs rules to enforce local context, such as always formatting prices in Kenyan Shillings (KES) and avoiding generic AI phrasing.\n\nInstead of just asking the LLM for a caption, we request a JSON response containing both the exact caption text and the extracted metadata like price, product name, and available colors. This structured output makes it easier to validate that the LLM didn't hallucinate a price that the merchant never mentioned.\n\nHandling missing information is crucial for reliability. If a merchant says to post new dresses but forgets to mention the price, the LLM should be prompted to return a specific needs_info flag. The system can then automatically message the merchant back on WhatsApp to ask for the price, rather than posting an incomplete caption.\n\nSocial media platforms do not render standard Markdown, like asterisks for bolding. The prompt must explicitly forbid the use of Markdown formatting, ensuring the output uses native line breaks and emojis instead, keeping the final text ready for immediate publication.",
+              "keyLearnings": [
+                "Prompt engineering for tone matching and brand voice",
+                "Extracting prices and product details from unstructured speech",
+                "Formatting output safely without markdown hallucinations"
+              ],
+              "samplePrompt": "You are a social media copywriter for a trendy Nairobi boutique. Take the raw voice transcript and write an Instagram caption. Keep it under 4 sentences. Include relevant emojis, format prices clearly in KES, and end with a call to action to visit the store or WhatsApp to order.",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 2,
+                  "caption": "Structured output lets you check a price before it goes live.",
+                  "compare": [
+                    {
+                      "label": "Free-text caption only",
+                      "text": "Hard to verify the price wasn't hallucinated",
+                      "good": false
+                    },
+                    {
+                      "label": "Structured JSON with caption + metadata",
+                      "text": "Price and product name can be checked before posting",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A voice note says to post new dresses but never mentions a price. What should the LLM be prompted to do?",
+                "options": [
+                  {
+                    "text": "Guess a reasonable price based on similar products",
+                    "feedback": "Guessing a price the merchant never said risks posting a wrong number to real customers.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Return a needs_info flag so the system asks the merchant for the missing price",
+                    "feedback": "Right. This lets the system follow up instead of publishing an incomplete post.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Post the caption without any price mentioned at all",
+                    "feedback": "Silently omitting the price is not the same as catching the gap and following up on it.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-3",
+            "number": "03",
+            "title": "Multi-Platform Adaptation",
+            "subtitle": "One voice note, multiple channel formats",
+            "status": "locked",
+            "duration": "25 min",
+            "category": "Prompt Design",
+            "summary": "Adapting the generated content for different platforms—differentiating a visual Instagram caption from a conversational Facebook Page post.",
+            "isGated": false,
+            "content": {
+              "overview": "Different platforms require different copy structures. We will extend our prompt engine to return a JSON payload with platform-specific variations: a hashtag-heavy Instagram version and a link-focused Facebook version.",
+              "lessonBody": "The reality of multi-channel marketing means a single piece of content performs differently on Instagram compared to a Facebook Page. Instagram relies heavily on visual aesthetics, emojis, and clusters of hashtags, while Facebook posts often need a more conversational tone and direct links, as Instagram doesn't support clickable links in captions.\n\nInstead of writing one generic caption, the system prompt is configured to return an array of platform-specific variations. The LLM processes the same original voice transcript but applies different formatting rules based on the target platform provided in the prompt instructions.\n\nInstagram captions have a character limit and truncate after the first few lines, meaning the hook and the price in KES must appear early. The LLM is instructed to front-load critical information for the Instagram variant, while the Facebook variant might include a full paragraph explaining the product's origin or material.\n\nOn Facebook, the call-to-action can directly include a WhatsApp API link for immediate purchasing. For Instagram, the system generates a 'Link in bio' or 'DM to order' instruction, adapting perfectly to the platform's constraints without requiring manual editing by the business owner.\n\nOnce the LLM returns the structured payload containing both variants, the system uses a schema validator to ensure both instagram_caption and facebook_caption keys exist and meet the character limits before moving them to the approval or publishing queue.",
+              "keyLearnings": [
+                "Structuring LLM outputs into strictly typed JSON",
+                "Adapting tone and length per social media platform",
+                "Generating platform-specific calls-to-action"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "One transcript becomes two platform-specific variants.",
+                  "flow": [
+                    "Same original voice transcript",
+                    "Instagram variant: hook + price up front, DM-to-order CTA",
+                    "Facebook variant: fuller paragraph, direct WhatsApp link"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why can't the Facebook-style caption (with a full paragraph and a link) just be reused as-is for Instagram?",
+                "options": [
+                  {
+                    "text": "Instagram captions truncate early and don't support clickable links, so critical info must front-load differently",
+                    "feedback": "Right. This is exactly why the prompt generates separate platform variants.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Instagram has a stricter profanity filter than Facebook",
+                    "feedback": "Profanity filtering isn't the reason given in the lesson.",
+                    "correct": false
+                  },
+                  {
+                    "text": "There is no real difference, platforms render captions identically",
+                    "feedback": "The lesson is specifically about how differently these platforms handle captions.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-4",
+            "number": "04",
+            "title": "Meta Graph API Authentication",
+            "subtitle": "Connecting the business accounts securely",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Integrations",
+            "summary": "Navigating Meta's OAuth flow to connect an Instagram Professional account and Facebook Page for API publishing.",
+            "isGated": true,
+            "content": {
+              "overview": "To publish automatically, we need the right permissions. This lesson covers setting up a Meta App, authenticating a business account, and generating the required long-lived access tokens for seamless background posting.",
+              "lessonBody": "To publish content directly to a Facebook Page or an Instagram Professional account, your system must authenticate through the Meta Graph API. This process replaces manual password sharing with secure, token-based authorization via Meta's standard OAuth 2.0 flow.\n\nThe first step involves creating an app in the Meta Developer portal and configuring the Facebook Login for Business product. You must request specific permissions—namely instagram_basic, instagram_content_publish, pages_show_list, and pages_read_engagement—to allow the system to post on the owner's behalf.\n\nWhen a boutique owner onboarding onto your system clicks Connect Facebook, they are redirected to Meta's servers to approve your app. Upon approval, Meta redirects them back to your application with a short-lived authorization code, which your backend immediately exchanges for a User Access Token.\n\nShort-lived tokens expire in hours, which breaks background automation. The system must hit the /oauth/access_token endpoint to trade the short-lived token for a long-lived one, valid for 60 days. It then queries the /me/accounts endpoint to get the specific Page Access Token, which never expires as long as the user's password remains unchanged.\n\nBecause Instagram publishing is routed through the connected Facebook Page, the system queries the Page's instagram_business_account field. Securing this specific Instagram Account ID is mandatory before any publishing requests can be made, completing the authentication pipeline.",
+              "keyLearnings": [
+                "Understanding Meta App Review and required permissions",
+                "Linking Instagram Professional accounts to Facebook Pages",
+                "Generating and securing long-lived access tokens"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 3,
+                  "caption": "Trading a short-lived token for one that survives background jobs.",
+                  "compare": [
+                    {
+                      "label": "Short-lived token",
+                      "text": "Expires in hours - breaks background automation",
+                      "good": false
+                    },
+                    {
+                      "label": "Long-lived token (60 days)",
+                      "text": "Exchanged via /oauth/access_token, keeps automation running",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why can't the system just keep using the short-lived token Meta issues right after OAuth approval?",
+                "options": [
+                  {
+                    "text": "Short-lived tokens expire in hours, which would break any background automation running later that day",
+                    "feedback": "Right. This is exactly why the exchange for a long-lived token is mandatory.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Short-lived tokens don't have permission to post at all",
+                    "feedback": "It's not a permissions issue - a short-lived token can post, it just expires too quickly.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Long-lived tokens are required by law in Kenya",
+                    "feedback": "This is a technical constraint from Meta's token system, not a legal requirement.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-5",
+            "number": "05",
+            "title": "Media Handling & Public URLs",
+            "subtitle": "Preparing images for Meta's servers",
+            "status": "locked",
+            "duration": "30 min",
+            "category": "Media Engine",
+            "summary": "Processing product images and ensuring they are hosted on publicly accessible URLs required by the Instagram API.",
+            "isGated": true,
+            "content": {
+              "overview": "The Instagram Graph API cannot accept direct file uploads; it requires a public URL to fetch the image. We will build a pipeline to temporarily host uploaded product photos and pass the correct URL format to the API.",
+              "lessonBody": "The Instagram Graph API does not allow you to send image or video files directly in the body of a publishing request. Instead, it requires a publicly accessible URL pointing to the media file, which Meta's servers will then download and process independently.\n\nWhen the business owner uploads a product photo via WhatsApp or a web portal, your system must temporarily store it. The architecture relies on an object storage service like AWS S3 or Google Cloud Storage, saving the image and generating a presigned URL or placing it in a publicly readable bucket temporarily.\n\nInstagram is notoriously strict about image dimensions. Before generating a public URL, the system should inspect the image file. If it doesn't meet the aspect ratio constraints, between 4:5 and 1.91:1, or is in an unsupported format like WebP, the system must convert it to a standard JPEG or reject it with a clear error message.\n\nWhen Meta's servers attempt to fetch the provided media URL, they expect an immediate successful response. If the URL points to a slow cold-storage bucket or a lambda function that needs to wake up, the Meta request will time out and the post will fail. Fast, direct links are essential.\n\nOnce the media has been successfully published to the social feed, the temporary public URL is no longer needed. To avoid hosting costs and prevent the unauthorized scraping of the boutique's product imagery, a background worker is triggered to delete the staged image from the temporary bucket.",
+              "keyLearnings": [
+                "Hosting media securely for API access",
+                "Validating image aspect ratios and formats for Instagram",
+                "Handling temporary presigned URLs for privacy"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Instagram never receives the file directly - only a URL to fetch it from.",
+                  "flow": [
+                    "Owner uploads product photo",
+                    "Image stored temporarily (S3 / Cloud Storage)",
+                    "Public URL generated",
+                    "Meta's servers fetch the image from that URL"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "You host the product image on a slow cold-storage bucket that takes a few seconds to wake up. What happens when Instagram tries to publish it?",
+                "options": [
+                  {
+                    "text": "Instagram waits patiently as long as it takes",
+                    "feedback": "Meta's servers expect an immediate response - they don't wait indefinitely.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The fetch request times out and the post fails",
+                    "feedback": "Right. Fast, direct links are essential for exactly this reason.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Instagram automatically retries every hour until it succeeds",
+                    "feedback": "There is no described automatic retry in this pipeline.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-6",
+            "number": "06",
+            "title": "The 2-Step Publishing Pipeline",
+            "subtitle": "Creating containers and pushing to feed",
+            "status": "locked",
+            "duration": "50 min",
+            "category": "Backend Dev",
+            "summary": "Implementing the core Instagram Graph API logic: creating a media container and executing the publish command.",
+            "isGated": true,
+            "content": {
+              "overview": "In this core lesson, you will build the actual posting logic. Meta requires a two-step process: first, creating a media container with the image URL and caption, and second, triggering the publish endpoint once the container is ready.",
+              "lessonBody": "Publishing to Instagram via the Graph API is not a single API call; it is a mandatory two-step process. Meta first requires you to create a media container on their servers, and then, only after that container is successfully processed, you issue a second command to actually publish it to the feed.\n\nThe system sends a POST request to the media endpoint, passing the public image URL, the generated caption, and the access token. Meta downloads the image, validates the aspect ratio, and returns a container ID. At this stage, the post exists on Meta's servers but is completely invisible to the public.\n\nFor simple JPEGs, the container is usually ready immediately. However, for videos or larger carousels, Meta requires time to encode the media. If you try to publish immediately, the API will throw an error. The system must implement a polling mechanism, checking the container's status until it returns a FINISHED state.\n\nOnce the container is ready, the system sends a final POST request to the media_publish endpoint, providing the container ID. This executes the actual posting action, pushing the content live to the business's Instagram grid and returning the final permanent post ID.\n\nMeta APIs are prone to opaque error codes. If the container creation fails due to a copyrighted audio track or a malformed image, the system must catch the specific Graph API error code, translate it into plain language, and alert the business owner via WhatsApp so they can fix the issue.",
+              "keyLearnings": [
+                "Executing the POST request to /{ig-user-id}/media",
+                "Capturing the creation_id container reference",
+                "Publishing the container to the live Instagram feed",
+                "Handling Meta API error codes and rate limits gracefully"
+              ],
+              "codeSnippet": "export async function publishToInstagram(igUserId: string, imageUrl: string, caption: string, token: string) {\n  // Step 1: Create Container\n  const containerRes = await fetch(`https://graph.facebook.com/v22.0/${igUserId}/media`, {\n    method: 'POST',\n    body: new URLSearchParams({ image_url: imageUrl, caption, access_token: token })\n  });\n  const { id: creationId } = await containerRes.json();\n\n  // Step 2: Publish\n  const publishRes = await fetch(`https://graph.facebook.com/v22.0/${igUserId}/media_publish`, {\n    method: 'POST',\n    body: new URLSearchParams({ creation_id: creationId, access_token: token })\n  });\n  return publishRes.json();\n}",
+              "visualBreaks": [
+                {
+                  "afterParagraph": 0,
+                  "caption": "Two API calls, not one - a container first, then the publish.",
+                  "flow": [
+                    "POST to /media with image URL + caption",
+                    "Meta returns a container ID (not yet public)",
+                    "Poll until container status is FINISHED",
+                    "POST to /media_publish with the container ID"
+                  ]
+                }
+              ],
+              "fadedPractice": {
+                "setup": "Using the publishToInstagram function from this lesson, a video is uploaded and the container is created.",
+                "workedExample": "For a simple JPEG, calling media_publish right after container creation usually works immediately, since Meta processes it fast.",
+                "challenge": "If the upload is a video instead of a JPEG, why can't you call media_publish immediately after getting the container ID back?",
+                "placeholder": "Videos need time for Meta to ___ the media, so the system must ___ the container's status until it returns FINISHED before publishing.",
+                "solution": "Videos need time for Meta to encode the media, so the system must poll the container's status until it returns FINISHED before publishing.",
+                "explanation": "Unlike JPEGs which are usually ready instantly, video and carousel containers need processing time on Meta's end - publishing too early throws an error, which is exactly why the polling mechanism exists."
+              }
+            }
+          },
+          {
+            "id": "soc-step-7",
+            "number": "07",
+            "title": "Building the Scheduling Logic",
+            "subtitle": "Automating the timing of posts",
+            "status": "locked",
+            "duration": "45 min",
+            "category": "Automation",
+            "summary": "Moving away from instant publishing by building a background scheduler to post content at optimal engagement times.",
+            "isGated": true,
+            "content": {
+              "overview": "Because the Instagram API doesn't have a native 'schedule for later' endpoint, we must build our own. We will store approved captions and image URLs in a database with a target timestamp, then use a cron job to trigger the publish pipeline.",
+              "lessonBody": "The Instagram Graph API does not offer a native scheduled publishing parameter for standard feed posts. If a boutique owner records five voice notes on a Sunday evening, the system cannot rely on Meta to drip them out over the week; it must maintain its own scheduling engine.\n\nWe need a database table that stores the approved caption text, the public image URL, the target platform, the authenticated User ID, and a critical publish timestamp. This acts as the single source of truth for the upcoming content calendar.\n\nA background process, often implemented via a cron job or a specialized task queue, runs every minute. It queries the database for any records where the publish timestamp is less than or equal to the current time and the status is still pending.\n\nA major risk in background scheduling is double-posting if the worker crashes mid-execution and restarts. Before initiating the Meta publishing pipeline, the system must lock the row in the database by updating its status to processing. If the worker fails, the lock expires; if it succeeds, it updates to published.\n\nEven with long-lived tokens, an owner might change their Facebook password, instantly invalidating the token. If the cron worker attempts to publish and receives an OAuth exception, it must immediately halt the post, mark it as a failure, and trigger a WhatsApp alert to the owner to re-authenticate.",
+              "keyLearnings": [
+                "Storing scheduled post metadata and target timestamps",
+                "Writing a reliable background worker or cron job",
+                "Ensuring idempotent operations so posts don't duplicate"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 3,
+                  "caption": "A row lock is what stops a crash from becoming a duplicate post.",
+                  "compare": [
+                    {
+                      "label": "No row locking",
+                      "text": "Worker crash + restart can post the same content twice",
+                      "good": false
+                    },
+                    {
+                      "label": "Status locked to 'processing' before publishing",
+                      "text": "Prevents duplicate posts even if the worker crashes",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A cron worker crashes mid-execution right after locking a row's status to 'processing', but before actually publishing. What happens?",
+                "options": [
+                  {
+                    "text": "The post is lost forever since the lock never resolves",
+                    "feedback": "The lesson describes the lock as expiring, not permanently blocking the row.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The lock expires, and the row becomes eligible to be picked up and processed again",
+                    "feedback": "Right. This is exactly what makes the system resilient to worker crashes.",
+                    "correct": true
+                  },
+                  {
+                    "text": "The system automatically publishes twice to be safe",
+                    "feedback": "Publishing twice is exactly the double-posting risk this locking mechanism prevents.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-8",
+            "number": "08",
+            "title": "Hashtag & Visual Suggestion",
+            "subtitle": "Enriching the post metadata automatically",
+            "status": "locked",
+            "duration": "35 min",
+            "category": "Content Gen",
+            "summary": "Using AI to automatically recommend locally trending hashtags and visual directions based on the generated caption.",
+            "isGated": true,
+            "content": {
+              "overview": "A good post needs discoverability. We will add a pipeline step that reads the drafted caption and suggests relevant Kenyan hashtags (e.g., #NairobiFashion, #MadeInKenya) and prompts the owner on what kind of photo would match the text best.",
+              "lessonBody": "A social media manager does more than just write captions; they curate the visual strategy and discoverability. Our agent replicates this by running a secondary AI pass over the generated caption to intelligently suggest missing metadata, specifically hashtags and visual direction.\n\nUsing generic tags like fashion or clothes results in the post being buried in global feeds. The system prompts the LLM to generate highly contextual, localized hashtags—like #NairobiStyle or #GikombaFinds—based on the specific items mentioned in the owner's voice note.\n\nInstagram algorithms actively penalize posts that use banned or spammy hashtags, or that use the exact same cluster of tags on every post. The prompt explicitly instructs the LLM to vary the tags, limit the count to an optimal number, and avoid known flagged terms, protecting the account's reach.\n\nOften, a merchant knows what they want to sell but doesn't know how to photograph it. The LLM is instructed to generate a visual suggestion string. For example, if the caption is about office tote bags, the system suggests a well-lit photo of the tote bag resting on an office desk next to a laptop, guiding the owner's photography.\n\nBefore the post is scheduled, this enriched metadata is sent back to the owner via WhatsApp. This transforms the system from a passive transcription tool into an active creative director for the small business, ensuring the final asset matches the quality of the generated text.",
+              "keyLearnings": [
+                "Generating contextual hashtag clusters",
+                "Avoiding banned or overused spam tags",
+                "Prompting the business owner for the correct media type"
+              ],
+              "testCase": {
+                "input": "Transcript: 'Just got the new leather tote bags in, selling them for 4500 shillings. Really great quality for office wear.'",
+                "expectedOutput": "{\"caption\": \"Upgrade your office look! ✨ New premium leather tote bags just landed in store. Only KES 4,500. DM or WhatsApp to reserve yours before they sell out!\", \"hashtags\": [\"#NairobiFashion\", \"#KenyanLeather\", \"#OfficeWearNairobi\"], \"visual_suggestion\": \"A well-lit photo of the tote bag resting on an office desk next to a laptop.\"}"
+              },
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Specific, local hashtags reach a real audience instead of a global void.",
+                  "compare": [
+                    {
+                      "label": "Generic hashtags",
+                      "text": "#fashion #clothes - buried in an oversaturated global feed",
+                      "good": false
+                    },
+                    {
+                      "label": "Localized hashtags",
+                      "text": "#NairobiStyle #GikombaFinds - reaches a relevant local audience",
+                      "good": true
+                    }
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "Why does the system avoid reusing the exact same cluster of hashtags on every single post?",
+                "options": [
+                  {
+                    "text": "Instagram algorithms can penalize repetitive or spammy-looking hashtag patterns",
+                    "feedback": "Right. Varying the tags protects the account's reach.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Hashtags can only be used once per Instagram account ever",
+                    "feedback": "There is no such one-time-use rule described.",
+                    "correct": false
+                  },
+                  {
+                    "text": "It is purely a stylistic preference with no algorithmic consequence",
+                    "feedback": "The lesson is explicit that this is about avoiding an algorithmic penalty.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-9",
+            "number": "09",
+            "title": "Analytics & Content Calendar",
+            "subtitle": "Giving the owner a clear view of their strategy",
+            "status": "locked",
+            "duration": "40 min",
+            "category": "Reporting",
+            "summary": "Fetching basic engagement metrics from the API and organizing scheduled posts into a readable calendar view.",
+            "isGated": true,
+            "content": {
+              "overview": "An automation tool is only useful if the owner trusts it. We will build a simple dashboard view that lists upcoming scheduled posts and pulls basic engagement metrics (likes, comments) for previously published content using the Graph API.",
+              "lessonBody": "Small business owners often post into a void, not knowing what content actually drives sales. An effective automation agent must not only push content out but pull performance data back in, providing the owner with actionable insights without requiring them to log into Meta Business Suite.\n\nOnce a post has been live for 24 hours, a background worker queries the Graph API using the stored post ID. It calls the insights endpoint to retrieve metrics specific to Instagram, such as engagement, impressions, and reach, storing these values alongside the original database record.\n\nFor the frontend interface, the system queries the database to display a unified view of both upcoming and past posts. This simple, visual content calendar allows the merchant to easily see that they have gaps on Thursday and Friday, prompting them to record new voice notes.\n\nBy analyzing the fetched insights, the system can begin to identify patterns. It can calculate the average engagement rate for posts featuring prices versus those without, or posts published on Tuesday mornings versus Saturday afternoons, displaying these top-level summaries to the user.\n\nIf a specific post performs exceptionally well, the system can proactively send a WhatsApp message to the owner. Alerting them that their post about the leather sandals is getting a lot of attention encourages them to check their DMs for orders and validates the value of the automation.",
+              "keyLearnings": [
+                "Querying the Instagram API for post-level insights",
+                "Displaying upcoming database records in a calendar format",
+                "Aggregating engagement data to inform future content"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 1,
+                  "caption": "Performance data flows back in, not just content flowing out.",
+                  "flow": [
+                    "Post live for 24 hours",
+                    "Background worker queries Graph API insights endpoint",
+                    "Engagement, impressions, reach pulled",
+                    "Stored alongside the original post record"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "A post about leather sandals gets unusually high engagement. What should the system do with that insight?",
+                "options": [
+                  {
+                    "text": "Nothing - insights are only for the owner to check manually later",
+                    "feedback": "The lesson describes the system proactively alerting the owner, not just passively storing data.",
+                    "correct": false
+                  },
+                  {
+                    "text": "Proactively message the owner on WhatsApp so they check their DMs for orders",
+                    "feedback": "Right. This validates the value of the automation to the owner in real time.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Automatically increase the price of the sandals since demand is high",
+                    "feedback": "Changing a price automatically is a business decision for the owner, not something this system does.",
+                    "correct": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "soc-step-10",
+            "number": "10",
+            "title": "Verified Portfolio Deployment",
+            "subtitle": "Going live for a real local boutique",
+            "status": "locked",
+            "duration": "60 min",
+            "category": "Deployment",
+            "summary": "Deploying the full voice-to-caption scheduling agent for an actual business, verifying a successful automated post, and securing your portfolio proof.",
+            "isGated": true,
+            "content": {
+              "overview": "This is where you prove your system works in the real world. You will deploy the scheduling agent for a real local boutique or brand, configure their Meta credentials, and verify a live automated post pipeline. You walk away with a live link and a verified quote from the owner.",
+              "lessonBody": "In this final lesson, you step away from the sandbox and deploy the complete Social Media Content Agent for a real business—a local boutique, bakery, or service provider. This proves the system can handle real-world latency, actual voice notes with background noise, and live Meta API credentials.\n\nMoving to production requires securing your API keys. You will configure secure environment variables on a hosting platform for the Meta App Secret, the OpenAI API key, and the database connection strings, ensuring that sensitive data is never exposed in the client-side code.\n\nYou will physically or virtually sit with the business owner, walk them through the Meta OAuth flow to connect their Instagram and Facebook pages, and send the first test voice note via WhatsApp. Observing a non-technical user interact with your webhook pipeline reveals critical edge cases in usability.\n\nThe true test of the system is the successful execution of the scheduled cron job. You must monitor the server logs as the system creates the media container, waits for processing, and executes the final publish command, confirming that the post appears live on the business's actual Instagram feed.\n\nInstead of an automated grade, your certification is the live deployment itself. You will capture the URL of the automated post on the client's feed, record a brief video demonstrating the voice-to-caption WhatsApp flow, and collect a direct quote from the business owner about how much time the system saves them.",
+              "keyLearnings": [
+                "Handling production environment variables and security",
+                "Onboarding a real business owner onto the Meta authentication flow",
+                "Capturing the successful deployment for your verified portfolio"
+              ],
+              "visualBreaks": [
+                {
+                  "afterParagraph": 4,
+                  "caption": "Three things combine into the final verified deliverable.",
+                  "flow": [
+                    "URL of the live automated post",
+                    "Short video of the voice-to-caption WhatsApp flow",
+                    "A direct quote from the business owner",
+                    "= your verified portfolio deliverable"
+                  ]
+                }
+              ],
+              "interactiveCheck": {
+                "type": "quiz",
+                "question": "According to this lesson, what actually certifies that you completed this course?",
+                "options": [
+                  {
+                    "text": "Passing an automated multiple-choice exam",
+                    "feedback": "There is no automated grade here - the live deployment itself is the certification.",
+                    "correct": false
+                  },
+                  {
+                    "text": "The live deployment: a captured post URL, a demo video, and a quote from the real business owner",
+                    "feedback": "Right. That combination is the actual proof of capability.",
+                    "correct": true
+                  },
+                  {
+                    "text": "Submitting your source code for manual review by Afridemy staff",
+                    "feedback": "Code review is not the described verification path here.",
+                    "correct": false
+                  }
+                ]
+              }
             }
           }
-        },
-        {
-          "id": "soc-step-9",
-          "number": "09",
-          "title": "Analytics & Content Calendar",
-          "subtitle": "Giving the owner a clear view of their strategy",
-          "status": "locked",
-          "duration": "40 min",
-          "category": "Reporting",
-          "summary": "Fetching basic engagement metrics from the API and organizing scheduled posts into a readable calendar view.",
-          "isGated": true,
-          "content": {
-            "overview": "An automation tool is only useful if the owner trusts it. We will build a simple dashboard view that lists upcoming scheduled posts and pulls basic engagement metrics (likes, comments) for previously published content using the Graph API.",
-            "lessonBody": "Small business owners often post into a void, not knowing what content actually drives sales. An effective automation agent must not only push content out but pull performance data back in, providing the owner with actionable insights without requiring them to log into Meta Business Suite.\n\nOnce a post has been live for 24 hours, a background worker queries the Graph API using the stored post ID. It calls the insights endpoint to retrieve metrics specific to Instagram, such as engagement, impressions, and reach, storing these values alongside the original database record.\n\nFor the frontend interface, the system queries the database to display a unified view of both upcoming and past posts. This simple, visual content calendar allows the merchant to easily see that they have gaps on Thursday and Friday, prompting them to record new voice notes.\n\nBy analyzing the fetched insights, the system can begin to identify patterns. It can calculate the average engagement rate for posts featuring prices versus those without, or posts published on Tuesday mornings versus Saturday afternoons, displaying these top-level summaries to the user.\n\nIf a specific post performs exceptionally well, the system can proactively send a WhatsApp message to the owner. Alerting them that their post about the leather sandals is getting a lot of attention encourages them to check their DMs for orders and validates the value of the automation.",
-            "keyLearnings": [
-              "Querying the Instagram API for post-level insights",
-              "Displaying upcoming database records in a calendar format",
-              "Aggregating engagement data to inform future content"
-            ]
-          }
-        },
-        {
-          "id": "soc-step-10",
-          "number": "10",
-          "title": "Verified Portfolio Deployment",
-          "subtitle": "Going live for a real local boutique",
-          "status": "locked",
-          "duration": "60 min",
-          "category": "Deployment",
-          "summary": "Deploying the full voice-to-caption scheduling agent for an actual business, verifying a successful automated post, and securing your portfolio proof.",
-          "isGated": true,
-          "content": {
-            "overview": "This is where you prove your system works in the real world. You will deploy the scheduling agent for a real local boutique or brand, configure their Meta credentials, and verify a live automated post pipeline. You walk away with a live link and a verified quote from the owner.",
-            "lessonBody": "In this final lesson, you step away from the sandbox and deploy the complete Social Media Content Agent for a real business—a local boutique, bakery, or service provider. This proves the system can handle real-world latency, actual voice notes with background noise, and live Meta API credentials.\n\nMoving to production requires securing your API keys. You will configure secure environment variables on a hosting platform for the Meta App Secret, the OpenAI API key, and the database connection strings, ensuring that sensitive data is never exposed in the client-side code.\n\nYou will physically or virtually sit with the business owner, walk them through the Meta OAuth flow to connect their Instagram and Facebook pages, and send the first test voice note via WhatsApp. Observing a non-technical user interact with your webhook pipeline reveals critical edge cases in usability.\n\nThe true test of the system is the successful execution of the scheduled cron job. You must monitor the server logs as the system creates the media container, waits for processing, and executes the final publish command, confirming that the post appears live on the business's actual Instagram feed.\n\nInstead of an automated grade, your certification is the live deployment itself. You will capture the URL of the automated post on the client's feed, record a brief video demonstrating the voice-to-caption WhatsApp flow, and collect a direct quote from the business owner about how much time the system saves them.",
-            "keyLearnings": [
-              "Handling production environment variables and security",
-              "Onboarding a real business owner onto the Meta authentication flow",
-              "Capturing the successful deployment for your verified portfolio"
-            ]
-          }
-        }
-      ]
+        ]
   },
   {
     id: 'inventory-restock-agent',
