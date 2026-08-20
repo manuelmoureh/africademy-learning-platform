@@ -102,33 +102,6 @@ export interface Track {
   featuredOnHomepage?: boolean;
 }
 
-export interface ChatMessage {
-  id: string;
-  sender: 'user' | 'bot' | 'system';
-  text: string;
-  timestamp: string;
-  meta?: {
-    intent?: string;
-    inventoryChecked?: string;
-    confidence?: number;
-    priceCalculated?: string;
-    modelUsed?: string;
-    isRealGemini?: boolean;
-  };
-}
-
-export interface InventoryItem {
-  id: string;
-  sku: string;
-  name: string;
-  category: string;
-  priceKES: number;
-  priceUSD: number;
-  stock: number;
-  status: 'In Stock' | 'Low Stock' | 'Out of Stock';
-  location: string;
-}
-
 export interface UserAccount {
   name: string;
   email: string;

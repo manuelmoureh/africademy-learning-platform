@@ -1,62 +1,4 @@
-import { Track, InventoryItem, PortfolioVerification } from '../types';
-
-export const INVENTORY_CATALOG: InventoryItem[] = [
-  {
-    id: 'inv-1',
-    sku: 'MSI-SND-01',
-    name: 'Handmade Maasai Beaded Sandals (Size 38-43)',
-    category: 'Footwear',
-    priceKES: 2800,
-    priceUSD: 22,
-    stock: 18,
-    status: 'In Stock',
-    location: 'Nairobi CBD'
-  },
-  {
-    id: 'inv-2',
-    sku: 'KKY-WRT-02',
-    name: 'Authentic Handwoven Mombasa Kikoy Wrap',
-    category: 'Apparel',
-    priceKES: 1400,
-    priceUSD: 11,
-    stock: 12,
-    status: 'In Stock',
-    location: 'Mombasa Old Town'
-  },
-  {
-    id: 'inv-3',
-    sku: 'KRC-TEA-03',
-    name: 'Kericho Reserve Pure Black Tea (500g Tin)',
-    category: 'Beverages',
-    priceKES: 850,
-    priceUSD: 7,
-    stock: 5,
-    status: 'Low Stock',
-    location: 'Kericho Depot'
-  },
-  {
-    id: 'inv-4',
-    sku: 'MCD-OIL-04',
-    name: 'Mt. Kenya Cold-Pressed Macadamia Oil (250ml)',
-    category: 'Organic Care',
-    priceKES: 1950,
-    priceUSD: 15,
-    stock: 24,
-    status: 'In Stock',
-    location: 'Nanyuki / Nairobi'
-  },
-  {
-    id: 'inv-5',
-    sku: 'KSS-STN-05',
-    name: 'Handcarved Kisii Soapstone Sculptural Decor',
-    category: 'Home & Living',
-    priceKES: 3200,
-    priceUSD: 25,
-    stock: 0,
-    status: 'Out of Stock',
-    location: 'Kilimani Warehouse'
-  }
-];
+import { Track, PortfolioVerification } from '../types';
 
 export const INITIAL_TRACKS: Track[] = [
   {
@@ -1205,11 +1147,11 @@ export const INITIAL_TRACKS: Track[] = [
             ],
             "interactiveCheck": {
               "type": "quiz",
-              "question": "What ultimately proves you've mastered this course, in the Afridemy model?",
+              "question": "A property manager asks how they can trust this bot with real leads before paying you. What's the honest answer, per this course?",
               "options": [
-                { "text": "A passing score on a final quiz", "feedback": "Afridemy deliberately doesn't grade this way - there are no scores here, on purpose.", "correct": false },
-                { "text": "A real, deployed system onboarded to an actual agency, with a business owner's quote", "feedback": "Right. A live system, a real qualified lead flowing through it, and a business owner's quote - that's the Verified Portfolio.", "correct": true },
-                { "text": "Completing all 12 lessons regardless of whether the system works", "feedback": "Working through the lessons isn't the finish line - a working, verified system is.", "correct": false }
+                { "text": "Tell them it scored well on a final quiz", "feedback": "Afridemy deliberately doesn't grade this way - there are no scores here to point to, on purpose.", "correct": false },
+                { "text": "Show them a live deployment: a real lead qualified over WhatsApp, a viewing booked on the calendar, and the row appearing in their CRM sheet", "feedback": "Right. That end-to-end flow, on their own real WhatsApp number, is the actual proof - not a certificate.", "correct": true },
+                { "text": "Tell them you completed all 12 lessons in the course", "feedback": "Finishing the lessons proves you learned the material, not that the system works for their actual agency.", "correct": false }
               ]
             }
           }
@@ -1763,11 +1705,11 @@ export const INITIAL_TRACKS: Track[] = [
             ],
             "interactiveCheck": {
               "type": "quiz",
-              "question": "What ultimately proves you've mastered this course, in the Afridemy model?",
+              "question": "A shop owner wants to know their handwritten receipts are actually safe to hand over to this system before they commit. What settles it?",
               "options": [
-                { "text": "A passing score on a final quiz", "feedback": "Afridemy deliberately doesn't grade this way - there are no scores here, on purpose.", "correct": false },
-                { "text": "A real, deployed system processing an actual shop's receipts and M-Pesa payments, with a business owner's quote", "feedback": "Right. A live system handling real receipts and real payments, verified by the business owner - that's the Verified Portfolio.", "correct": true },
-                { "text": "Completing all 12 lessons regardless of whether the system works", "feedback": "Working through the lessons isn't the finish line - a working, verified system is.", "correct": false }
+                { "text": "Show them a quiz certificate from this course", "feedback": "Afridemy deliberately doesn't grade this way - there's no certificate that proves the OCR and payment matching actually work on their receipts.", "correct": false },
+                { "text": "A live deployment processing their real receipts into PDFs and matching real M-Pesa payments, with a business owner's quote", "feedback": "Right. Real receipts, real payments reconciled correctly, verified by the owner - that's the Verified Portfolio.", "correct": true },
+                { "text": "Point to the 12 completed lessons", "feedback": "Finishing the lessons shows you learned the pipeline, not that it correctly reads their specific handwriting and receipts.", "correct": false }
               ]
             }
           }

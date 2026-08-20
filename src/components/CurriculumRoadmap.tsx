@@ -1,16 +1,15 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Step } from '../types';
+import { Lock, ArrowRight } from 'lucide-react';
 
 const rowFade = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0 },
 };
-import { CheckCircle, Lock, ExternalLink, Code2, ArrowRight } from 'lucide-react';
 
 interface CurriculumRoadmapProps {
   steps: Step[];
-  selectedStepId: string | null;
   onSelectStep: (step: Step) => void;
   onToggleCompleteStep: (stepId: string) => void;
   isUnlocked: boolean;
@@ -18,7 +17,6 @@ interface CurriculumRoadmapProps {
 
 export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
   steps,
-  selectedStepId,
   onSelectStep,
   onToggleCompleteStep,
   isUnlocked,
@@ -51,7 +49,6 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
         className="space-y-3"
       >
         {steps.map((step) => {
-          const isSelected = selectedStepId === step.id;
           const isLocked = step.isGated && !isUnlocked;
 
           if (step.status === 'completed') {
@@ -62,9 +59,7 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 whileHover={{ x: 2 }}
                 onClick={() => onSelectStep(step)}
-                className={`group flex items-center gap-4 p-4 rounded-xl bg-[#10B981]/5 border border-[#10B981]/20 transition-all cursor-pointer hover:border-[#10B981]/40 ${
-                  isSelected ? 'ring-2 ring-[#10B981]/40' : ''
-                }`}
+                className="group flex items-center gap-4 p-4 rounded-xl bg-[#10B981]/5 border border-[#10B981]/20 transition-all cursor-pointer hover:border-[#10B981]/40"
               >
                 <div className="w-6 h-6 rounded-full bg-[#10B981] flex items-center justify-center text-white text-[10px] font-bold shrink-0 font-mono">
                   ✓
@@ -107,9 +102,7 @@ export const CurriculumRoadmap: React.FC<CurriculumRoadmapProps> = ({
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 whileHover={{ x: 2 }}
                 onClick={() => onSelectStep(step)}
-                className={`group flex items-center gap-4 p-4 rounded-xl bg-white border border-[#12102A]/10 shadow-xs transition-all cursor-pointer hover:border-[#F5A623] ${
-                  isSelected ? 'ring-2 ring-[#F5A623]' : ''
-                }`}
+                className="group flex items-center gap-4 p-4 rounded-xl bg-white border border-[#12102A]/10 shadow-xs transition-all cursor-pointer hover:border-[#F5A623]"
               >
                 <div className="w-6 h-6 rounded-full border-2 border-[#F5A623] flex items-center justify-center text-[#F5A623] text-[10px] font-bold shrink-0 font-mono">
                   {step.number}

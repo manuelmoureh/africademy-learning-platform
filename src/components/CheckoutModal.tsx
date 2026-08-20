@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Check, ArrowRight, Loader2, AlertCircle, ShieldCheck, Lock, Tag } from 'lucide-react';
-import { COUPONS } from '../data/coupons';
+import { getActiveCoupon } from '../data/coupons';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -59,7 +59,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponError, setCouponError] = useState('');
 
-  const discount = appliedCoupon ? COUPONS[appliedCoupon] : 0;
+  const discount = appliedCoupon ? getActiveCoupon(appliedCoupon)?.discount || 0 : 0;
   const finalPrice = discount ? Math.round(product.price * (1 - discount)) : product.price;
   const finalPriceDisplay = `KES ${finalPrice.toLocaleString()}`;
   const discountAmount = product.price - finalPrice;
@@ -67,13 +67,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const handleApplyCoupon = () => {
     const code = couponInput.trim().toUpperCase();
     if (!code) return;
-    if (COUPONS[code]) {
+    if (getActiveCoupon(code)) {
       setAppliedCoupon(code);
       setCouponError('');
       setIsPromoOpen(false);
     } else {
       setAppliedCoupon(null);
-      setCouponError('That code is not valid.');
+      setCouponError('That code is not valid or has expired.');
     }
   };
 

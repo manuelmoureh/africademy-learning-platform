@@ -27,7 +27,6 @@ import { ProfilePage } from './components/ProfilePage';
 import { CommunityView } from './components/CommunityView';
 import { INITIAL_TRACKS, INITIAL_PORTFOLIO_VERIFICATION } from './data/courses';
 import { Step, Track, UserAccount, PortfolioVerification } from './types';
-import { Play, Sparkles, CheckCheck, ShieldCheck, Check } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { fetchUserProgress, setStepProgress, fetchUserPurchases } from './lib/db';
 import { trackPageView } from './lib/analytics';
@@ -42,7 +41,8 @@ function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' |
   if (pathname === '/verified') return { view: 'verified-work', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/payment/callback') return { view: 'payment-callback', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/profile') return { view: 'profile', activeNav: '', trackId: null, stepId: null };
-  if (pathname === '/community') return { view: 'app', activeNav: 'community', trackId: null, stepId: null };
+  // '/community' is shelved for later - route intentionally not wired up, falls through to
+  // landing. CommunityView.tsx and its render branch below are left in place, unreachable.
   if (pathname === '/systems') return { view: 'app', activeNav: 'catalog', trackId: null, stepId: null };
 
   const lessonMatch = pathname.match(/^\/systems\/([^/]+)\/learn\/([^/]+)\/?$/);
@@ -583,7 +583,6 @@ export default function App() {
                 <div className="lg:col-span-2 flex flex-col gap-6">
                   <CurriculumRoadmap
                     steps={activeTrack.steps}
-                    selectedStepId={null}
                     onSelectStep={openLesson}
                     onToggleCompleteStep={handleToggleCompleteStep}
                     isUnlocked={isTrackUnlocked(activeTrack.id)}

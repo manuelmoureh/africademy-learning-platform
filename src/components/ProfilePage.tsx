@@ -82,6 +82,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [location, setLocation] = useState(user.location);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [avatarError, setAvatarError] = useState('');
   const [submissions, setSubmissions] = useState<PortfolioSubmissionRow[]>([]);
 
   useEffect(() => {
@@ -99,12 +101,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const handleSave = async () => {
     if (!userId || !isDirty) return;
     setSaving(true);
+    setSaveError('');
     const { error } = await updateProfile(userId, { name: name.trim(), location });
     setSaving(false);
     if (!error) {
       onProfileUpdated({ name: name.trim(), location });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+    } else {
+      setSaveError("Couldn't save your changes. Check your connection and try again.");
     }
   };
 
@@ -114,9 +119,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     const file = e.target.files?.[0];
     if (!file || !userId) return;
     setUploading(true);
+    setAvatarError('');
     const url = await uploadAvatar(userId, file);
     setUploading(false);
-    if (url) onProfileUpdated({ avatarUrl: url });
+    if (url) {
+      onProfileUpdated({ avatarUrl: url });
+    } else {
+      setAvatarError("Couldn't upload that photo. Try a smaller image or a different file.");
+    }
     e.target.value = '';
   };
 
@@ -238,6 +248,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   </span>
                 )}
               </div>
+              {saveError && (
+                <p className="text-xs font-bold text-red-600 flex items-center gap-1">
+                  <XCircle className="w-3.5 h-3.5" /> {saveError}
+                </p>
+              )}
+              {avatarError && (
+                <p className="text-xs font-bold text-red-600 flex items-center gap-1">
+                  <XCircle className="w-3.5 h-3.5" /> {avatarError}
+                </p>
+              )}
             </div>
           </div>
 

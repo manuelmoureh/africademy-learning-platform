@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { randomUUID } from 'crypto';
 import { INITIAL_TRACKS } from '../../src/data/courses.js';
-import { COUPONS } from '../../src/data/coupons.js';
+import { getActiveCoupon } from '../../src/data/coupons.js';
 import { getSupabaseAdmin } from '../_lib/supabaseAdmin.js';
 
 // Starts a real Paystack transaction for a one-time track unlock. The price is looked up
@@ -40,7 +40,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const normalizedCoupon = typeof couponCode === 'string' ? couponCode.trim().toUpperCase() : '';
-  const discount = COUPONS[normalizedCoupon] || 0;
+  const activeCoupon = getActiveCoupon(normalizedCoupon);
+  const discount = activeCoupon?.discount || 0;
   const chargeAmount = discount > 0 ? Math.round(track.price * (1 - discount)) : track.price;
 
   const reference = `af_${trackId}_${Date.now()}_${randomUUID().slice(0, 8)}`;
