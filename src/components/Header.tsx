@@ -173,13 +173,17 @@ export const Header: React.FC<HeaderProps> = ({
                   </p>
                 </div>
                 <div
-                  className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs transition-all ${
+                  className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-xs transition-all overflow-hidden ${
                     user.plan === 'pro'
                       ? 'bg-[#12102A] text-[#F5A623] ring-2 ring-[#F5A623]/30'
                       : 'bg-[#12102A]/10 text-[#12102A]'
                   }`}
                 >
-                  {user.initials}
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    user.initials
+                  )}
                 </div>
               </button>
             </>

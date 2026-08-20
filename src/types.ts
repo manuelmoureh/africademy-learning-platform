@@ -136,6 +136,7 @@ export interface UserAccount {
   initials: string;
   plan: 'free' | 'pro';
   location: string;
+  avatarUrl?: string | null;
 }
 
 export interface RubricCriterion {

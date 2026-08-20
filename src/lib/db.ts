@@ -124,3 +124,56 @@ export async function fetchUserTrackRating(userId: string, trackId: string): Pro
   }
   return data?.rating ?? null;
 }
+
+export async function updateProfile(
+  userId: string,
+  updates: { name?: string; location?: string }
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
+  return { error: error ? error.message : null };
+}
+
+// Uploads to the public 'avatars' Storage bucket at avatars/<userId>/avatar.<ext> (RLS in
+// supabase/add_profile_avatar.sql only allows a user to write inside their own uid folder),
+// then caches the resulting public URL on profiles.avatar_url so other pages don't need a
+// Storage round-trip just to render it. upsert:true means re-uploading just replaces the file.
+export async function uploadAvatar(userId: string, file: File): Promise<string | null> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${userId}/avatar.${ext}`;
+
+  const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+  if (uploadError) {
+    console.error('uploadAvatar failed', uploadError);
+    return null;
+  }
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  const publicUrl = `${data.publicUrl}?t=${Date.now()}`; // cache-bust so a re-upload shows immediately
+
+  const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', userId);
+  if (updateError) console.error('uploadAvatar: failed to save avatar_url', updateError);
+
+  return publicUrl;
+}
+
+export interface PortfolioSubmissionRow {
+  id: string;
+  track_id: string;
+  project_url: string;
+  demo_video_url: string | null;
+  status: 'pending' | 'verified' | 'rejected';
+  submitted_at: string;
+}
+
+export async function fetchUserPortfolioSubmissions(userId: string): Promise<PortfolioSubmissionRow[]> {
+  const { data, error } = await supabase
+    .from('portfolio_submissions')
+    .select('id, track_id, project_url, demo_video_url, status, submitted_at')
+    .eq('user_id', userId)
+    .order('submitted_at', { ascending: false });
+  if (error) {
+    console.error('fetchUserPortfolioSubmissions failed', error);
+    return [];
+  }
+  return data ?? [];
+}

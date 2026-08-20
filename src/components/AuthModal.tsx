@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, User, Lock, ArrowRight, Loader2, LogOut } from 'lucide-react';
+import { X, User, Lock, ArrowRight, Loader2, LogOut, UserCircle2 } from 'lucide-react';
 import { UserAccount } from '../types';
 import { supabase } from '../lib/supabase';
 
@@ -11,6 +11,7 @@ interface AuthModalProps {
   onLogin: (user: UserAccount) => void;
   isAuthenticated?: boolean;
   onSignOut?: () => void;
+  onViewProfile?: () => void;
 }
 
 interface ProfileRow {
@@ -18,6 +19,7 @@ interface ProfileRow {
   email: string;
   plan: string;
   location: string | null;
+  avatar_url: string | null;
 }
 
 function buildUserAccount(profile: ProfileRow): UserAccount {
@@ -32,6 +34,7 @@ function buildUserAccount(profile: ProfileRow): UserAccount {
     initials,
     plan: profile.plan === 'pro' ? 'pro' : 'free',
     location: profile.location || 'Nairobi, Kenya',
+    avatarUrl: profile.avatar_url,
   };
 }
 
@@ -42,6 +45,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onLogin,
   isAuthenticated,
   onSignOut,
+  onViewProfile,
 }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
@@ -78,7 +82,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         await supabase.from('profiles').update({ location }).eq('id', data.user.id);
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('name, email, plan, location')
+          .select('name, email, plan, location, avatar_url')
           .eq('id', data.user.id)
           .single();
         if (profileError) throw profileError;
@@ -92,7 +96,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (signInError) throw signInError;
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('name, email, plan, location')
+          .select('name, email, plan, location, avatar_url')
           .eq('id', data.user.id)
           .single();
         if (profileError) throw profileError;
@@ -151,14 +155,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {isAuthenticated ? (
           <div className="p-6 space-y-4">
             <div className="p-4 rounded-xl bg-[#F0EEF6] border border-[#12102A]/10 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#12102A] text-[#F5A623] flex items-center justify-center font-black text-xs shrink-0">
-                {currentUser.initials}
+              <div className="w-9 h-9 rounded-full bg-[#12102A] text-[#F5A623] flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                {currentUser.avatarUrl ? (
+                  <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-full h-full object-cover" />
+                ) : (
+                  currentUser.initials
+                )}
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-[#12102A] truncate">{currentUser.name}</p>
                 <p className="text-xs text-[#12102A]/60 truncate">{currentUser.email}</p>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => { onViewProfile?.(); onClose(); }}
+              className="w-full py-3 bg-[#12102A] hover:bg-[#1c1940] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+            >
+              <UserCircle2 className="w-3.5 h-3.5" />
+              View Profile
+            </button>
             <button
               type="button"
               onClick={() => { onSignOut?.(); onClose(); }}

@@ -24,6 +24,7 @@ import { VerifiedWorkPage } from './components/VerifiedWorkPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/TermsOfServicePage';
 import { PaymentCallbackPage } from './components/PaymentCallbackPage';
+import { ProfilePage } from './components/ProfilePage';
 import { CommunityView } from './components/CommunityView';
 import { INITIAL_TRACKS, INITIAL_PORTFOLIO_VERIFICATION } from './data/courses';
 import { Step, Track, UserAccount, PortfolioVerification } from './types';
@@ -35,12 +36,13 @@ import { trackPageView } from './lib/analytics';
 // Maps the URL to what used to be `viewMode`/`activeNav` state, so every page the app
 // can show has a real, bookmarkable, back-button-friendly URL instead of living entirely
 // in memory.
-function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'lesson' | 'payment-callback' | 'app'; activeNav: string; trackId: string | null; stepId: string | null } {
+function parseRoute(pathname: string): { view: 'landing' | 'about' | 'privacy' | 'terms' | 'verified-work' | 'lesson' | 'payment-callback' | 'profile' | 'app'; activeNav: string; trackId: string | null; stepId: string | null } {
   if (pathname === '/about') return { view: 'about', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/privacy') return { view: 'privacy', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/terms') return { view: 'terms', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/verified') return { view: 'verified-work', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/payment/callback') return { view: 'payment-callback', activeNav: '', trackId: null, stepId: null };
+  if (pathname === '/profile') return { view: 'profile', activeNav: '', trackId: null, stepId: null };
   if (pathname === '/community') return { view: 'app', activeNav: 'community', trackId: null, stepId: null };
   if (pathname === '/systems') return { view: 'app', activeNav: 'catalog', trackId: null, stepId: null };
 
@@ -123,7 +125,7 @@ export default function App() {
     async function loadProfileAndProgress(userId: string) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('name, email, plan, location')
+        .select('name, email, plan, location, avatar_url')
         .eq('id', userId)
         .single();
       if (!active) return;
@@ -139,6 +141,7 @@ export default function App() {
           initials,
           plan: profile.plan === 'pro' ? 'pro' : 'free',
           location: profile.location || 'Nairobi, Kenya',
+          avatarUrl: profile.avatar_url,
         });
       }
       const progressRows = await fetchUserProgress(userId);
@@ -176,6 +179,13 @@ export default function App() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+  };
+
+  // ProfilePage writes to Supabase itself (updateProfile/uploadAvatar); this just syncs the
+  // already-saved fields into local state so the rest of the app (Header avatar, etc.)
+  // reflects the change without a full profile refetch.
+  const handleProfileUpdated = (updates: Partial<UserAccount>) => {
+    setUser((prev) => ({ ...prev, ...updates }));
   };
 
   // Portfolio Verification State
@@ -327,6 +337,7 @@ export default function App() {
           currentUser={user}
           isAuthenticated={!!authUserId}
           onSignOut={handleSignOut}
+          onViewProfile={() => navigate('/profile')}
           onLogin={(updatedUser) => {
             setUser(updatedUser);
             setPortfolioData(prev => ({
@@ -402,6 +413,32 @@ export default function App() {
     );
   }
 
+  if (viewMode === 'profile') {
+    return (
+      <ProfilePage
+        tracks={tracks}
+        user={user}
+        userId={authUserId}
+        isAuthenticated={!!authUserId}
+        authLoading={authLoading}
+        purchasedTrackIds={purchasedTrackIds}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={() => navigate('/systems')}
+        onGoHome={() => navigate('/')}
+        onEnterApp={() => navigate('/systems')}
+        onSelectCourse={(id) => navigate(`/systems/${id}`)}
+        onContinueTrack={(id) => navigate(`/systems/${id}/learn`)}
+        onOpenVerifiedWork={() => navigate('/verified')}
+        onOpenAbout={() => navigate('/about')}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onSignOut={handleSignOut}
+        onViewProfile={() => navigate('/profile')}
+        onProfileUpdated={handleProfileUpdated}
+      />
+    );
+  }
+
   // If on Landing Page view
   if (viewMode === 'landing') {
     return (
@@ -445,6 +482,7 @@ export default function App() {
           currentUser={user}
           isAuthenticated={!!authUserId}
           onSignOut={handleSignOut}
+          onViewProfile={() => navigate('/profile')}
           onLogin={(updatedUser) => {
             setUser(updatedUser);
             setPortfolioData(prev => ({
@@ -624,6 +662,7 @@ export default function App() {
         currentUser={user}
         isAuthenticated={!!authUserId}
         onSignOut={handleSignOut}
+        onViewProfile={() => navigate('/profile')}
         onLogin={(updatedUser) => {
           setUser(updatedUser);
           setPortfolioData(prev => ({
