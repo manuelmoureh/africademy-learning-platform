@@ -423,6 +423,7 @@ export default function App() {
             setSearchQuery(query);
             navigate('/systems');
           }}
+          onSelectCourse={(id) => navigate(`/systems/${id}`)}
           tracks={tracks}
         />
 
@@ -511,10 +512,11 @@ export default function App() {
 
       {/* Main Learning Hub Layout */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* Left Navigation Sidebar: hidden on the Systems catalog page, it's built around an
-            already-selected track (progress, hardcoded track-specific specs) which doesn't
-            apply while someone is still browsing */}
-        {activeNav !== 'catalog' && (
+        {/* Left Navigation Sidebar: hidden on the Systems catalog and single-course detail
+            pages, it's built around an already-selected track (progress, hardcoded
+            track-specific specs) which doesn't apply while someone is still browsing -
+            course-detail already has its own self-contained price/CTA panel */}
+        {activeNav !== 'catalog' && activeNav !== 'course-detail' && (
           <Sidebar
             track={activeTrack}
             onBrowseAll={() => navigate('/systems')}

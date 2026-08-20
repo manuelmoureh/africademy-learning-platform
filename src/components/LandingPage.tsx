@@ -174,6 +174,7 @@ interface LandingPageProps {
   onOpenPrivacy: () => void;
   onOpenTerms: () => void;
   onSearch: (query: string) => void;
+  onSelectCourse: (trackId: string) => void;
   tracks: Track[];
 }
 
@@ -185,6 +186,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenPrivacy,
   onOpenTerms,
   onSearch,
+  onSelectCourse,
   tracks,
 }) => {
   const reduce = useReducedMotion();
@@ -533,7 +535,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 viewport={{ once: true, amount: 0.3 }}
                 variants={fadeUp}
                 transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className="rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col overflow-hidden hover:border-[#F5A623] transition-all group"
+                onClick={() => onSelectCourse(track.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectCourse(track.id);
+                  }
+                }}
+                className="rounded-2xl border border-[#12102A]/10 bg-[#F0EEF6] flex flex-col overflow-hidden hover:border-[#F5A623] transition-all group cursor-pointer"
               >
                 <div className="h-28 bg-[#12102A] flex items-center justify-center p-3">
                   <SystemThumbnail trackId={track.id} />
@@ -574,7 +585,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       </span>
                     </div>
                     <button
-                      onClick={onEnterApp}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectCourse(track.id);
+                      }}
                       className="text-xs font-bold text-[#12102A] hover:text-[#F5A623] flex items-center gap-1 cursor-pointer transition-colors"
                     >
                       View System <ArrowRight className="w-3.5 h-3.5" />
